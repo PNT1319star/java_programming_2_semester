@@ -1,0 +1,3 @@
+show
+execute_script D:\Admin\IdeaProjects\CollectionManager\output\data\script.txt
+exit
