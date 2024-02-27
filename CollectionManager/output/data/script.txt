@@ -1,3 +1,13 @@
+add
+itmo
+2
+3
+itmolife
+russia
+3000
+9000
+public
 show
 execute_script D:\Admin\IdeaProjects\CollectionManager\output\data\script.txt
+save
 exit

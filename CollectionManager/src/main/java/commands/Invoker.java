@@ -9,7 +9,6 @@ import java.util.Stack;
  * It contains a map of commands and their corresponding names.
  */
 public class Invoker {
-    private final static Stack<String> commandHistory = new Stack<>();
     private final static HashMap<String, AbstractCommand> commands = new HashMap<>();
 
     /**

@@ -27,7 +27,7 @@ public class InfoCommand extends AbstractCommand {
      */
     @Override
     public void execute(String[] arg) throws WrongAmountOfElementsException {
-        if (arg.length != 0) throw new WrongAmountOfElementsException();
+        if (arg.length == 0) throw new WrongAmountOfElementsException();
         receiver.info();
     }
 

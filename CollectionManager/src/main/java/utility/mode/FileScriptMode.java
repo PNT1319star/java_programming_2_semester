@@ -21,6 +21,11 @@ public class FileScriptMode {
     private static Console console = new Console(receiver);
     private static Scanner userScanner;
     private static OrganizationBuilder organizationBuilder;
+    /**
+     * Executes the commands from the specified script file.
+     *
+     * @param argument The path to the script file.
+     */
     public static void scriptMode(String argument) {
         count += 1;
         console.invokerStarter();
@@ -103,6 +108,12 @@ public class FileScriptMode {
             System.err.println("Unexpected error!");
         }
     }
+
+    /**
+     * Retrieves the scanner used for reading input from the script file.
+     *
+     * @return The scanner used for reading input from the script file.
+     */
     public static Scanner getScanner() {
         return userScanner;
     }

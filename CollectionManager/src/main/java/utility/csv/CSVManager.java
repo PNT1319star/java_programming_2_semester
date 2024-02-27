@@ -1,25 +1,38 @@
 package utility.csv;
 
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-import org.apache.commons.csv.CSVRecord;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVWriter;
+import com.opencsv.CSVWriterBuilder;
+import com.opencsv.exceptions.CsvValidationException;
 
-import java.io.*;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The CSVManager class implements the FileManager interface and provides methods for reading from and writing to CSV files.
+ */
 public class CSVManager implements FileManager {
+    private static boolean flag = false;
+
+    /**
+     * Reads the contents of a CSV file and returns them as a list of lines.
+     *
+     * @param pathToFile The path to the CSV file.
+     * @return A list of lines read from the CSV file.
+     */
     @Override
     public ArrayList<String> readFromFile(String pathToFile) {
         ArrayList<String> lineList = new ArrayList<>();
 
-        try (FileReader fileReader = new FileReader(pathToFile);
-             CSVParser csvParser = new CSVParser(fileReader,CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreSurroundingSpaces())) {
-
-            for (CSVRecord record : csvParser) {
+        try (CSVReader reader = new CSVReader(new FileReader(pathToFile))) {
+            String[] nextLine;
+            while ((nextLine = reader.readNext()) != null) {
+                flag = true;
                 StringBuilder stringBuilder = new StringBuilder();
-                for(String element : record) {
+                for (String element : nextLine) {
                     if (stringBuilder.length() > 0) {
                         stringBuilder.append(",");
                     }
@@ -27,27 +40,45 @@ public class CSVManager implements FileManager {
                 }
                 lineList.add(stringBuilder.toString());
             }
-        } catch (IOException | IllegalArgumentException exception) {
+        } catch (IOException | CsvValidationException exception) {
             throw new IllegalArgumentException("CSV format violation: " + exception.getMessage());
         }
 
         return lineList;
     }
 
+    /**
+     * Writes the specified header and records to a CSV file.
+     *
+     * @param pathToFile The path to the CSV file.
+     * @param header     The header line to be written to the CSV file.
+     * @param records    The list of records to be written to the CSV file.
+     * @throws IllegalArgumentException If there is an error writing the CSV file.
+     */
     @Override
-    public void writeToFile(String pathToFile, String[] header, List<String> records) throws IOException {
-        try {
-            PrintWriter fileWriter = new PrintWriter(new FileWriter(pathToFile));
-            CSVPrinter csvPrinter = new CSVPrinter(fileWriter,CSVFormat.DEFAULT.withHeader("id", "name", "x", "y", "annual turnover",
-                    "full name","employees count", "type", "postal address"));
-            for (String record : records) {
-                csvPrinter.printRecord(record.split(","));
-            }
+    public void writeToFile(String pathToFile, String[] header, List<String> records) {
+        try (CSVWriter csvWriter = (CSVWriter) new CSVWriterBuilder(new FileWriter(pathToFile))
+                .withSeparator(',')
+                .withQuoteChar(CSVWriter.NO_QUOTE_CHARACTER)
+                .build()) {
 
-            csvPrinter.flush();
-            csvPrinter.close();
+            csvWriter.writeNext(header);
+
+            for (String record : records) {
+                String[] fields = record.split(",");
+                csvWriter.writeNext(fields);
+            }
         } catch (IOException exception) {
-            System.out.println(exception.getMessage());
+            throw new IllegalArgumentException("Error writing CSV file: " + exception.getMessage());
         }
+    }
+
+    /**
+     * Retrieves the flag indicating whether the CSV file was successfully read.
+     *
+     * @return The flag indicating whether the CSV file was successfully read.
+     */
+    public static boolean getFlag() {
+        return flag;
     }
 }

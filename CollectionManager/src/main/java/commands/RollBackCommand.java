@@ -2,6 +2,8 @@ package commands;
 
 import exceptions.WrongAmountOfElementsException;
 
+import java.util.Scanner;
+
 public class RollBackCommand extends AbstractCommand {
     private final Receiver receiver;
     public RollBackCommand (Receiver receiver) {
@@ -12,7 +14,7 @@ public class RollBackCommand extends AbstractCommand {
     @Override
     public void execute(String[] arg) throws WrongAmountOfElementsException {
         if (arg.length != 2) throw new WrongAmountOfElementsException();
-        receiver.e
+        receiver.rollBack(arg[1]);
     }
 
     @Override

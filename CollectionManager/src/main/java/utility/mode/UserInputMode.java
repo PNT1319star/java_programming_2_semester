@@ -3,16 +3,19 @@ package utility.mode;
 import commands.Invoker;
 import commands.Receiver;
 import utility.Console;
-import utility.creator.OrganizationBuilder;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
+/**
+ * The UserInputMode class represents the interactive mode for receiving user input and executing commands.
+ */
 public class UserInputMode {
     private static Console console = new Console(new Receiver(new Invoker()));
     private static Scanner userScanner;
+
+    /**
+     * Executes the interactive mode for receiving user input and executing commands.
+     */
     public static void interactiveMode() {
         int commandStatus;
         console.invokerStarter();
@@ -28,6 +31,11 @@ public class UserInputMode {
         }
     }
 
+    /**
+     * Retrieves the scanner used for reading user input in the interactive mode.
+     *
+     * @return The scanner used for reading user input.
+     */
     public static Scanner getScanner() {
         return userScanner;
     }

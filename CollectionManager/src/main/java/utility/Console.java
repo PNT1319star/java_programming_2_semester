@@ -1,6 +1,10 @@
 package utility;
 
 import commands.*;
+import utility.csv.CSVManager;
+import utility.csv.CSVProcess;
+
+import java.util.Scanner;
 
 /**
  * The {@code Console} class represents a utility for managing commands and interacting with the program via the command line.
@@ -23,7 +27,21 @@ public class Console {
      * Registers all available commands with the invoker.
      */
     public void invokerStarter() {
-        CollectionManager.initializationCollection();
+        CollectionManager.getCollectionFromFile(CSVProcess.getPathToFile());
+        if (CSVManager.getFlag()) {
+            System.out.println("Do you want to use the existing data in this file? (yes/no)");
+            Scanner scanner = new Scanner(System.in);
+            String answer = scanner.nextLine().trim().toLowerCase();
+                switch (answer) {
+                    case "yes" :
+                        System.out.println("The data from file has been loaded!");
+                        break;
+                    case "no" :
+                        CollectionManager.initializationCollection();
+                        System.out.println("A new collection has been created!");
+                        break;
+            }
+        } else {CollectionManager.initializationCollection();}
         Invoker.register("help", new HelpCommand(receiver));
         Invoker.register("info", new InfoCommand(receiver));
         Invoker.register("show", new ShowCommand(receiver));
@@ -40,5 +58,6 @@ public class Console {
         Invoker.register("min_by_creation_date", new MinByCreationDateCommand(receiver));
         Invoker.register("filter_starts_with_full_name", new FilterStartsWFullNameCommand(receiver));
         Invoker.register("print_unique_postal_address", new PrintUniqPostalAddCommand(receiver));
+        Invoker.register("roll_back", new RollBackCommand(receiver));
     }
 }

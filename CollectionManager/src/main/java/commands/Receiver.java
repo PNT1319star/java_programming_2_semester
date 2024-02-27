@@ -1,12 +1,12 @@
 package commands;
 
+import data.Organization;
 import exceptions.EmptyCollectionException;
 import utility.CollectionManager;
-import utility.Console;
-import utility.creator.OrganizationBuilder;
 import utility.creator.OrganizationCreator;
 import utility.mode.FileScriptMode;
 
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -48,7 +48,9 @@ public class Receiver {
      * Execute the add command
      */
     public void add(Scanner scanner) {
-        CollectionManager.addOrganization(OrganizationCreator.organizationCreator(scanner));
+        Organization organization = OrganizationCreator.organizationCreator(scanner);
+        CollectionManager.getCommandOrders().put("remove",organization);
+        CollectionManager.addOrganization(organization);
         System.out.println("The 'add' command has been executed successfully");
     }
 
@@ -56,7 +58,9 @@ public class Receiver {
      * Execute the add_if_max command
      */
     public void addIfMax(Scanner scanner) {
-        CollectionManager.addIfMax(OrganizationCreator.organizationCreator(scanner));
+        Organization organization = OrganizationCreator.organizationCreator(scanner);
+        CollectionManager.addIfMax(organization);
+        if (CollectionManager.getAddIfMaxFlag()) CollectionManager.getCommandOrders().put("remove",organization);
         System.out.println("The 'add_if_max' command has been executed successfully");
     }
 
@@ -69,7 +73,11 @@ public class Receiver {
             if (CollectionManager.getCollection().size() == 0) throw new EmptyCollectionException();
             ID = Integer.parseInt(sID);
             if (CollectionManager.idExistence(ID)) {
-                CollectionManager.updateElement(OrganizationCreator.organizationCreator(scanner), ID);
+                Organization oldOrganization = CollectionManager.getOrganizationByID(ID);
+                Organization newOrganization = OrganizationCreator.organizationCreator(scanner);
+                CollectionManager.getCommandOrders().put("remove",newOrganization);
+                CollectionManager.getCommandOrders().put("add",oldOrganization);
+                CollectionManager.updateElement(newOrganization, ID);
                 System.out.println("The 'update' command has been executed successfully");
                 System.out.println("Organization is updated!");
             } else {
@@ -90,6 +98,8 @@ public class Receiver {
         try {
             ID = Integer.parseInt(sID);
             if (CollectionManager.idExistence(ID)) {
+                Organization organization = CollectionManager.getOrganizationByID(ID);
+                CollectionManager.getCommandOrders().put("add",organization);
                 CollectionManager.removeElement(ID);
                 System.out.println("The 'remove_by_id' command has been executed successfully");
                 System.out.println("The organization with this ID has been deleted!");
@@ -105,6 +115,11 @@ public class Receiver {
      * Execute the clear command
      */
     public void clear() {
+        List<Organization> clearList = CollectionManager.getClearList();
+        Organization[] clearArray = clearList.toArray(new Organization[clearList.size()]);
+        for (int i = clearList.size(); i > 0; i--) {
+            CollectionManager.getCommandOrders().put("add", clearArray[i]);
+        }
         CollectionManager.clearCollection();
         System.out.println("The 'clear' command has been executed successfully");
         System.out.println("The collection is cleared!");
@@ -144,14 +159,20 @@ public class Receiver {
         System.out.println("The collection has been saved in the file!");
         CollectionManager.saveCollectionToFile();
     }
-
-
     /**
      * Execute the remove_lower command
      */
     public void removeLower(Scanner scanner) {
-        CollectionManager.removeLowerElement(OrganizationCreator.organizationCreator(scanner));
-        System.out.println("The 'head' command has been executed successfully");
+        Organization organization = OrganizationCreator.organizationCreator(scanner);
+        CollectionManager.removeLowerElement(organization);
+        List<Organization> removeLowerArrayList = CollectionManager.getRemoveLowerList();
+        Organization[] removeLowerArray = removeLowerArrayList.toArray(new Organization[removeLowerArrayList.size()]);
+        if (CollectionManager.getRemoveLowerFlag()) {
+            for (int i = CollectionManager.getRemoveLowerList().size(); i > 0; i--) {
+                CollectionManager.getCommandOrders().put("add",removeLowerArray[i]);
+            }
+        }
+        System.out.println("The 'remove_lower' command has been executed successfully");
     }
 
     /**
@@ -174,11 +195,17 @@ public class Receiver {
      * Execute the print_unique_postal_address command
      */
     public void printUniquePostalAddress() {
-        System.out.println("The 'print_unique_postal_address' command has been executed successfully");
         CollectionManager.printUniquePostalAddress();
+        System.out.println("The 'print_unique_postal_address' command has been executed successfully");
     }
 
-    public void rollBack(Scanner scanner) {
-
+    public void rollBack(String strSteps) {
+        try {
+            int steps = Integer.parseInt(strSteps);
+            CollectionManager.rollBack(steps);
+            System.out.println("The 'roll_back' command has been executed successfully");
+        } catch (EmptyCollectionException exception) {
+            System.err.println("Can not roll back! You have not used any command that affects the collection!");
+        }
     }
 }
