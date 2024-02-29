@@ -2,8 +2,8 @@ package utility.csv;
 
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
-import com.opencsv.CSVWriterBuilder;
 import com.opencsv.exceptions.CsvValidationException;
+
 
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -26,22 +26,23 @@ public class CSVManager implements FileManager {
     @Override
     public ArrayList<String> readFromFile(String pathToFile) {
         ArrayList<String> lineList = new ArrayList<>();
-
         try (CSVReader reader = new CSVReader(new FileReader(pathToFile))) {
             String[] nextLine;
             while ((nextLine = reader.readNext()) != null) {
                 flag = true;
                 StringBuilder stringBuilder = new StringBuilder();
                 for (String element : nextLine) {
-                    if (stringBuilder.length() > 0) {
+                    if (!stringBuilder.isEmpty()) {
                         stringBuilder.append(",");
                     }
                     stringBuilder.append(element.trim());
                 }
                 lineList.add(stringBuilder.toString());
             }
-        } catch (IOException | CsvValidationException exception) {
+        } catch (IOException exception) {
             throw new IllegalArgumentException("CSV format violation: " + exception.getMessage());
+        } catch (CsvValidationException e) {
+            throw new RuntimeException(e);
         }
 
         return lineList;
@@ -57,13 +58,8 @@ public class CSVManager implements FileManager {
      */
     @Override
     public void writeToFile(String pathToFile, String[] header, List<String> records) {
-        try (CSVWriter csvWriter = (CSVWriter) new CSVWriterBuilder(new FileWriter(pathToFile))
-                .withSeparator(',')
-                .withQuoteChar(CSVWriter.NO_QUOTE_CHARACTER)
-                .build()) {
-
+        try (CSVWriter csvWriter = new CSVWriter(new FileWriter(pathToFile))) {
             csvWriter.writeNext(header);
-
             for (String record : records) {
                 String[] fields = record.split(",");
                 csvWriter.writeNext(fields);

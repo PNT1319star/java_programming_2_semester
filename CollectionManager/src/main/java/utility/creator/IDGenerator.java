@@ -1,6 +1,6 @@
 package utility.creator;
 
-import java.util.HashSet; //Sử dụng HashSet để đảm bảo là mỗi phần tử là duy nhất
+import java.util.HashSet;
 import java.util.Random;
 
 /**
@@ -8,12 +8,16 @@ import java.util.Random;
  */
 public class IDGenerator {
     private static HashSet<Integer> IDs = new HashSet<>();
-    public static  int generateID() {
-        Integer id = new Random().nextInt(Integer.MAX_VALUE) + 1;
-        if(IDs.contains(id)) {
-            while(IDs.contains(id)){
-                id = new Random().nextInt(Integer.MAX_VALUE) + 1;
-            }
+
+    /**
+     * Generates a unique ID.
+     *
+     * @return the generated unique ID.
+     */
+    public static int generateID() {
+        int id = new Random().nextInt(30000) + 1;
+        while (IDs.contains(id)) {
+            id = new Random().nextInt(30000) + 1;
         }
         IDs.add(id);
         return id;

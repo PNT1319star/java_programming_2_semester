@@ -21,24 +21,56 @@ public class OrganizationBuilder {
     private Scanner userScanner;
     private boolean fileMode;
 
+    /**
+     * Creates a new instance of the OrganizationBuilder class.
+     *
+     * @param scanner the Scanner object used to read user input.
+     */
     public OrganizationBuilder(Scanner scanner) {
         this.userScanner = scanner;
     }
 
+    /**
+     * Sets the Scanner object used to read user input.
+     *
+     * @param scanner the Scanner object to set.
+     */
     public void setUserScanner(Scanner scanner) {
         this.userScanner = scanner;
     }
 
+    /**
+     * Gets the Scanner object used to read user input.
+     *
+     * @return the Scanner object.
+     */
     public Scanner getUserScanner() {
         return userScanner;
     }
 
+    /**
+     * Sets the file mode.
+     * This mode is used when reading input from a file.
+     */
     public void setFileMode() {
         this.fileMode = true;
     }
+
+    /**
+     * Sets the user mode.
+     * This mode is used when reading input from the user.
+     */
     public void setUserMode() {
         this.fileMode = false;
     }
+
+    /**
+     * Asks the user for the organization's name.
+     *
+     * @return the organization's name.
+     * @throws WrongInputInScriptException if an error occurs while reading input in script mode.
+     */
+
     public String nameAsker() throws WrongInputInScriptException {
         String name;
         while (true) {
@@ -62,6 +94,12 @@ public class OrganizationBuilder {
         return name;
     }
 
+    /**
+     * Asks the user for the x coordinate.
+     *
+     * @return the x coordinate.
+     * @throws WrongInputInScriptException if an error occurs while reading input in script mode.
+     */
     public Long xAsker() throws WrongInputInScriptException {
         String strX;
         long x;
@@ -91,6 +129,12 @@ public class OrganizationBuilder {
         return x;
     }
 
+    /**
+     * Asks the user for the y coordinate.
+     *
+     * @return the y coordinate.
+     * @throws WrongInputInScriptException if an error occurs while reading input in script mode.
+     */
     public long yAsker() throws WrongInputInScriptException {
         String strY;
         long y;
@@ -115,6 +159,13 @@ public class OrganizationBuilder {
         }
         return y;
     }
+
+    /**
+     * Asks the user for the organization's full name.
+     *
+     * @return the organization's full name.
+     * @throws WrongInputInScriptException if an error occurs while reading input in script mode.
+     */
     public String fullNameAsker() throws WrongInputInScriptException {
         final int MAX_LENGTH = 2048;
         String fullName;
@@ -142,6 +193,12 @@ public class OrganizationBuilder {
         return fullName;
     }
 
+    /**
+     * Asks the user for the organization's address.
+     *
+     * @return the organization's address.
+     * @throws WrongInputInScriptException if an error occurs while reading input in script mode.
+     */
     public String addressAsker() throws WrongInputInScriptException {
         String address = null;
         try {
@@ -162,6 +219,12 @@ public class OrganizationBuilder {
         return address;
     }
 
+    /**
+     * Asks the user for the number of employees of the organization.
+     *
+     * @return the number of employees.
+     * @throws WrongInputInScriptException if an error occurs while reading input in script mode.
+     */
     public Integer employeesCountAsker() throws WrongInputInScriptException {
         String strCount;
         int employeesCount;
@@ -191,6 +254,12 @@ public class OrganizationBuilder {
         return employeesCount;
     }
 
+    /**
+     * Asks the user for the annual turnover of the organization.
+     *
+     * @return the annual turnover.
+     * @throws WrongInputInScriptException if an error occurs while reading input in script mode.
+     */
     public Float annualTurnoverAsker() throws WrongInputInScriptException {
         String strAnnualTurnover;
         float annualTurnover;
@@ -220,6 +289,12 @@ public class OrganizationBuilder {
         return annualTurnover;
     }
 
+    /**
+     * Asks the user for the organization type.
+     *
+     * @return the organization type.
+     * @throws WrongInputInScriptException if an error occurs while reading input in script mode.
+     */
     public OrganizationType organizationTypeAsker() throws WrongInputInScriptException {
         String strOrgType;
         OrganizationType organizationType;

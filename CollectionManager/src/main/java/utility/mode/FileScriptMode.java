@@ -28,7 +28,7 @@ public class FileScriptMode {
      */
     public static void scriptMode(String argument) {
         count += 1;
-        console.invokerStarter();
+        console.commandStarter();
         String[] userCommand = {"",""};
         int commandStatus = 0;
         scriptStack.add(argument);

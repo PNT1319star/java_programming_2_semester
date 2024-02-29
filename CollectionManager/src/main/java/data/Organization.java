@@ -8,7 +8,7 @@ import java.util.Objects;
  * It includes details such as ID, name, coordinates, creation date, annual turnover,
  * full name, employees count, type, and postal address.
  */
-public class Organization  implements  Comparable<Organization> {
+public class Organization  implements  Comparable<Organization>,Cloneable {
     private Integer id;
     private String name;
     private Coordinates coordinates;
@@ -141,6 +141,16 @@ public class Organization  implements  Comparable<Organization> {
                 Objects.equals(employeesCount, otherOrganization.employeesCount) &&
                 Objects.equals(type, otherOrganization.type) &&
                 Objects.equals(postalAddress, otherOrganization.postalAddress);
+    }
+
+    @Override
+    public Organization clone() {
+        try {
+            Organization cloned = (Organization) super.clone();
+            return cloned;
+        } catch (CloneNotSupportedException exception) {
+            return null;
+        }
     }
 }
 

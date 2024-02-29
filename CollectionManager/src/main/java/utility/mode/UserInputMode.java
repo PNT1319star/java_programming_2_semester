@@ -22,7 +22,7 @@ public class UserInputMode {
         try {
             userScanner = new Scanner(System.in);
             do{
-                commandStatus = Invoker.executeCommand(userScanner.nextLine().trim().split(" "));
+                commandStatus = Invoker.executeCommand(userScanner.nextLine().trim().toLowerCase().split(" "));
             } while (userScanner.hasNextLine() && commandStatus !=2 );
         } catch (NoSuchElementException exception) {
             System.err.println("No user input detected!");

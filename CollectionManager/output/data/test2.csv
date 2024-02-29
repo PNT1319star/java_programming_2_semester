@@ -1,4 +1,5 @@
-id,name,x,y,annual turnover,full name,employees count,type,postal address
-948194534,itmo,2,3,9000.0,itmolife,3000,PUBLIC,russia
-1625482328,itmo,2,3,9000.0,itmolife,3000,PUBLIC,russia
-1486962645,itmo,2,3,9000.0,itmolife,3000,PUBLIC,russia
+"id","name","x","y","annual turnover","full name","employees count","type","postal address"
+"15817","leti","4","5","6000.0","leti university","5000","GOVERNMENT","saint peterburg"
+"13986","itmo","300","4000","6000.0","itmo university","5000","GOVERNMENT","saint peterburg"
+"13554","bauman","5000","6000","6000.0","bauman universit","5000","TRUST","moscow"
+"8628","123123","123","1231","312.0","312","312","PUBLIC","31"

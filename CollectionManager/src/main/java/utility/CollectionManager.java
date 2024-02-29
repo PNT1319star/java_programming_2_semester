@@ -10,12 +10,10 @@ import exceptions.EmptyCollectionException;
 
 public class CollectionManager {
     private static boolean addIfMaxFlag;
-    private static boolean removeLowerFlag;
+    public static Stack<String> historyCommandList = new Stack<>() ;
     private static List<Organization> clearList = new ArrayList<>();
     private static List<Organization> removeLowerList = new ArrayList<>();
-    private static Map <String, Organization> commandOrders = new HashMap<>();
-    private static Stack<String> commandStack = new Stack<>();
-    private static Stack<Organization> organizationStack = new Stack<>();
+    public static Stack<Organization> organizationStack = new Stack<>();
 
     private static ArrayDeque<Organization> arrayDeque;
     private static ZonedDateTime initializationDate;
@@ -24,10 +22,8 @@ public class CollectionManager {
      * Initializes the collection if it is null.
      */
     public static void initializationCollection() {
-        if (arrayDeque == null) {
             arrayDeque = new ArrayDeque<>();
             initializationDate = ZonedDateTime.now();
-        }
     }
 
     /**
@@ -47,7 +43,8 @@ public class CollectionManager {
      */
     public static Organization getOrganizationByID (int ID) {
         for(Organization organization : arrayDeque) {
-            if (organization.getId().equals(ID)) {
+            int id = organization.getId().intValue();
+            if (id == ID) {
                 return organization;
             }
         }
@@ -60,9 +57,11 @@ public class CollectionManager {
      * @param ID The ID of the organization.
      * @return true if an organization with the specified ID exists, false otherwise.
      */
-    public static boolean idExistence (int ID) {
+    public static boolean idExistence(int ID) {
         for (Organization organization : arrayDeque) {
-            return organization.getId().equals(ID);
+            if (organization.getId().intValue() == ID) {
+                return true;
+            }
         }
         return false;
     }
@@ -149,7 +148,7 @@ public class CollectionManager {
     public static void clearCollection() {
         for (Organization organization : arrayDeque) {
             clearList.add(organization);
-        }
+        };
         arrayDeque.clear();
     }
 
@@ -242,14 +241,12 @@ public class CollectionManager {
      */
     public static void removeLowerElement(Organization organization) {
         try {
-            removeLowerFlag = false;
             if (arrayDeque.size() == 0) throw new EmptyCollectionException();
 
             for (Organization organization1 : arrayDeque) {
                 if (organization1.compareTo(organization) < 0) {
                     removeLowerList.add(organization1);
                     arrayDeque.remove(organization1);
-                    removeLowerFlag = true;
                 }
             }
         } catch (EmptyCollectionException exception) {
@@ -265,27 +262,39 @@ public class CollectionManager {
      * @throws EmptyCollectionException If the commandOrders map is empty.
      */
     public static void rollBack(int steps) throws EmptyCollectionException{
-        if (commandOrders.isEmpty()) throw new EmptyCollectionException();
-        commandStack.addAll(commandOrders.keySet());
-        Collection<Organization> values = commandOrders.values();
-        for (Organization value : values) {
-            organizationStack.push(value);
-        }
-        for (int i = 0; i < steps; i++) {
-            String command = commandStack.pop();
-            Organization organization = organizationStack.pop();
+        if (historyCommandList.isEmpty()) throw new EmptyCollectionException();
+        for (int i = 0; i < steps; i++){
+            String command = historyCommandList.pop();
             switch (command) {
-                case "add":
-                    CollectionManager.addOrganization(organization);
+                case "add" :
+                    CollectionManager.removeElement(organizationStack.pop().getId());
                     break;
-                case "remove":
-                    CollectionManager.removeElement(organization.getId());
+                case "remove" :
+                    CollectionManager.addOrganization(organizationStack.pop());
                     break;
+                case "remove_lower" :
+                    Organization[] removeLowerArray = removeLowerList.toArray(new Organization[removeLowerList.size()]);
+                    for (int j = 0; j < removeLowerList.size(); j++) {
+                        CollectionManager.addOrganization(removeLowerArray[j]);
+                    }
+                    removeLowerList.clear();
+                    break;
+                case "update":
+                    Organization newOrganization = organizationStack.pop();
+                    CollectionManager.removeElement(newOrganization.getId());
+                    Organization oldOrganization = organizationStack.pop();
+                    CollectionManager.addOrganization(oldOrganization);
+                    break;
+                case "clear" :
+                    Organization[] clearArray = clearList.toArray(new Organization[clearList.size()]);
+                    for (int j = 0; j < clearList.size(); j++) {
+                        CollectionManager.addOrganization(clearArray[j]);
+                    }
+                    clearList.clear();
+                    break;
+
             }
         }
-        int remain = commandStack.size();
-        System.out.println("You're only able to roll back" + remain + " steps!");
-
     }
 
     /**
@@ -305,15 +314,6 @@ public class CollectionManager {
     }
 
     /**
-     * Returns the commandOrders map.
-     *
-     * @return The commandOrders map.
-     */
-    public static Map<String,Organization> getCommandOrders() {
-        return commandOrders;
-    }
-
-    /**
      * Returns the addIfMaxFlag value.
      *
      * @return The addIfMaxFlag value.
@@ -322,31 +322,5 @@ public class CollectionManager {
         return addIfMaxFlag;
     }
 
-    /**
-     * Returns the removeLowerFlag value.
-     *
-     * @return The removeLowerFlag value.
-     */
-    public static boolean getRemoveLowerFlag() {
-        return removeLowerFlag;
-    }
-
-    /**
-     * Returns the list of organizations removed using removeLowerElement.
-     *
-     * @return The list of organizations removed.
-     */
-    public static List<Organization> getRemoveLowerList() {
-        return removeLowerList;
-    }
-
-    /**
-     * Returns the list of organizations cleared using clearCollection.
-     *
-     * @return The list of organizations cleared.
-     */
-    public static List<Organization> getClearList() {
-        return clearList;
-    }
 }
 

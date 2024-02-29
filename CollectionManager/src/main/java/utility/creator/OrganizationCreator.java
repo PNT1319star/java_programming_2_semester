@@ -5,11 +5,12 @@ import data.Coordinates;
 import data.Organization;
 import data.OrganizationType;
 import exceptions.WrongInputInScriptException;
-import utility.creator.IDGenerator;
-import utility.creator.OrganizationBuilder;
 
 import java.util.Scanner;
 
+/**
+ * The OrganizationCreator class is responsible for creating Organization objects based on user input.
+ */
 public class OrganizationCreator {
     private static String name;
     private static Long x;
@@ -19,6 +20,13 @@ public class OrganizationCreator {
     private static Integer employeesCount;
     private static Float annualTurnover;
     private static OrganizationType type;
+
+    /**
+     * Creates an Organization object based on user input.
+     *
+     * @param scanner the Scanner object used to read user input.
+     * @return the created Organization object.
+     */
     public static Organization organizationCreator(Scanner scanner) {
         try {
             OrganizationBuilder organizationBuilder = new OrganizationBuilder(scanner);

@@ -49,9 +49,10 @@ public class Receiver {
      */
     public void add(Scanner scanner) {
         Organization organization = OrganizationCreator.organizationCreator(scanner);
-        CollectionManager.getCommandOrders().put("remove",organization);
         CollectionManager.addOrganization(organization);
         System.out.println("The 'add' command has been executed successfully");
+        CollectionManager.historyCommandList.push("add");
+        CollectionManager.organizationStack.push(organization);
     }
 
     /**
@@ -60,7 +61,10 @@ public class Receiver {
     public void addIfMax(Scanner scanner) {
         Organization organization = OrganizationCreator.organizationCreator(scanner);
         CollectionManager.addIfMax(organization);
-        if (CollectionManager.getAddIfMaxFlag()) CollectionManager.getCommandOrders().put("remove",organization);
+        if (CollectionManager.getAddIfMaxFlag()) {
+            CollectionManager.historyCommandList.push("add");
+            CollectionManager.organizationStack.push(organization);
+        }
         System.out.println("The 'add_if_max' command has been executed successfully");
     }
 
@@ -68,18 +72,21 @@ public class Receiver {
      * Execute the update command
      */
     public void update(String sID, Scanner scanner) {
-        Integer ID;
+        int ID;
         try {
             if (CollectionManager.getCollection().size() == 0) throw new EmptyCollectionException();
             ID = Integer.parseInt(sID);
             if (CollectionManager.idExistence(ID)) {
-                Organization oldOrganization = CollectionManager.getOrganizationByID(ID);
+                Organization tempOrganization1 = CollectionManager.getOrganizationByID(ID);
+                Organization oldOrganization = tempOrganization1.clone();
+                CollectionManager.historyCommandList.push("update");
+                CollectionManager.organizationStack.push(oldOrganization);
                 Organization newOrganization = OrganizationCreator.organizationCreator(scanner);
-                CollectionManager.getCommandOrders().put("remove",newOrganization);
-                CollectionManager.getCommandOrders().put("add",oldOrganization);
                 CollectionManager.updateElement(newOrganization, ID);
+                Organization tempOrganization = CollectionManager.getOrganizationByID(ID);
+                CollectionManager.organizationStack.push(tempOrganization);
                 System.out.println("The 'update' command has been executed successfully");
-                System.out.println("Organization is updated!");
+                System.out.println("Organization id " + ID+ " is updated!");
             } else {
                 System.out.println("The organization with this ID does not exist in the collection!");
             }
@@ -99,7 +106,8 @@ public class Receiver {
             ID = Integer.parseInt(sID);
             if (CollectionManager.idExistence(ID)) {
                 Organization organization = CollectionManager.getOrganizationByID(ID);
-                CollectionManager.getCommandOrders().put("add",organization);
+                CollectionManager.historyCommandList.push("remove");
+                CollectionManager.organizationStack.push(organization);
                 CollectionManager.removeElement(ID);
                 System.out.println("The 'remove_by_id' command has been executed successfully");
                 System.out.println("The organization with this ID has been deleted!");
@@ -115,11 +123,7 @@ public class Receiver {
      * Execute the clear command
      */
     public void clear() {
-        List<Organization> clearList = CollectionManager.getClearList();
-        Organization[] clearArray = clearList.toArray(new Organization[clearList.size()]);
-        for (int i = clearList.size(); i > 0; i--) {
-            CollectionManager.getCommandOrders().put("add", clearArray[i]);
-        }
+        CollectionManager.historyCommandList.push("clear");
         CollectionManager.clearCollection();
         System.out.println("The 'clear' command has been executed successfully");
         System.out.println("The collection is cleared!");
@@ -165,13 +169,7 @@ public class Receiver {
     public void removeLower(Scanner scanner) {
         Organization organization = OrganizationCreator.organizationCreator(scanner);
         CollectionManager.removeLowerElement(organization);
-        List<Organization> removeLowerArrayList = CollectionManager.getRemoveLowerList();
-        Organization[] removeLowerArray = removeLowerArrayList.toArray(new Organization[removeLowerArrayList.size()]);
-        if (CollectionManager.getRemoveLowerFlag()) {
-            for (int i = CollectionManager.getRemoveLowerList().size(); i > 0; i--) {
-                CollectionManager.getCommandOrders().put("add",removeLowerArray[i]);
-            }
-        }
+        CollectionManager.historyCommandList.push("remove_lower");
         System.out.println("The 'remove_lower' command has been executed successfully");
     }
 

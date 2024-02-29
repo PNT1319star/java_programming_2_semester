@@ -1,18 +1,14 @@
 package utility.csv;
 
-import com.opencsv.CSVReader;
-import com.opencsv.CSVReaderBuilder;
+
 import com.opencsv.CSVWriter;
-import com.opencsv.CSVWriterBuilder;
-import com.opencsv.exceptions.CsvValidationException;
+
 import data.Address;
 import data.Coordinates;
 import data.Organization;
 import data.OrganizationType;
 import utility.CollectionManager;
-import utility.creator.IDGenerator;
 
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayDeque;
@@ -65,7 +61,8 @@ public class CSVProcess {
             try {
                 CSVManager csvManager = new CSVManager();
                 List<String> parsedCSVFile = csvManager.readFromFile(fileName);
-                ArrayDeque<Organization> organizations = new ArrayDeque<>();
+                CollectionManager.initializationCollection();
+                ArrayDeque<Organization> organizations = CollectionManager.getCollection();
                 boolean isFirstLine = true;
                 for (String line : parsedCSVFile) {
                     if (isFirstLine) {
@@ -100,10 +97,8 @@ public class CSVProcess {
      * @throws IllegalArgumentException If there is an error in the CSV format.
      */
     public static void writeCollection() {
-        try (CSVWriter csvWriter = (CSVWriter) new CSVWriterBuilder(new FileWriter(pathToFile))
-                .withSeparator(',')
-                .withQuoteChar(CSVWriter.NO_QUOTE_CHARACTER)
-                .build()) {
+        try (CSVWriter csvWriter =  new CSVWriter(new FileWriter(pathToFile)))
+    {
 
             String[] headers = {"id", "name", "x", "y", "annual turnover",
                     "full name", "employees count", "type", "postal address"};

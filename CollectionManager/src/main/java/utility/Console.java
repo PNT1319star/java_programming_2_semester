@@ -11,7 +11,7 @@ import java.util.Scanner;
  * It initializes the invoker with registered commands and handles user input.
  */
 public class Console {
-    private Receiver receiver;
+    private final Receiver receiver;
 
     /**
      * Constructs a console with the specified receiver.
@@ -28,20 +28,34 @@ public class Console {
      */
     public void invokerStarter() {
         CollectionManager.getCollectionFromFile(CSVProcess.getPathToFile());
-        if (CSVManager.getFlag()) {
-            System.out.println("Do you want to use the existing data in this file? (yes/no)");
-            Scanner scanner = new Scanner(System.in);
-            String answer = scanner.nextLine().trim().toLowerCase();
+        boolean validInput = false;
+        while (!validInput) {
+            if (CSVManager.getFlag()) {
+                System.out.println("Do you want to use the existing data in this file? (yes/no)");
+                Scanner scanner = new Scanner(System.in);
+                String answer = scanner.nextLine().trim().toLowerCase();
                 switch (answer) {
-                    case "yes" :
+                    case "yes":
                         System.out.println("The data from file has been loaded!");
+                        validInput = true;
                         break;
-                    case "no" :
+                    case "no":
                         CollectionManager.initializationCollection();
                         System.out.println("A new collection has been created!");
+                        validInput = true;
                         break;
+                    default:
+                        System.out.println("Invalid input. Please enter 'yes' or 'no'.");
+                }
+                this.commandStarter();
+            } else {
+                CollectionManager.initializationCollection();
+                validInput = true;
+                this.commandStarter();
             }
-        } else {CollectionManager.initializationCollection();}
+        }
+    }
+    public void commandStarter() {
         Invoker.register("help", new HelpCommand(receiver));
         Invoker.register("info", new InfoCommand(receiver));
         Invoker.register("show", new ShowCommand(receiver));
