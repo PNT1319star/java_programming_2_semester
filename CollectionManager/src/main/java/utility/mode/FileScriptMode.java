@@ -66,29 +66,44 @@ public class FileScriptMode {
                         break;
                     case "execute_script" :
                         for (String script : scriptStack) {
-                            if (userCommand[1].equals(script)) {
-                                if(flag) {
-                                    System.out.println("The execute_script command appears in the script file!");
-                                    System.out.println(("Do you want to execute this command?"));
+                            if (userCommand[1].toLowerCase().equals(script)) {
+                                if(FileScriptMode.flag) {
+                                    System.out.println("\u001B[33mThe execute_script command appears in the script file!\u001B[0m");
+                                    System.out.println(("\u001B[33mDo you want to execute this command?\u001B[0m (\u001B[36myes\u001B[0m / \u001B[36mno\u001B[0m)"));
                                     Scanner scanner1 = new Scanner(System.in);
                                     String scn1 = scanner1.nextLine().trim().toLowerCase();
-                                    if (scn1.equals("yes")) {
-                                        System.out.println("How many times do you want to execute this command?");
-                                        Scanner scanner2 = new Scanner(System.in);
-                                        String scn2 = scanner2.nextLine().trim();
-                                        FileScriptMode.number = Integer.parseInt(scn2);
-                                    if (scn1.equals("no")) break;
+                                    while (true) {
+                                        if (scn1.equals("yes")) {
+                                            while (true) {
+                                                System.out.println("\u001B[33mHow many times do you want to execute this command?\u001B[0m");
+                                                Scanner scanner2 = new Scanner(System.in);
+                                                String scn2 = scanner2.nextLine().trim();
+                                                try {
+                                                    int number = Integer.parseInt(scn2);
+                                                    FileScriptMode.number = number;
+                                                    break; // Thoát khỏi vòng lặp nếu nhập đúng
+                                                } catch (NumberFormatException e) {
+                                                    System.out.println("\u001B[31mPlease enter a valid number.\u001B[0m");
+                                                }
+                                            }
+                                        } else if (scn1.equals("no")) {
+                                            break; // Thoát khỏi vòng lặp lớn nếu người dùng không muốn tiếp tục
+                                        } else {
+                                            System.out.println("\u001B[31mInvalid input. Please enter 'yes' or 'no'.\u001B[0m");
+                                            break;
+                                        }
                                     }
                                 }
-                                flag = false;
+                                FileScriptMode.flag = false;
                                 while(count <= number) {
-                                    System.out.println("The execute_script command has been execute " + count + "-time!");
+                                    System.out.printf("\u001B[33mThe execute_script command has been execute %s-time!\u001B[0m",count);
                                     scriptStack.remove(scriptStack.size() - 1);
-                                    FileScriptMode.scriptMode(userCommand[1]);
+                                    FileScriptMode.scriptMode(userCommand[1].toLowerCase());
                                 }
 
                                 }
                             }
+                        commandStatus = 1;
                         break;
                     default:
                         commandStatus = Invoker.executeCommand(userCommand);
@@ -98,7 +113,7 @@ public class FileScriptMode {
             organizationBuilder.setUserScanner(tmpScanner);
             organizationBuilder.setUserMode();
             if (commandStatus == 0 && !(userCommand[0].equals("execute_script") && !userCommand[1].isEmpty())) {
-                System.out.println("Check the script to ensure the entered data is correct!");
+                System.err.println("Check the script to ensure the entered data is correct!");
             }
         } catch (FileNotFoundException exception) {
             System.err.println("Can not find the file with the script!");

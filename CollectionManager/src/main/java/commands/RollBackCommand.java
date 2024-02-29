@@ -16,7 +16,7 @@ public class RollBackCommand extends AbstractCommand {
      * @param receiver the Receiver object that will handle the rollback operation.
      */
     public RollBackCommand (Receiver receiver) {
-        super("roll_back", "undo the change mades.");
+        super("\u001B[36mroll_back\u001B[0m", "undo the change mades.");
         this.receiver = receiver;
     }
 

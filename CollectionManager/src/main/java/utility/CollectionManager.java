@@ -174,7 +174,7 @@ public class CollectionManager {
     public static void filterStartsWithFullName(String fullName) {
         arrayDeque.forEach(organization -> {
             if (organization.getFullName().startsWith(fullName)) {
-                System.out.print(organization.toString());
+                System.out.println(organization);
             }
         });
     }

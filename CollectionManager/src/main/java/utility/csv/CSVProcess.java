@@ -1,17 +1,13 @@
 package utility.csv;
 
-
-import com.opencsv.CSVWriter;
-
 import data.Address;
 import data.Coordinates;
 import data.Organization;
 import data.OrganizationType;
 import utility.CollectionManager;
 
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -97,29 +93,26 @@ public class CSVProcess {
      * @throws IllegalArgumentException If there is an error in the CSV format.
      */
     public static void writeCollection() {
-        try (CSVWriter csvWriter =  new CSVWriter(new FileWriter(pathToFile)))
-    {
+        CSVManager csvManager = new CSVManager();
+        String[] headers = {"id", "name", "x", "y", "annual turnover",
+                "full name", "employees count", "type", "postal address"};
+        List<String> records = new ArrayList<>();
 
-            String[] headers = {"id", "name", "x", "y", "annual turnover",
-                    "full name", "employees count", "type", "postal address"};
-            csvWriter.writeNext(headers);
-
-            for (Organization organization : CollectionManager.getCollection()) {
-                String[] fields = {
-                        String.valueOf(organization.getId()),
-                        organization.getName(),
-                        String.valueOf(organization.getCoordinates().getX()),
-                        String.valueOf(organization.getCoordinates().getY()),
-                        String.valueOf(organization.getAnnualTurnover()),
-                        organization.getFullName(),
-                        String.valueOf(organization.getEmployeesCount()),
-                        organization.getType().toString(),
-                        organization.getPostalAddress().getStreet()
-                };
-                csvWriter.writeNext(fields);
-            }
-        } catch (IOException | IllegalArgumentException exception) {
-            throw new IllegalArgumentException("CSV Format Violation: " + exception.getMessage());
+        for (Organization organization : CollectionManager.getCollection()) {
+            String[] fields = {
+                    String.valueOf(organization.getId()),
+                    organization.getName(),
+                    String.valueOf(organization.getCoordinates().getX()),
+                    String.valueOf(organization.getCoordinates().getY()),
+                    String.valueOf(organization.getAnnualTurnover()),
+                    organization.getFullName(),
+                    String.valueOf(organization.getEmployeesCount()),
+                    organization.getType().toString(),
+                    organization.getPostalAddress().getStreet()
+            };
+            records.add(String.join(",", fields));
         }
+
+        csvManager.writeToFile(pathToFile, headers, records);
     }
 }

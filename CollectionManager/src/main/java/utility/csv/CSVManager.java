@@ -1,13 +1,13 @@
 package utility.csv;
 
-import com.opencsv.CSVReader;
-import com.opencsv.CSVWriter;
-import com.opencsv.exceptions.CsvValidationException;
-
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,13 +26,14 @@ public class CSVManager implements FileManager {
     @Override
     public ArrayList<String> readFromFile(String pathToFile) {
         ArrayList<String> lineList = new ArrayList<>();
-        try (CSVReader reader = new CSVReader(new FileReader(pathToFile))) {
-            String[] nextLine;
-            while ((nextLine = reader.readNext()) != null) {
+        try {
+            CSVParser parser = CSVFormat.DEFAULT.parse(new FileReader(pathToFile));
+            List<CSVRecord> records = parser.getRecords();
+            for (CSVRecord record : records) {
                 flag = true;
                 StringBuilder stringBuilder = new StringBuilder();
-                for (String element : nextLine) {
-                    if (!stringBuilder.isEmpty()) {
+                for (String element : record) {
+                    if (stringBuilder.length() > 0) {
                         stringBuilder.append(",");
                     }
                     stringBuilder.append(element.trim());
@@ -41,8 +42,6 @@ public class CSVManager implements FileManager {
             }
         } catch (IOException exception) {
             throw new IllegalArgumentException("CSV format violation: " + exception.getMessage());
-        } catch (CsvValidationException e) {
-            throw new RuntimeException(e);
         }
 
         return lineList;
@@ -58,11 +57,26 @@ public class CSVManager implements FileManager {
      */
     @Override
     public void writeToFile(String pathToFile, String[] header, List<String> records) {
-        try (CSVWriter csvWriter = new CSVWriter(new FileWriter(pathToFile))) {
-            csvWriter.writeNext(header);
+        try (PrintWriter writer = new PrintWriter(new FileWriter(pathToFile))) {
+            // Write header
+            for (int i = 0; i < header.length; i++) {
+                writer.print(header[i]);
+                if (i < header.length - 1) {
+                    writer.print(",");
+                }
+            }
+            writer.println(); // Move to next line after writing header
+
+            // Write records
             for (String record : records) {
                 String[] fields = record.split(",");
-                csvWriter.writeNext(fields);
+                for (int i = 0; i < fields.length; i++) {
+                    writer.print(fields[i]);
+                    if (i < fields.length - 1) {
+                        writer.print(",");
+                    }
+                }
+                writer.println(); // Move to next line after writing record
             }
         } catch (IOException exception) {
             throw new IllegalArgumentException("Error writing CSV file: " + exception.getMessage());

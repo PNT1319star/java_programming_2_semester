@@ -31,9 +31,9 @@ public class Console {
         boolean validInput = false;
         while (!validInput) {
             if (CSVManager.getFlag()) {
-                System.out.println("Do you want to use the existing data in this file? (yes/no)");
+                System.out.println("Do you want to use the existing data in this file? (\u001B[36myes\u001B[0m / \u001B[36mno\u001B[0m)");
                 Scanner scanner = new Scanner(System.in);
-                String answer = scanner.nextLine().trim().toLowerCase();
+                String answer = scanner.nextLine().trim();
                 switch (answer) {
                     case "yes":
                         System.out.println("The data from file has been loaded!");
@@ -45,16 +45,21 @@ public class Console {
                         validInput = true;
                         break;
                     default:
-                        System.out.println("Invalid input. Please enter 'yes' or 'no'.");
+                        System.out.println("Invalid input. Please enter \u001B[36myes\u001B[0m or \u001B[36mno\u001B[0m.");
                 }
                 this.commandStarter();
             } else {
+                System.out.println("Your file is empty!");
+                System.out.println("A new collection has been created!");
                 CollectionManager.initializationCollection();
                 validInput = true;
                 this.commandStarter();
             }
         }
     }
+    /**
+     * Starts the command execution process by registering commands with the invoker.
+     */
     public void commandStarter() {
         Invoker.register("help", new HelpCommand(receiver));
         Invoker.register("info", new InfoCommand(receiver));

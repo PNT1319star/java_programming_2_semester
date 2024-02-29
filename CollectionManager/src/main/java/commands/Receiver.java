@@ -6,13 +6,11 @@ import utility.CollectionManager;
 import utility.creator.OrganizationCreator;
 import utility.mode.FileScriptMode;
 
-import java.util.List;
 import java.util.Scanner;
 
 /**
  * Utility class for managing commands in the program.
  */
-
 public class Receiver {
     private final Invoker invoker;
 
@@ -20,20 +18,20 @@ public class Receiver {
         this.invoker = invoker;
     }
 
-
     /**
      * Execute the help command
      */
     public void help() {
         invoker.getCommands().forEach((name, command) -> command.getCommandInformation());
-        System.out.println("The 'help' command has been executed successfully");
+        System.out.println("\u001B[33mThe 'help' command has been executed successfully\u001B[0m");
     }
+
     /**
      * Execute the info command
      */
     public void info() {
         CollectionManager.information();
-        System.out.println("The 'info' command has been executed successfully");
+        System.out.println("\u001B[33mThe 'info' command has been executed successfully\u001B[0m");
     }
 
     /**
@@ -41,7 +39,7 @@ public class Receiver {
      */
     public void show() {
         CollectionManager.fullInformation();
-        System.out.println("The 'show' command has been executed successfully");
+        System.out.println("\u001B[33mThe 'show' command has been executed successfully\u001B[0m");
     }
 
     /**
@@ -50,7 +48,7 @@ public class Receiver {
     public void add(Scanner scanner) {
         Organization organization = OrganizationCreator.organizationCreator(scanner);
         CollectionManager.addOrganization(organization);
-        System.out.println("The 'add' command has been executed successfully");
+        System.out.println("\u001B[33mThe 'add' command has been executed successfully\u001B[0m");
         CollectionManager.historyCommandList.push("add");
         CollectionManager.organizationStack.push(organization);
     }
@@ -65,7 +63,7 @@ public class Receiver {
             CollectionManager.historyCommandList.push("add");
             CollectionManager.organizationStack.push(organization);
         }
-        System.out.println("The 'add_if_max' command has been executed successfully");
+        System.out.println("\u001B[33mThe 'add_if_max' command has been executed successfully\u001B[0m");
     }
 
     /**
@@ -85,15 +83,15 @@ public class Receiver {
                 CollectionManager.updateElement(newOrganization, ID);
                 Organization tempOrganization = CollectionManager.getOrganizationByID(ID);
                 CollectionManager.organizationStack.push(tempOrganization);
-                System.out.println("The 'update' command has been executed successfully");
-                System.out.println("Organization id " + ID+ " is updated!");
+                System.out.println("\u001B[33mThe 'update' command has been executed successfully\u001B[0m");
+                System.out.println("\u001B[33mOrganization id \u001B[0m" + ID+ " \u001B[33mis updated!\u001B[0m");
             } else {
-                System.out.println("The organization with this ID does not exist in the collection!");
+                System.err.println("The organization with this ID does not exist in the collection!");
             }
         } catch (NumberFormatException exception) {
-            System.out.println("The ID is not correct!");
+            System.err.println("The ID is not correct!");
         } catch (EmptyCollectionException exception) {
-            System.out.println("The collection is empty");
+            System.err.println("The collection is empty");
         }
     }
 
@@ -109,13 +107,13 @@ public class Receiver {
                 CollectionManager.historyCommandList.push("remove");
                 CollectionManager.organizationStack.push(organization);
                 CollectionManager.removeElement(ID);
-                System.out.println("The 'remove_by_id' command has been executed successfully");
-                System.out.println("The organization with this ID has been deleted!");
+                System.out.println("\u001B[33mThe 'remove_by_id' command has been executed successfully\u001B[0m");
+                System.out.println("\u001B[33mThe organization with this ID has been deleted!\u001B[0m");
             } else {
-                System.out.println("The organization with this ID does not exist!");
+                System.err.println("The organization with this ID does not exist!");
             }
         } catch (NumberFormatException exception) {
-            System.out.println("Invalid command argument!");
+            System.err.println("Invalid command argument!");
         }
     }
 
@@ -125,25 +123,24 @@ public class Receiver {
     public void clear() {
         CollectionManager.historyCommandList.push("clear");
         CollectionManager.clearCollection();
-        System.out.println("The 'clear' command has been executed successfully");
-        System.out.println("The collection is cleared!");
+        System.out.println("\u001B[33mThe 'clear' command has been executed successfully\u001B[0m");
+        System.out.println("\u001B[33mThe collection is cleared!\u001B[0m");
     }
-
 
     /**
      * Execute the execute_script command
      */
     public void executeScript(String path) {
         FileScriptMode.scriptMode(path);
-        System.out.println("The 'execute_script' command has been executed successfully");
+        System.out.println("\u001B[33mThe 'execute_script' command has been executed successfully\u001B[0m");
     }
 
     /**
      * Execute the exit command
      */
     public void exit() {
-        System.out.println("The 'exit' command has been executed successfully");
-        System.out.println("The program closed!");
+        System.out.println("\u001B[33mThe 'exit' command has been executed successfully\u001B[0m");
+        System.out.println("\u001B[33mProgram has been closed!\u001B[0m");
         System.exit(0);
     }
 
@@ -151,7 +148,7 @@ public class Receiver {
      * Execute the head command
      */
     public void head() {
-        System.out.println("The 'head' command has been executed successfully");
+        System.out.println("\u001B[33mThe 'head' command has been executed successfully\u001B[0m");
         CollectionManager.printFirstElement();
     }
 
@@ -159,8 +156,8 @@ public class Receiver {
      * Execute the save command
      */
     public void save() {
-        System.out.println("The 'save' command has been executed successfully");
-        System.out.println("The collection has been saved in the file!");
+        System.out.println("\u001B[33mThe 'save' command has been executed successfully\u001B[0m");
+        System.out.println("\u001B[33mThe collection has been saved in the file!\u001B[0m");
         CollectionManager.saveCollectionToFile();
     }
     /**
@@ -170,7 +167,7 @@ public class Receiver {
         Organization organization = OrganizationCreator.organizationCreator(scanner);
         CollectionManager.removeLowerElement(organization);
         CollectionManager.historyCommandList.push("remove_lower");
-        System.out.println("The 'remove_lower' command has been executed successfully");
+        System.out.println("\u001B[33mThe 'remove_lower' command has been executed successfully\u001B[0m");
     }
 
     /**
@@ -178,7 +175,7 @@ public class Receiver {
      */
     public void minByCreationDate() {
         CollectionManager.printElementWithMinimalCreationDate();
-        System.out.println("The 'min_by_creation_date' command has been executed successfully");
+        System.out.println("\u001B[33mThe 'min_by_creation_date' command has been executed successfully\u001B[0m");
     }
 
     /**
@@ -186,7 +183,7 @@ public class Receiver {
      */
     public void filterStartsWithFullName(String fullName) {
         CollectionManager.filterStartsWithFullName(fullName);
-        System.out.println("The 'filter_starts_with_full_name' command has been executed successfully");
+        System.out.println("\u001B[33mThe 'filter_starts_with_full_name' command has been executed successfully\u001B[0m");
     }
 
     /**
@@ -194,14 +191,17 @@ public class Receiver {
      */
     public void printUniquePostalAddress() {
         CollectionManager.printUniquePostalAddress();
-        System.out.println("The 'print_unique_postal_address' command has been executed successfully");
+        System.out.println("\u001B[33mThe 'print_unique_postal_address' command has been executed successfully\u001B[0m");
     }
 
+    /**
+     * Execute the roll_back command
+     */
     public void rollBack(String strSteps) {
         try {
             int steps = Integer.parseInt(strSteps);
             CollectionManager.rollBack(steps);
-            System.out.println("The 'roll_back' command has been executed successfully");
+            System.out.println("\u001B[33mThe 'roll_back' command has been executed successfully\u001B[0m");
         } catch (EmptyCollectionException exception) {
             System.err.println("Can not roll back! You have not used any command that affects the collection!");
         }
