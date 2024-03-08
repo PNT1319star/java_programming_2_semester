@@ -1,6 +1,8 @@
 package commands;
 
 import exceptions.WrongAmountOfElementsException;
+import utility.ConsolePrinter;
+
 import java.util.Scanner;
 
 /**
@@ -16,7 +18,7 @@ public class AddCommand extends AbstractCommand {
      * @param receiver the receiver to add the new element
      */
     public AddCommand(Receiver receiver) {
-        super("\u001B[36madd {element}\u001B[0m", "add a new element to the collection");
+        super("add {element}", "add a new element to the collection");
         this.receiver = receiver;
     }
 
@@ -37,6 +39,6 @@ public class AddCommand extends AbstractCommand {
      */
     @Override
     public void getCommandInformation() {
-        System.out.println(super.toString());
+        ConsolePrinter.printInformation(super.toString());
     }
 }

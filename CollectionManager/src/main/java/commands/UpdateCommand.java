@@ -1,6 +1,7 @@
 package commands;
 
 import exceptions.WrongAmountOfElementsException;
+import utility.ConsolePrinter;
 
 import java.util.Scanner;
 
@@ -17,7 +18,7 @@ public class UpdateCommand extends AbstractCommand {
      * @param receiver the receiver used to execute the command
      */
     public UpdateCommand(Receiver receiver) {
-        super("\u001B[36mupdate id {element}\u001B[0m", "update the value of a collection element whose id is equal to a given one.");
+        super("update id {element}", "update the value of a collection element whose id is equal to a given one.");
         this.receiver = receiver;
     }
 
@@ -38,6 +39,6 @@ public class UpdateCommand extends AbstractCommand {
      */
     @Override
     public void getCommandInformation() {
-        System.out.println(super.toString());
+        ConsolePrinter.printInformation(super.toString());
     }
 }

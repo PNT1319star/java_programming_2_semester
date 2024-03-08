@@ -1,6 +1,7 @@
 package commands;
 
 import exceptions.WrongAmountOfElementsException;
+import utility.ConsolePrinter;
 
 /**
  * The PrintUniqPostalAddCommand class represents a command to print the unique values of the postalAddress field of all elements in the collection.
@@ -14,7 +15,7 @@ public class PrintUniqPostalAddCommand extends AbstractCommand {
      * @param receiver the receiver to use for executing the command
      */
     public PrintUniqPostalAddCommand(Receiver receiver) {
-        super("\u001B[36mprint_unique_postal_address\u001B[0m", "print the unique values of the postalAddress field of all elements in the collection.");
+        super("print_unique_postal_address", "print the unique values of the postalAddress field of all elements in the collection.");
         this.receiver = receiver;
     }
 
@@ -35,6 +36,6 @@ public class PrintUniqPostalAddCommand extends AbstractCommand {
      */
     @Override
     public void getCommandInformation() {
-        System.out.println(super.toString());
+        ConsolePrinter.printInformation(super.toString());
     }
 }

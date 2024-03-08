@@ -1,6 +1,7 @@
 package commands;
 
 import exceptions.WrongAmountOfElementsException;
+import utility.ConsolePrinter;
 
 /**
  * The ClearCommand class represents a command to clear the collection.
@@ -15,7 +16,7 @@ public class ClearCommand extends AbstractCommand {
      * @param receiver the receiver to clear the collection
      */
     public ClearCommand(Receiver receiver) {
-        super("\u001B[36mclear\u001B[0m", "clear collection");
+        super("clear", "clear collection");
         this.receiver = receiver;
     }
 
@@ -35,7 +36,6 @@ public class ClearCommand extends AbstractCommand {
      * Retrieves information about the clear command.
      */
     @Override
-    public void getCommandInformation() {
-        System.out.println(super.toString());
+    public void getCommandInformation() { ConsolePrinter.printInformation(super.toString());
     }
 }

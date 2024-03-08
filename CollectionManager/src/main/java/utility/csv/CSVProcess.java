@@ -55,8 +55,7 @@ public class CSVProcess {
             System.out.println("File name has not been provided!");
         } else {
             try {
-                CSVManager csvManager = new CSVManager();
-                List<String> parsedCSVFile = csvManager.readFromFile(fileName);
+                List<String> parsedCSVFile = CSVReader.readFromFile(fileName);
                 CollectionManager.initializationCollection();
                 ArrayDeque<Organization> organizations = CollectionManager.getCollection();
                 boolean isFirstLine = true;
@@ -93,7 +92,6 @@ public class CSVProcess {
      * @throws IllegalArgumentException If there is an error in the CSV format.
      */
     public static void writeCollection() {
-        CSVManager csvManager = new CSVManager();
         String[] headers = {"id", "name", "x", "y", "annual turnover",
                 "full name", "employees count", "type", "postal address"};
         List<String> records = new ArrayList<>();
@@ -113,6 +111,6 @@ public class CSVProcess {
             records.add(String.join(",", fields));
         }
 
-        csvManager.writeToFile(pathToFile, headers, records);
+        CSVWriter.writeToFile(pathToFile, headers, records);
     }
 }

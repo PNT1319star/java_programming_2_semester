@@ -1,8 +1,9 @@
 package utility.mode;
 
+import commands.CommandManager;
 import commands.Invoker;
 import commands.Receiver;
-import utility.Console;
+import utility.ConsolePrinter;
 import utility.creator.OrganizationBuilder;
 
 import java.io.File;
@@ -12,115 +13,179 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
-public class FileScriptMode {
-    private static boolean flag = true;
-    private static int count = 0;
-    private static int number = 0;
-    private static List<String> scriptStack = new ArrayList<>();
-    private static Receiver receiver = new Receiver(new Invoker());
-    private static Console console = new Console(receiver);
-    private static Scanner userScanner;
-    private static OrganizationBuilder organizationBuilder;
+/**
+
+ The FileScriptMode class represents a mode for executing commands from a script file.
+ It reads commands from the script file and handles their execution.
+ */
+public class FileScriptMode implements IMode {
+    private String argument;
+    private boolean flag = true;
+    private int count = 0;
+    private int number = 0;
+    private int commandStatus = 0;
+    private final List<String> scriptStack = new ArrayList<>();
+    private final Receiver receiver = new Receiver(new Invoker());
+    private Scanner userScanner;
+
     /**
-     * Executes the commands from the specified script file.
+     * Constructs a FileScriptMode object with the specified script file argument.
      *
      * @param argument The path to the script file.
      */
-    public static void scriptMode(String argument) {
+    public FileScriptMode (String argument) {
+        this.argument = argument;
+    }
+    /**
+     * Executes the commands from the specified script file.
+     */
+    @Override
+    public void executeMode() {
         count += 1;
-        console.commandStarter();
-        String[] userCommand = {"",""};
-        int commandStatus = 0;
-        scriptStack.add(argument);
-        try  {
-            userScanner = new Scanner(new File(argument));
-            organizationBuilder = new OrganizationBuilder(new Scanner(System.in));
-            if (!userScanner.hasNext()) throw new NoSuchElementException();
-            Scanner tmpScanner = organizationBuilder.getUserScanner();
+        OrganizationBuilder organizationBuilder = new OrganizationBuilder(new Scanner(System.in));
+        Scanner tmpScanner = organizationBuilder.getUserScanner();
+        CommandManager.commandStarter();
+        try {
+            initializeScript(this.argument);
             organizationBuilder.setUserScanner(userScanner);
             organizationBuilder.setFileMode();
             do {
-                userCommand = (userScanner.nextLine().trim() + " ").split(" ", 2);
-                userCommand[1] = userCommand[1].trim();
-                System.out.println("> " + String.join(" ", userCommand));
-                while (userScanner.hasNextLine() && userCommand[0].isEmpty()) {
-                    userCommand = (userScanner.nextLine().trim() + " ").split(" ", 2);
-                    userCommand[1] = userCommand[1].trim();
-                }
-                switch(userCommand[0]) {
-                    case "add" :
-                        receiver.add(userScanner);
-                        commandStatus = 1;
-                        break;
-                    case "update" :
-                        receiver.update(userCommand[1], userScanner);
-                        commandStatus = 1;
-                        break;
-                    case "remove_lower" :
-                        receiver.removeLower(userScanner);
-                        commandStatus = 1;
-                        break;
-                    case "add_if_max" :
-                        receiver.addIfMax(userScanner);
-                        commandStatus = 1;
-                        break;
-                    case "execute_script" :
-                        for (String script : scriptStack) {
-                            if (userCommand[1].toLowerCase().equals(script)) {
-                                if(FileScriptMode.flag) {
-                                    System.out.println("\u001B[33mThe execute_script command appears in the script file!\u001B[0m");
-                                    System.out.println(("\u001B[33mDo you want to execute this command?\u001B[0m (\u001B[36myes\u001B[0m / \u001B[36mno\u001B[0m)"));
-                                    Scanner scanner1 = new Scanner(System.in);
-                                    String scn1 = scanner1.nextLine().trim().toLowerCase();
-                                    while (true) {
-                                        if (scn1.equals("yes")) {
-                                            while (true) {
-                                                System.out.println("\u001B[33mHow many times do you want to execute this command?\u001B[0m");
-                                                Scanner scanner2 = new Scanner(System.in);
-                                                String scn2 = scanner2.nextLine().trim();
-                                                try {
-                                                    int number = Integer.parseInt(scn2);
-                                                    FileScriptMode.number = number;
-                                                    break; // Thoát khỏi vòng lặp nếu nhập đúng
-                                                } catch (NumberFormatException e) {
-                                                    System.out.println("\u001B[31mPlease enter a valid number.\u001B[0m");
-                                                }
-                                            }
-                                        } else if (scn1.equals("no")) {
-                                            break; // Thoát khỏi vòng lặp lớn nếu người dùng không muốn tiếp tục
-                                        } else {
-                                            System.out.println("\u001B[31mInvalid input. Please enter 'yes' or 'no'.\u001B[0m");
-                                            break;
-                                        }
-                                    }
-                                }
-                                FileScriptMode.flag = false;
-                                while(count <= number) {
-                                    System.out.printf("\u001B[33mThe execute_script command has been execute %s-time!\u001B[0m",count);
-                                    scriptStack.remove(scriptStack.size() - 1);
-                                    FileScriptMode.scriptMode(userCommand[1].toLowerCase());
-                                }
-
-                                }
-                            }
-                        commandStatus = 1;
-                        break;
-                    default:
-                        commandStatus = Invoker.executeCommand(userCommand);
-
-                }
+                String userCommand = getNextUserCommand();
+                handleUserCommand(userCommand);
             } while (commandStatus == 1 && userScanner.hasNextLine());
-            organizationBuilder.setUserScanner(tmpScanner);
-            organizationBuilder.setUserMode();
-            if (commandStatus == 0 && !(userCommand[0].equals("execute_script") && !userCommand[1].isEmpty())) {
-                System.err.println("Check the script to ensure the entered data is correct!");
-            }
+
         } catch (FileNotFoundException exception) {
-            System.err.println("Can not find the file with the script!");
+            ConsolePrinter.printError("Find not found!");
         } catch (NoSuchElementException exception) {
-            System.err.println("The script file is empty!");
+            ConsolePrinter.printError("The script file is empty!");
         } catch (IllegalStateException exception) {
-            System.err.println("Unexpected error!");
+            ConsolePrinter.printError("Unexpected error!");
+        }
+        organizationBuilder.setUserScanner(tmpScanner);
+        organizationBuilder.setUserMode();
+    }
+
+    /**
+     * Initializes the script by creating a scanner for reading input from the script file.
+     *
+     * @param argument The path to the script file.
+     * @throws FileNotFoundException  if the script file is not found.
+     * @throws NoSuchElementException if the script file is empty.
+     */
+    public void initializeScript (String argument) throws FileNotFoundException, NoSuchElementException {
+        this.userScanner = new Scanner(new File(argument));
+        if(!userScanner.hasNext()) throw new NoSuchElementException();
+        scriptStack.add(argument);
+    }
+
+    /**
+     * Retrieves the next user command from the script file.
+     *
+     * @return The next user command.
+     */
+    public String getNextUserCommand() {
+        String userCommand = this.userScanner.nextLine().trim();
+        ConsolePrinter.printInformation(">" + userCommand);
+        return userCommand;
+    }
+
+    /**
+     * Handles the execution of a user command.
+     *
+     * @param userCommand The user command to be executed.
+     */
+    public void handleUserCommand(String userCommand) {
+        String[] commandPart = userCommand.split(" ",2);
+        String commandName = commandPart[0].trim();
+        String commandArgument = commandPart.length > 1 ? commandPart[1].trim() : "";
+        while (this.userScanner.hasNextLine() && commandName.isEmpty()) {
+            commandPart = userCommand.split(" ",2);
+            commandName = commandPart[0].trim();
+            commandArgument = commandPart.length > 1 ? commandPart[1].trim() : "";
+        }
+        switch (commandName) {
+            case "add" :
+                receiver.add(this.userScanner);
+                commandStatus = 1;
+                break;
+            case "update" :
+                receiver.update(commandArgument, userScanner);
+                commandStatus = 1;
+                break;
+            case "remove_lower" :
+                receiver.removeLower(userScanner);
+                commandStatus = 1;
+                break;
+            case "add_if_max" :
+                receiver.addIfMax(userScanner);
+                commandStatus = 1;
+                break;
+            case "execute_script" :
+                handleExecuteScriptCommand(commandArgument);
+                commandStatus = 1;
+                break;
+            default :
+                commandStatus = Invoker.executeCommand(commandPart);
+        }
+    }
+
+    /**
+     * Handles the execution of an execute_script command.
+     *
+     * @param scriptFile The path to the script file to be executed.
+     */
+    public void handleExecuteScriptCommand (String scriptFile) {
+        for (String script : scriptStack) {
+            if (scriptFile.toLowerCase().equals(script)) {
+                if (this.flag) {
+                    askAction();
+                }
+                this.flag = false;
+                while(count <= number) {
+                    ConsolePrinter.printResult("The execute_script command has been execute " + count + " - time!");
+                    scriptStack.remove(scriptStack.size() - 1);
+                    this.executeMode();
+                }
+                break;
+            }
+        }
+    }
+
+    /**
+     * Asks the user for the number of times to execute the execute_script command.
+     */
+    public void askTimes () {
+        while (true) {
+            ConsolePrinter.printResult("How many times do you want to execute this command?");
+            Scanner scanner2 = new Scanner(System.in);
+            String scn2 = scanner2.nextLine().trim();
+            try {
+                this.number = Integer.parseInt(scn2);
+                break;
+            } catch (NumberFormatException exception) {
+                ConsolePrinter.printError("Please enter a valid number!");
+            }
+        }
+    }
+
+    /**
+     * Asks the user whether to execute the execute_script command.
+     */
+    public void askAction() {
+        ConsolePrinter.printResult("The execute_script command appears in the script file!");
+        ConsolePrinter.printResult("Do you want to execute this command? (yes / no)");
+        Scanner scanner1 = new Scanner(System.in);
+        String scn1 = scanner1.nextLine().trim().toLowerCase();
+        while(true) {
+            if (scn1.equals("yes")) {
+                this.askTimes();
+                break;
+            } else if (scn1.equals("no")) {
+                break;
+            } else {
+                ConsolePrinter.printError("Invalid input. Please enter 'yes' or 'no'!");
+                break;
+            }
         }
     }
 
@@ -129,7 +194,8 @@ public class FileScriptMode {
      *
      * @return The scanner used for reading input from the script file.
      */
-    public static Scanner getScanner() {
+    @Override
+    public Scanner getScanner() {
         return userScanner;
     }
 

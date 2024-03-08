@@ -1,6 +1,7 @@
 package commands;
 
 import exceptions.WrongAmountOfElementsException;
+import utility.ConsolePrinter;
 
 import java.util.Scanner;
 
@@ -17,7 +18,7 @@ public class ShowCommand extends AbstractCommand {
      * @param receiver the receiver used to execute the command
      */
     public ShowCommand(Receiver receiver) {
-        super("\u001B[36mshow\u001B[0m", "print to standard output all the elements of the collection in string representation.");
+        super("show", "print to standard output all the elements of the collection in string representation.");
         this.receiver = receiver;
     }
 
@@ -38,6 +39,6 @@ public class ShowCommand extends AbstractCommand {
      */
     @Override
     public void getCommandInformation() {
-        System.out.println(super.toString());
+        ConsolePrinter.printInformation(super.toString());
     }
 }

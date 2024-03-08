@@ -1,6 +1,7 @@
 package commands;
 
 import exceptions.WrongAmountOfElementsException;
+import utility.ConsolePrinter;
 
 import java.util.Scanner;
 
@@ -17,7 +18,7 @@ public class RemoveLowerCommand extends AbstractCommand {
      * @param receiver the receiver used to execute the command
      */
     public RemoveLowerCommand(Receiver receiver) {
-        super("\u001B[36mremove_lower {element}\u001B[0m ", "remove from a collection all elements smaller than a given one.");
+        super("remove_lower {element} ", "remove from a collection all elements smaller than a given one.");
         this.receiver = receiver;
     }
 
@@ -38,6 +39,6 @@ public class RemoveLowerCommand extends AbstractCommand {
      */
     @Override
     public void getCommandInformation() {
-        System.out.println(super.toString());
+        ConsolePrinter.printInformation(super.toString());
     }
 }

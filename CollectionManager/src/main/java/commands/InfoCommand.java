@@ -1,6 +1,7 @@
 package commands;
 
 import exceptions.WrongAmountOfElementsException;
+import utility.ConsolePrinter;
 
 /**
  * The InfoCommand class represents a command to print information about the collection.
@@ -15,7 +16,7 @@ public class InfoCommand extends AbstractCommand {
      * @param receiver the receiver to execute the command
      */
     public InfoCommand(Receiver receiver) {
-        super("\u001B[36minfo\u001B[0m", "print information about the collection");
+        super("info", "print information about the collection");
         this.receiver = receiver;
     }
 
@@ -36,6 +37,6 @@ public class InfoCommand extends AbstractCommand {
      */
     @Override
     public void getCommandInformation() {
-        System.out.println(super.toString());
+        ConsolePrinter.printInformation(super.toString());
     }
 }

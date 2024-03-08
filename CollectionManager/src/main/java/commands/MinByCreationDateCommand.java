@@ -1,6 +1,7 @@
 package commands;
 
 import exceptions.WrongAmountOfElementsException;
+import utility.ConsolePrinter;
 
 /**
  * The MinByCreationDateCommand class represents a command to print any object from the collection whose creationDate field value is minimal.
@@ -14,7 +15,7 @@ public class MinByCreationDateCommand extends AbstractCommand {
      * @param receiver the receiver to use for executing the command
      */
     public MinByCreationDateCommand(Receiver receiver) {
-        super("\u001B[36mmin_by_creation_date\u001B[0m", "print any object from the collection whose creationDate field value is minimal.");
+        super("min_by_creation_date", "print any object from the collection whose creationDate field value is minimal.");
         this.receiver = receiver;
     }
 
@@ -35,6 +36,6 @@ public class MinByCreationDateCommand extends AbstractCommand {
      */
     @Override
     public void getCommandInformation() {
-        System.out.println(super.toString());
+        ConsolePrinter.printInformation(super.toString());
     }
 }

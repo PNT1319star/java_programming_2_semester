@@ -1,6 +1,7 @@
 package commands;
 
 import exceptions.WrongAmountOfElementsException;
+import utility.ConsolePrinter;
 
 import java.util.Scanner;
 
@@ -16,7 +17,7 @@ public class RollBackCommand extends AbstractCommand {
      * @param receiver the Receiver object that will handle the rollback operation.
      */
     public RollBackCommand (Receiver receiver) {
-        super("\u001B[36mroll_back\u001B[0m", "undo the change mades.");
+        super("roll_back", "undo the change mades.");
         this.receiver = receiver;
     }
 
@@ -37,6 +38,6 @@ public class RollBackCommand extends AbstractCommand {
      */
     @Override
     public void getCommandInformation() {
-        System.out.println(super.toString());
+        ConsolePrinter.printInformation(super.toString());
     }
 }

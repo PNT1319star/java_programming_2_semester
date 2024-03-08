@@ -1,6 +1,7 @@
 package commands;
 
 import exceptions.WrongAmountOfElementsException;
+import utility.ConsolePrinter;
 
 /**
  * The RemoveByIdCommand class represents a command to remove an element from a collection by its id.
@@ -15,7 +16,7 @@ public class RemoveByIdCommand extends AbstractCommand {
      * @param receiver the receiver used to execute the command
      */
     public RemoveByIdCommand(Receiver receiver) {
-        super("\u001B[36mremove_by_id id\u001B[0m", "remove an element from a collection by its id");
+        super("remove_by_id ", "remove an element from a collection by its id");
         this.receiver = receiver;
     }
 
@@ -36,6 +37,6 @@ public class RemoveByIdCommand extends AbstractCommand {
      */
     @Override
     public void getCommandInformation() {
-        System.out.println(super.toString());
+        ConsolePrinter.printInformation(super.toString());
     }
 }

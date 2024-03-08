@@ -1,6 +1,7 @@
 package commands;
 
 import exceptions.WrongAmountOfElementsException;
+import utility.ConsolePrinter;
 
 /**
  * The ExecuteScriptCommand class represents a command to read and execute the script from the specified file.
@@ -16,7 +17,7 @@ public class ExecuteScriptCommand extends AbstractCommand {
      * @param receiver the receiver to execute the script
      */
     public ExecuteScriptCommand(Receiver receiver) {
-        super("\u001B[36mexecute_script file_name\u001B[0m", "read and execute the script from the specified file.");
+        super("execute_script file_name", "read and execute the script from the specified file.");
         this.receiver = receiver;
     }
 
@@ -34,7 +35,7 @@ public class ExecuteScriptCommand extends AbstractCommand {
             ExecuteScriptCommand.path = arg[1];
             receiver.executeScript(path);
         } catch (StackOverflowError error) {
-            System.out.println("Stack overflow occurred");
+            ConsolePrinter.printError("Stack overflow occurred");
         }
     }
 
@@ -43,6 +44,6 @@ public class ExecuteScriptCommand extends AbstractCommand {
      */
     @Override
     public void getCommandInformation() {
-        System.out.println(super.toString());
+        ConsolePrinter.printInformation(super.toString());
     }
 }

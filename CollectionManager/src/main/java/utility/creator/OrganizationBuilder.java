@@ -1,13 +1,10 @@
 package utility.creator;
 
-import data.Address;
-import data.Coordinates;
-import data.Organization;
 import data.OrganizationType;
 import exceptions.NotDeclaredValueException;
 import exceptions.NotInDeclaredLimitsException;
-import exceptions.WrongAmountOfElementsException;
 import exceptions.WrongInputInScriptException;
+import utility.ConsolePrinter;
 
 
 import java.util.NoSuchElementException;
@@ -75,19 +72,19 @@ public class OrganizationBuilder {
         String name;
         while (true) {
             try {
-                System.out.println("Enter organization's name: ");
-                System.out.print(">");
+                ConsolePrinter.printInformation("Enter organization's name: ");
+                ConsolePrinter.printInput(">");
                 name = userScanner.nextLine().trim();
-                if(fileMode) System.out.println(name);
+                if(fileMode) ConsolePrinter.printInformation(name);
                 if (name.equals("")) throw new NotDeclaredValueException();
                 break;
             } catch (NotDeclaredValueException exception) {
-                System.err.println("The 'name' value cannot be empty! Try again!");
+                ConsolePrinter.printError("The 'name' value cannot be empty! Try again!");
                 if (fileMode) throw new WrongInputInScriptException();
             } catch (NoSuchElementException exception) {
-                System.err.println("The name isn't recognized!");
+                ConsolePrinter.printError("The name isn't recognized!");
             } catch (IllegalStateException exception) {
-                System.err.println("Unexpected error!");
+                ConsolePrinter.printError("Unexpected error!");
                 System.exit(0);
             }
         }
@@ -105,24 +102,24 @@ public class OrganizationBuilder {
         long x;
         while (true) {
             try {
-                System.out.println("Enter x coordinate: ");
-                System.out.print(">");
+                ConsolePrinter.printInformation("Enter x coordinate: ");
+                ConsolePrinter.printInput(">");
                 strX = userScanner.nextLine().trim();
-                if (fileMode) System.out.println(strX);
+                if (fileMode) ConsolePrinter.printInformation(strX);
                 x = Long.parseLong(strX);
                 if(strX.isEmpty()) throw new NotDeclaredValueException();
                 break;
             } catch (NotDeclaredValueException exception) {
-                System.out.println("Coordinate x cannot be empty! Try again!");
+                ConsolePrinter.printError("Coordinate x cannot be empty! Try again!");
                 if (fileMode) throw new WrongInputInScriptException();
             } catch (NumberFormatException exception) {
-                System.out.println("Coordinate x must be a number! Try again!");
+                ConsolePrinter.printError("Coordinate x must be a number! Try again!");
                 if (fileMode) throw new WrongInputInScriptException();
             } catch (NullPointerException | IllegalStateException exception) {
-                System.err.println("Unexpected error!");
+                ConsolePrinter.printError("Unexpected error!");
                 System.exit(0);
             } catch (NoSuchElementException exception) {
-                System.err.println("Coordinate x isn't recodnized!");
+                ConsolePrinter.printError("Coordinate x isn't recodnized!");
                 if (fileMode) throw new WrongInputInScriptException();
             }
         }
@@ -140,20 +137,20 @@ public class OrganizationBuilder {
         long y;
         while (true) {
             try {
-                System.out.println("Enter y coordinate: ");
-                System.out.print(">");
+                ConsolePrinter.printInformation("Enter y coordinate: ");
+                ConsolePrinter.printInput(">");
                 strY = userScanner.nextLine().trim();
-                if (fileMode) System.out.println(strY);
+                if (fileMode) ConsolePrinter.printInformation(strY);
                 y = Long.parseLong(strY);
                 break;
             } catch (NumberFormatException exception) {
-                System.err.println("Coordinate y must be a number");
+                ConsolePrinter.printError("Coordinate y must be a number");
                 if (fileMode) throw new WrongInputInScriptException();
             } catch (NoSuchElementException exception) {
-                System.err.println("Coordinate y isn't  recognized!");
+                ConsolePrinter.printError("Coordinate y isn't  recognized!");
                 if (fileMode) throw new WrongInputInScriptException();
             } catch (NullPointerException | IllegalStateException exception) {
-                System.err.println("Unexpected error!");
+                ConsolePrinter.printError("Unexpected error!");
                 System.exit(0);
             }
         }
@@ -171,22 +168,22 @@ public class OrganizationBuilder {
         String fullName;
         while (true) {
             try {
-                System.out.println("Enter organization's full name: ");
-                System.out.print(">");
+                ConsolePrinter.printInformation("Enter organization's full name: ");
+                ConsolePrinter.printInput(">");
                 fullName = userScanner.nextLine().trim();
-                if (fileMode) System.out.println(fullName);
+                if (fileMode) ConsolePrinter.printInformation(fullName);
                 if (fullName.isEmpty()) throw new NotDeclaredValueException();
                 if (fullName.length() > MAX_LENGTH) throw new NotInDeclaredLimitsException();
                 break;
             } catch (NotDeclaredValueException exception) {
-                System.err.println("Full name cannot be empty! Try again!");
+                ConsolePrinter.printError("Full name cannot be empty! Try again!");
             } catch (NotInDeclaredLimitsException exception) {
-                System.err.println("Length of full name cannot exceed 2048! Try again!");
+                ConsolePrinter.printError("Length of full name cannot exceed 2048! Try again!");
             } catch (NoSuchElementException exception) {
-                System.err.println("Full name isn't recognized!");
+                ConsolePrinter.printError("Full name isn't recognized!");
                 if (fileMode) throw new WrongInputInScriptException();
             } catch (NullPointerException | IllegalStateException exception) {
-                System.err.println("Unexpected error!");
+                ConsolePrinter.printError("Unexpected error!");
                 System.exit(0);
             }
         }
@@ -203,17 +200,17 @@ public class OrganizationBuilder {
         String address = null;
         try {
             while (true) {
-                System.out.println("Enter the organization's address: ");
-                System.out.print(">");
+                ConsolePrinter.printInformation("Enter the organization's address: ");
+                ConsolePrinter.printInput(">");
                 address = userScanner.nextLine().trim();
-                if (fileMode) System.out.println(address);
+                if (fileMode) ConsolePrinter.printInformation(address);
                 break;
             }
         } catch (NoSuchElementException exception) {
-            System.err.println("Address isn't recognized!");
+            ConsolePrinter.printError("Address isn't recognized!");
             if (fileMode) throw new WrongInputInScriptException();
         } catch (NullPointerException | IllegalStateException exception) {
-            System.err.println("Unexpected Error!");
+            ConsolePrinter.printError("Unexpected Error!");
             System.exit(0);
         }
         return address;
@@ -230,24 +227,24 @@ public class OrganizationBuilder {
         int employeesCount;
         while (true) {
             try {
-                System.out.println("Enter the number of employees of organization: ");
-                System.out.print(">");
+                ConsolePrinter.printInformation("Enter the number of employees of organization: ");
+                ConsolePrinter.printInput(">");
                 strCount = userScanner.nextLine().trim();
-                if (fileMode) System.out.println(strCount);
+                if (fileMode) ConsolePrinter.printInformation(strCount);
                 employeesCount = Integer.parseInt(strCount);
                 if (employeesCount <= 0) throw new NotInDeclaredLimitsException();
                 break;
             } catch (NotInDeclaredLimitsException exception) {
-                System.err.println("The number of employees must be greater than 0! Try again!");
+                ConsolePrinter.printError("The number of employees must be greater than 0! Try again!");
                 if (fileMode) throw new WrongInputInScriptException();
             } catch (NumberFormatException exception) {
-                System.err.println("The number of employees must be a number! Try again!");
+                ConsolePrinter.printError("The number of employees must be a number! Try again!");
                 if (fileMode) throw new WrongInputInScriptException();
             } catch (NoSuchElementException exception) {
-                System.err.println("Employees Count isn't recognized!");
+                ConsolePrinter.printError("Employees Count isn't recognized!");
                 if (fileMode) throw new WrongInputInScriptException();
             } catch (NullPointerException | IllegalStateException exception) {
-                System.err.println("Unexpected error!");
+                ConsolePrinter.printError("Unexpected error!");
                 System.exit(0);
             }
         }
@@ -265,24 +262,24 @@ public class OrganizationBuilder {
         float annualTurnover;
         while (true) {
             try {
-                System.out.println("Enter the sale revenue of organization: ");
-                System.out.print(">");
+                ConsolePrinter.printInformation("Enter the sale revenue of organization: ");
+                ConsolePrinter.printInput(">");
                 strAnnualTurnover = userScanner.nextLine().trim();
                 if (fileMode) throw new WrongInputInScriptException();
                 annualTurnover = Float.parseFloat(strAnnualTurnover);
                 if (annualTurnover <= 0) throw new NotInDeclaredLimitsException();
                 break;
             } catch (NotInDeclaredLimitsException exception) {
-                System.err.println("The sale revenue of the organization must be greater than 0! Try again!");
+                ConsolePrinter.printError("The sale revenue of the organization must be greater than 0! Try again!");
                 if (fileMode) throw new WrongInputInScriptException();
             } catch (NumberFormatException exception) {
-                System.err.println("The sale revenue of the organization must be a number! Try again!");
+                ConsolePrinter.printError("The sale revenue of the organization must be a number! Try again!");
                 if (fileMode) throw new WrongInputInScriptException();
             } catch (NoSuchElementException exception) {
-                System.err.println("Annual turnover isn't recognized!");
+                ConsolePrinter.printError("Annual turnover isn't recognized!");
                 if (fileMode) throw new WrongInputInScriptException();
             } catch (NullPointerException | IllegalStateException exception) {
-                System.err.println("Unexpected error!");
+                ConsolePrinter.printError("Unexpected error!");
                 System.exit(0);
             }
         }
@@ -300,21 +297,21 @@ public class OrganizationBuilder {
         OrganizationType organizationType;
         while (true) {
             try {
-                System.out.println("Organization Type List: " + OrganizationType.nameList());
-                System.out.println("Enter the organization type: ");
-                System.out.print(">");
+                ConsolePrinter.printInformation("Organization Type List: " + OrganizationType.nameList());
+                ConsolePrinter.printInformation("Enter the organization type: ");
+                ConsolePrinter.printInput(">");
                 strOrgType = userScanner.nextLine().trim();
-                if (fileMode) System.out.println(strOrgType);
+                if (fileMode) ConsolePrinter.printInformation(strOrgType);
                 organizationType = OrganizationType.valueOf(strOrgType.toUpperCase());
                 break;
             } catch (IllegalArgumentException exception) {
-                System.err.println("This type does not exist! Try again!");
+                ConsolePrinter.printError("This type does not exist! Try again!");
                 if (fileMode) throw new WrongInputInScriptException();
             } catch (IllegalStateException exception) {
-                System.err.println("Unexpected error!");
+                ConsolePrinter.printError("Unexpected error!");
                 System.exit(0);
             } catch (NoSuchElementException exception) {
-                System.err.println("Type isn't recognized!");
+                ConsolePrinter.printError("Type isn't recognized!");
                 if (fileMode) throw new WrongInputInScriptException();
             }
         }

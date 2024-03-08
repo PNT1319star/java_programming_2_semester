@@ -1,6 +1,8 @@
 package commands;
 
 import exceptions.WrongAmountOfElementsException;
+import utility.ConsolePrinter;
+
 import java.util.HashMap;
 import java.util.Stack;
 
@@ -33,15 +35,15 @@ public class Invoker {
                 AbstractCommand command = commands.get(name[0]);
                 command.execute(name);
                 return 1;
-            } else {
-                System.out.println("You have not entered the command !");
             }
+            ConsolePrinter.printError("You have not entered the command !");
+
         } catch (IllegalStateException | NullPointerException exception) {
             if (!name[0].equals("") && (!name[0].equals("execute_script"))) {
-                System.out.println("The command " + name[0] + " does not exist! Use command 'help' to get the available command list !");
+                ConsolePrinter.printError("The command " + name[0] + " does not exist! Use command 'help' to get the available command list !");
             }
         } catch (WrongAmountOfElementsException exception) {
-            System.err.println("Invalid command format!");
+            ConsolePrinter.printError("Invalid command format!");
         }
         return 0;
     }

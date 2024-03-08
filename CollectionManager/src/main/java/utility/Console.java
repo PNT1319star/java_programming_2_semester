@@ -1,8 +1,9 @@
 package utility;
 
 import commands.*;
-import utility.csv.CSVManager;
 import utility.csv.CSVProcess;
+import utility.csv.CSVReader;
+import utility.mode.UserInputMode;
 
 import java.util.Scanner;
 
@@ -11,72 +12,45 @@ import java.util.Scanner;
  * It initializes the invoker with registered commands and handles user input.
  */
 public class Console {
-    private final Receiver receiver;
-
-    /**
-     * Constructs a console with the specified receiver.
-     *
-     * @param receiver the receiver object to execute commands
-     */
-    public Console(Receiver receiver) {
-        this.receiver = receiver;
-    }
-
     /**
      * Initializes the invoker with registered commands.
      * Registers all available commands with the invoker.
      */
-    public void invokerStarter() {
+    public static void starter(String pathToFile) {
+        CSVProcess.setPathToFile(pathToFile);
         CollectionManager.getCollectionFromFile(CSVProcess.getPathToFile());
         boolean validInput = false;
         while (!validInput) {
-            if (CSVManager.getFlag()) {
-                System.out.println("Do you want to use the existing data in this file? (\u001B[36myes\u001B[0m / \u001B[36mno\u001B[0m)");
+            if (CSVReader.getFlag()) {
+                ConsolePrinter.printInformation("Do you want to use the existing data in this file? (yes / no)");
                 Scanner scanner = new Scanner(System.in);
                 String answer = scanner.nextLine().trim();
                 switch (answer) {
                     case "yes":
-                        System.out.println("The data from file has been loaded!");
+                        ConsolePrinter.printResult("The data from file has been loaded!");
                         validInput = true;
                         break;
                     case "no":
                         CollectionManager.initializationCollection();
-                        System.out.println("A new collection has been created!");
+                        ConsolePrinter.printResult("A new collection has been created!");
                         validInput = true;
                         break;
                     default:
-                        System.out.println("Invalid input. Please enter \u001B[36myes\u001B[0m or \u001B[36mno\u001B[0m.");
+                        ConsolePrinter.printInformation("Invalid input. Please enter 'yes' or 'no'.");
                 }
-                this.commandStarter();
+                CommandManager.commandStarter();
+                UserInputMode userInputMode = new UserInputMode();
+                userInputMode.executeMode();
             } else {
-                System.out.println("Your file is empty!");
-                System.out.println("A new collection has been created!");
+                ConsolePrinter.printResult("Your file is empty!");
+                ConsolePrinter.printResult("A new collection has been created!");
                 CollectionManager.initializationCollection();
                 validInput = true;
-                this.commandStarter();
+                CommandManager.commandStarter();
+                UserInputMode userInputMode = new UserInputMode();
+                userInputMode.executeMode();
+
             }
         }
-    }
-    /**
-     * Starts the command execution process by registering commands with the invoker.
-     */
-    public void commandStarter() {
-        Invoker.register("help", new HelpCommand(receiver));
-        Invoker.register("info", new InfoCommand(receiver));
-        Invoker.register("show", new ShowCommand(receiver));
-        Invoker.register("add", new AddCommand(receiver));
-        Invoker.register("update", new UpdateCommand(receiver));
-        Invoker.register("remove_by_id", new RemoveByIdCommand(receiver));
-        Invoker.register("clear", new ClearCommand(receiver));
-        Invoker.register("save", new SaveCommand(receiver));
-        Invoker.register("execute_script", new ExecuteScriptCommand(receiver));
-        Invoker.register("exit", new ExitCommand(receiver));
-        Invoker.register("head", new HeadCommand(receiver));
-        Invoker.register("add_if_max", new AddIfMaxCommand(receiver));
-        Invoker.register("remove_lower", new RemoveLowerCommand(receiver));
-        Invoker.register("min_by_creation_date", new MinByCreationDateCommand(receiver));
-        Invoker.register("filter_starts_with_full_name", new FilterStartsWFullNameCommand(receiver));
-        Invoker.register("print_unique_postal_address", new PrintUniqPostalAddCommand(receiver));
-        Invoker.register("roll_back", new RollBackCommand(receiver));
     }
 }

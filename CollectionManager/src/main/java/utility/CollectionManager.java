@@ -70,7 +70,7 @@ public class CollectionManager {
      * Prints information about the collection, such as its type, initialization date, and number of elements.
      */
     public static void information() {
-        System.out.println("Type of collection: " + arrayDeque.getClass().getName() + ".\nInitialization Date: " + initializationDate
+        ConsolePrinter.printInformation("Type of collection: " + arrayDeque.getClass().getName() + ".\nInitialization Date: " + initializationDate
                 + ".\nNumber of elements: " + arrayDeque.size() + ".");
 
     }
@@ -83,10 +83,10 @@ public class CollectionManager {
         try{
             if (arrayDeque.isEmpty()) throw new EmptyCollectionException();
             for (Organization organization : arrayDeque) {
-                System.out.println(organization.toString());
+                ConsolePrinter.printInformation(organization.toString());
             }
         } catch (EmptyCollectionException exception) {
-            System.out.println("The collection is empty.");
+            ConsolePrinter.printError("The collection is empty.");
         }
 
     }
@@ -174,7 +174,7 @@ public class CollectionManager {
     public static void filterStartsWithFullName(String fullName) {
         arrayDeque.forEach(organization -> {
             if (organization.getFullName().startsWith(fullName)) {
-                System.out.println(organization);
+                ConsolePrinter.printInformation(organization);
             }
         });
     }
@@ -186,9 +186,9 @@ public class CollectionManager {
     public static void printFirstElement() {
         try {
             if (arrayDeque.size() == 0) throw new EmptyCollectionException();
-            System.out.println("First organization: " + arrayDeque.peekFirst());
+            ConsolePrinter.printInformation("First organization: " + arrayDeque.peekFirst());
         } catch (EmptyCollectionException exception) {
-            System.out.println("Collection is empty!");
+            ConsolePrinter.printError("Collection is empty!");
         }
     }
 
@@ -206,9 +206,9 @@ public class CollectionManager {
                     minCreationDateOrganization = organization;
                 }
             }
-            System.out.println("Element with minimal creation date: " + minCreationDateOrganization);
+            ConsolePrinter.printInformation("Element with minimal creation date: " + minCreationDateOrganization);
         } catch (EmptyCollectionException exception) {
-            System.out.println("Collection is empty!");
+            ConsolePrinter.printError("Collection is empty!");
         }
     }
 
@@ -224,12 +224,12 @@ public class CollectionManager {
             for (Organization organization : arrayDeque) {
                 uniquePostalAddresses.add(organization.getPostalAddress().getStreet());
             }
-            System.out.println("Unique postal addresses: ");
+            ConsolePrinter.printInformation("Unique postal addresses: ");
             for (String postalAddress : uniquePostalAddresses) {
-                System.out.println(postalAddress);
+                ConsolePrinter.printInformation(postalAddress);
             }
         } catch (EmptyCollectionException exception) {
-            System.out.println("Collection is empty");
+            ConsolePrinter.printError("Collection is empty");
         }
     }
 
@@ -250,7 +250,7 @@ public class CollectionManager {
                 }
             }
         } catch (EmptyCollectionException exception) {
-            System.out.println("Collection is empty!");
+            ConsolePrinter.printError("Collection is empty!");
         }
     }
 

@@ -1,6 +1,8 @@
 package commands;
 
 import exceptions.WrongAmountOfElementsException;
+import utility.ConsolePrinter;
+
 import java.util.Scanner;
 
 /**
@@ -17,7 +19,7 @@ public class AddIfMaxCommand extends AbstractCommand {
      * @param receiver the receiver to add the new element if it is maximum
      */
     public AddIfMaxCommand(Receiver receiver) {
-        super("\u001B[36madd_if_max {element}\u001B[0m", "add a new element to a collection if its value is greater than the value of the largest element of this collection");
+        super("add_if_max {element}", "add a new element to a collection if its value is greater than the value of the largest element of this collection");
         this.receiver = receiver;
     }
 
@@ -38,6 +40,6 @@ public class AddIfMaxCommand extends AbstractCommand {
      */
     @Override
     public void getCommandInformation() {
-        System.out.println(super.toString());
+        ConsolePrinter.printInformation(super.toString());
     }
 }

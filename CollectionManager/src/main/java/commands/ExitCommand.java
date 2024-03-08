@@ -1,6 +1,7 @@
 package commands;
 
 import exceptions.WrongAmountOfElementsException;
+import utility.ConsolePrinter;
 
 /**
  * The ExitCommand class represents a command to end the program without saving to a file.
@@ -15,7 +16,7 @@ public class ExitCommand extends AbstractCommand {
      * @param receiver the receiver to end the program
      */
     public ExitCommand(Receiver receiver) {
-        super("\u001B[36mexit\u001B[0m", "end the program (without saving to a file).");
+        super("exit", "end the program (without saving to a file).");
         this.receiver = receiver;
     }
 
@@ -36,6 +37,6 @@ public class ExitCommand extends AbstractCommand {
      */
     @Override
     public void getCommandInformation() {
-        System.out.println(super.toString());
+        ConsolePrinter.printInformation(super.toString());
     }
 }

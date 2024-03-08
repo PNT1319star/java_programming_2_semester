@@ -1,6 +1,7 @@
 package commands;
 
 import exceptions.WrongAmountOfElementsException;
+import utility.ConsolePrinter;
 
 /**
  * The HeadCommand class represents a command to print the first element of the collection.
@@ -15,7 +16,7 @@ public class HeadCommand extends AbstractCommand {
      * @param receiver the receiver to execute the command
      */
     public HeadCommand(Receiver receiver) {
-        super("\u001B[36mhead\u001B[0m", "print the first element of the collection.");
+        super("head", "print the first element of the collection.");
         this.receiver = receiver;
     }
 
@@ -36,6 +37,6 @@ public class HeadCommand extends AbstractCommand {
      */
     @Override
     public void getCommandInformation() {
-        System.out.println(super.toString());
+        ConsolePrinter.printInformation(super.toString());
     }
 }

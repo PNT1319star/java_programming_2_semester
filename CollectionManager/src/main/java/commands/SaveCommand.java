@@ -1,6 +1,7 @@
 package commands;
 
 import exceptions.WrongAmountOfElementsException;
+import utility.ConsolePrinter;
 
 import java.util.Scanner;
 
@@ -17,7 +18,7 @@ public class SaveCommand extends AbstractCommand {
      * @param receiver the receiver used to execute the command
      */
     public SaveCommand(Receiver receiver) {
-        super("\u001B[36msave\u001B[0m", "save the collection to the file");
+        super("save", "save the collection to the file");
         this.receiver = receiver;
     }
 
@@ -38,6 +39,6 @@ public class SaveCommand extends AbstractCommand {
      */
     @Override
     public void getCommandInformation() {
-        System.out.println(super.toString());
+        ConsolePrinter.printInformation(super.toString());
     }
 }

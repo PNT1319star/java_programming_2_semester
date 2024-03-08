@@ -1,6 +1,7 @@
 package commands;
 
 import exceptions.WrongAmountOfElementsException;
+import utility.ConsolePrinter;
 
 /**
  * The HelpCommand class represents a command that provides help information.
@@ -17,7 +18,7 @@ public class HelpCommand extends AbstractCommand {
      * @param receiver the receiver to execute the command
      */
     public HelpCommand(Receiver receiver) {
-        super("\u001B[36mhelp\u001B[0m", "display help on available commands");
+        super("help", "display help on available commands");
         this.receiver = receiver;
     }
 
@@ -39,6 +40,6 @@ public class HelpCommand extends AbstractCommand {
      */
     @Override
     public void getCommandInformation() {
-        System.out.println(super.toString());
+        ConsolePrinter.printInformation(super.toString());
     }
 }

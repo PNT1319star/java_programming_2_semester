@@ -1,6 +1,7 @@
 package commands;
 
 import exceptions.WrongAmountOfElementsException;
+import utility.ConsolePrinter;
 
 /**
  * The FilterStartsWFullNameCommand class represents a command to display elements whose fullName field value begins with a given substring.
@@ -15,7 +16,7 @@ public class FilterStartsWFullNameCommand extends AbstractCommand {
      * @param receiver the receiver to execute the command
      */
     public FilterStartsWFullNameCommand(Receiver receiver) {
-        super("\u001B[36mfilter_starts_with_full_name fullName\u001B[0m", "display elements whose fullName field value begins with a given substring");
+        super("filter_starts_with_full_name fullName", "display elements whose fullName field value begins with a given substring");
         this.receiver = receiver;
     }
 
@@ -36,6 +37,6 @@ public class FilterStartsWFullNameCommand extends AbstractCommand {
      */
     @Override
     public void getCommandInformation() {
-        System.out.println(super.toString());
+        ConsolePrinter.printInformation(super.toString());
     }
 }
