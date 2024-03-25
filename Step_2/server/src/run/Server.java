@@ -1,9 +1,8 @@
 package run;
 
 import server.Communicator;
-import utility.ConsolePrinter;
 import utility.csv.CSVProcess;
-import utility.csv.CSVWriter;
+
 
 public class Server {
     public static void main(String[] args) {
@@ -13,7 +12,7 @@ public class Server {
 //        }
         String fileName = "D:\\Admin\\IdeaProjects\\Step_2\\output\\test.csv";
 //        String fileName = args[1];
-        CSVProcess.setPathToFile(fileName);
+        CSVProcess.loadCollection(fileName);
         Runtime.getRuntime().addShutdownHook(new Thread(CSVProcess::writeCollection));
         Communicator communicator = new Communicator();
         communicator.run("2223");

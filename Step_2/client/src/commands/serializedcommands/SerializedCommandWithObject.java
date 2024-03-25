@@ -2,11 +2,14 @@ package commands.serializedcommands;
 
 import commands.AbstractCommand;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 public class SerializedCommandWithObject implements Serializable {
-    private AbstractCommand command;
-    private Object objectToSend;
+    @Serial
+    private static final long serialVersionUID = 32L;
+    private final AbstractCommand command;
+    private final Object objectToSend;
 
     public SerializedCommandWithObject(AbstractCommand command, Object objectToSend) {
         this.command = command;

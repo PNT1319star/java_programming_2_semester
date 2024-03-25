@@ -4,8 +4,8 @@ import client.Receiver;
 import commands.AbstractCommand;
 import utility.ConsolePrinter;
 
-import javax.annotation.processing.Filer;
 import java.io.IOException;
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -14,6 +14,7 @@ import java.io.Serializable;
  */
 public class FilterStartsWFullNameCommand extends AbstractCommand implements Serializable {
     transient private Receiver receiver;
+    @Serial
     private static final long serialVersionUID = 32L;
 
     /**
@@ -25,6 +26,7 @@ public class FilterStartsWFullNameCommand extends AbstractCommand implements Ser
         super("filter_starts_with_full_name fullName", "display elements whose fullName field value begins with a given substring");
         this.receiver = receiver;
     }
+
     public FilterStartsWFullNameCommand() {
         super("filter_starts_with_full_name fullName", "display elements whose fullName field value begins with a given substring");
     }

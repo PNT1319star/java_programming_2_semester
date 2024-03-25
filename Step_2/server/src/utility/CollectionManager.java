@@ -1,16 +1,14 @@
 package utility;
 
 import data.Organization;
-import utility.creator.IDGenerator;
+import utility.csv.CSVProcess;
 
-import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.ArrayDeque;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Comparator;
+import java.util.stream.Collectors;
 
 public class CollectionManager {
-    private static boolean addIfMaxFlag;
     private static ArrayDeque<Organization> arrayDeque;
     private static ZonedDateTime initializationDate;
 
@@ -20,12 +18,7 @@ public class CollectionManager {
     }
 
     public static boolean idExistence(int ID) {
-        for (Organization organization : arrayDeque) {
-            if (organization.getId().intValue() == ID) {
-                return true;
-            }
-        }
-        return false;
+        return arrayDeque.stream().anyMatch(organization -> organization.getId() == ID);
     }
 
     public static ArrayDeque<Organization> getCollection() {
@@ -44,106 +37,72 @@ public class CollectionManager {
     }
 
     public static String addIfMax(Organization organization) {
-        if (arrayDeque.isEmpty()) {
+        if (arrayDeque.isEmpty() || arrayDeque.stream().allMatch(org -> org.compareTo(organization) <= 0)) {
             add(organization);
             return "The organization has been added to the collection!";
-        } else {
-            addIfMaxFlag = true;
-            for (Organization organization1 : arrayDeque) {
-                if (organization1.compareTo(organization) > 0) {
-                    addIfMaxFlag = false;
-                    break;
-                }
-            }
-            if (addIfMaxFlag) {
-                add(organization);
-                return "The organization has been added to the collection!";
-            }
-            return "The organization can not be added to the collection!";
         }
+        return "The organization can not be added to the collection!";
     }
 
     public static String info() {
-        String out = "Type of collection: " + arrayDeque.getClass().getName() + ".\nInitialization Date: " + initializationDate
+        return "Type of collection: " + arrayDeque.getClass().getName() + ".\nInitialization Date: " + initializationDate
                 + ".\nNumber of elements: " + arrayDeque.size() + ".";
-        return out;
     }
 
-    public static String filterStartsWithFullName(String fullName) throws IOException {
+    public static String filterStartsWithFullName(String fullName) {
         StringBuilder string = new StringBuilder();
-        arrayDeque.forEach(organization -> {
-            if (organization.getFullName().startsWith(fullName)) {
-                string.append(organization.toString());
-            }
-        });
-        return String.valueOf(string);
+        arrayDeque.stream()
+                .filter(organization -> organization.getFullName().startsWith(fullName))
+                .forEach(string::append);
+        return string.toString();
     }
 
     public static String head() {
-        if (arrayDeque.size() == 0) {
+        if (arrayDeque.isEmpty()) {
             return "The collection is empty!";
         }
         return arrayDeque.peekFirst().toString();
     }
 
     public static String minByCreationDate() {
-        if (arrayDeque.isEmpty()) return "The collection is empty!";
-        Organization minCreationDateOrganization = arrayDeque.getFirst();
-        for (Organization organization : arrayDeque) {
-            if (organization.getCreationDate().compareTo(minCreationDateOrganization.getCreationDate()) < 0) {
-                minCreationDateOrganization = organization;
-            }
-        }
-        return minCreationDateOrganization.toString();
+        return arrayDeque.stream()
+                .min(Comparator.comparing(Organization::getCreationDate))
+                .map(Organization::toString)
+                .orElse("The collection is empty");
     }
 
     public static String printUniquePostalAddress() {
         if (arrayDeque.isEmpty()) return "The collection is empty!";
-        Set<String> uniquePostalAddresses = new HashSet<>();
-        for (Organization organization : arrayDeque) {
-            uniquePostalAddresses.add(organization.getPostalAddress().getStreet());
-        }
-        StringBuilder stringBuilder = new StringBuilder();
-        for (String string : uniquePostalAddresses) {
-            stringBuilder.append(string);
-        }
-        return String.valueOf(stringBuilder);
+        return arrayDeque.stream()
+                .map(organization -> organization.getPostalAddress().getStreet())
+                .distinct()
+                .collect(Collectors.joining());
     }
 
-    public static String removeByID(String sID) throws IOException {
+    public static String removeByID(String sID) {
         if (arrayDeque.isEmpty()) return "The collection is empty!";
         Integer ID = Integer.parseInt(sID);
-        for (Organization organization : arrayDeque) {
-            if (organization.getId().equals(ID)) {
-                arrayDeque.remove(organization);
-                break;
-            }
-        }
+        arrayDeque.removeIf(organization -> organization.getId().equals(ID));
         return "The organization with this ID has been removed!";
     }
 
     public static String removeLower(Organization organization) {
         if (arrayDeque.isEmpty()) return "The collection is empty!";
-        for (Organization organization1 : arrayDeque) {
-            if (organization1.compareTo(organization) < 0) {
-                arrayDeque.remove(organization1);
-            }
-        }
+        arrayDeque.removeIf(org -> org.compareTo(organization) < 0);
         return "All organizations that meet the conditions have been deleted!";
     }
 
     public static String show() {
         if (arrayDeque.isEmpty()) return "The collection is empty!";
-        StringBuilder stringBuilder = new StringBuilder();
-        for (Organization organization : arrayDeque) {
-            stringBuilder.append(organization.toString());
-        }
-        return String.valueOf(stringBuilder);
+        return arrayDeque.stream()
+                .map(Organization::toString)
+                .collect(Collectors.joining());
     }
+
     public static void updateElement(Organization newOrganization, Integer ID) {
         arrayDeque.forEach(organization -> {
-            if (organization.getId().equals(ID) ) {
-                organization.setName(newOrganization.getName() );
+            if (organization.getId().equals(ID)) {
+                organization.setName(newOrganization.getName());
                 organization.setCoordinates(newOrganization.getCoordinates());
                 organization.setAnnualTurnover(newOrganization.getAnnualTurnover());
                 organization.setType(newOrganization.getType());
@@ -152,5 +111,8 @@ public class CollectionManager {
                 organization.setPostalAddress(newOrganization.getPostalAddress());
             }
         });
+    }
+    public static void getCollectionFromFile(String fileName) {
+        arrayDeque = CSVProcess.loadCollection(fileName);
     }
 }

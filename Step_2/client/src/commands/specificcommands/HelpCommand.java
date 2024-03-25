@@ -4,6 +4,7 @@ import client.Receiver;
 import commands.AbstractCommand;
 import utility.ConsolePrinter;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -13,7 +14,8 @@ import java.io.Serializable;
  */
 public class HelpCommand extends AbstractCommand implements Serializable {
 
-    transient private Receiver receiver;
+    final transient private Receiver receiver;
+    @Serial
     private static final long serialVersionUID = 32L;
 
     /**

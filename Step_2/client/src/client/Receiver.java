@@ -1,5 +1,6 @@
 package client;
 
+import client.mode.FileScriptMode;
 import commands.serializedcommands.SerializedCommandWithArgument;
 import commands.serializedcommands.SerializedCommandWithObject;
 import commands.serializedcommands.SerializedCommandWithObjectAndArgument;
@@ -8,19 +9,25 @@ import commands.specificcommands.*;
 import utility.ConsolePrinter;
 import utility.OrganizationCreator;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.net.Socket;
 import java.util.Scanner;
 
 public class Receiver {
-    private Invoker invoker;
-    private Sender sender;
-    private ObjectInputStream inputStream;
+    private final Invoker invoker;
+    private final Sender sender;
+    private final Socket socket;
+    private final ObjectInputStream inputStream;
 
-    public Receiver(Invoker invoker,Sender sender, ObjectInputStream inputStream) {
+    public Receiver(Invoker invoker,Sender sender, Socket socket) throws IOException {
         this.invoker = invoker;
         this.sender = sender;
-        this.inputStream = inputStream;
+        this.socket = socket;
+        BufferedInputStream bufferedInputStream = new BufferedInputStream(this.socket.getInputStream());
+        this.inputStream = new ObjectInputStream(bufferedInputStream);
     }
 
     public void help() {
@@ -106,14 +113,9 @@ public class Receiver {
     }
 
     public void executeScript(String path) throws IOException {
-        try {
-            SerializedCommandWithArgument serializedExecuteScriptCommand = new SerializedCommandWithArgument(new ExecuteScriptCommand(), path);
-            sender.sendObject(serializedExecuteScriptCommand);
-            String result = (String) inputStream.readObject();
-            ConsolePrinter.printResult(result);
-        } catch (ClassNotFoundException exception) {
-            ConsolePrinter.printError("Error while processing command response!");
-        }
+        FileScriptMode fileScriptMode = new FileScriptMode(path);
+        fileScriptMode.executeMode();
+        ConsolePrinter.printResult("The 'execute_script' command has been executed successfully!");
     }
 
     public void exit() {
@@ -175,5 +177,8 @@ public class Receiver {
         } catch (ClassNotFoundException exception) {
             ConsolePrinter.printError("Something went wrong in the server! The command can be executed!");
         }
+    }
+    public Invoker getInvoker() {
+        return invoker;
     }
 }

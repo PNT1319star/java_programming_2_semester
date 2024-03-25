@@ -1,9 +1,11 @@
 package data;
 
+import java.io.Serializable;
+
 /**
  * The {@code OrganizationType} enum represents different types of organizations.
  */
-public enum OrganizationType {
+public enum OrganizationType implements Serializable {
     PUBLIC,
     GOVERNMENT,
     TRUST,
@@ -16,9 +18,9 @@ public enum OrganizationType {
      * @return A string containing all organization type names, separated by commas.
      */
     public static String nameList() {
-        String nameList = "";
+        StringBuilder nameList = new StringBuilder();
         for (OrganizationType organizationType : values()) {
-            nameList += organizationType.name() + ",";
+            nameList.append(organizationType.name()).append(",");
         }
         return nameList.substring(0,nameList.length() -2);
     }

@@ -3,7 +3,6 @@ package commands;
 import exceptions.WrongAmountOfElementsException;
 
 import java.io.IOException;
-import java.io.InterruptedIOException;
 
 /**
  * The AbstractCommand class represents a template for implementing command objects in the command pattern.
@@ -12,10 +11,10 @@ import java.io.InterruptedIOException;
 public abstract class AbstractCommand{
 
     /** The name of the command. */
-    private String name;
+    private final String name;
 
     /** The description of the command. */
-    private String description;
+    private final String description;
 
 
     public AbstractCommand(String name, String description) {

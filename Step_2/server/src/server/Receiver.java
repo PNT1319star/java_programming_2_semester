@@ -1,16 +1,14 @@
 package server;
 
-import commands.specificcommands.ClearCommand;
 import data.Organization;
 import utility.CollectionManager;
 
 import java.io.IOException;
-import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 public class Receiver {
-    private Socket socket;
+    private final Socket socket;
 
     public Receiver(Socket socket) {
         this.socket = socket;

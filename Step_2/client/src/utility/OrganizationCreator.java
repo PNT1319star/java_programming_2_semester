@@ -42,7 +42,7 @@ public class OrganizationCreator {
             ConsolePrinter.printError("Wrong input!");
         }
 
-        return new Organization(utility.creator.IDGenerator.generateID(),name,new Coordinates(x, y), annualTurnover, fullName,
+        return new Organization(utility.IDGenerator.generateID(),name,new Coordinates(x, y), annualTurnover, fullName,
                 employeesCount, type, new Address(address));
     }
 }

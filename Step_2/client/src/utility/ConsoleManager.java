@@ -4,44 +4,64 @@ import client.Communicator;
 import client.Invoker;
 import client.Receiver;
 import client.Sender;
-import commands.specificcommands.*;
+import client.mode.UserInputMode;
+import commands.CommandManager;
+import exceptions.ConnectionErrorException;
+import exceptions.NotInDeclaredLimitsException;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.util.Scanner;
+
 
 public class ConsoleManager {
+    private static Communicator communicator;
+    private static Receiver receiver;
+    private static final int MAX_RECONNECTION_ATTEMPTS = 5;
+    private static final int RECONNECTION_TIMEOUT = 5 * 1000;
 
-    public void interactive(String host, String port) throws IOException {
-        try (Scanner scanner = new Scanner(System.in)) {
-            Communicator communicator = new Communicator(host, Integer.parseInt(port));
-            communicator.startCommunication();
-            Sender sender = new Sender(communicator);
-            Invoker invoker = new Invoker();
-            ObjectInputStream inputStream = new ObjectInputStream(communicator.getSocket().getInputStream());
-            Receiver receiver = new Receiver(invoker, sender, inputStream);
-            invoker.register("help", new HelpCommand(receiver));
-            invoker.register("info", new InfoCommand(receiver));
-            invoker.register("show", new ShowCommand(receiver));
-            invoker.register("add", new AddCommand(receiver));
-            invoker.register("update", new UpdateCommand(receiver));
-            invoker.register("remove_by_id", new RemoveByIdCommand(receiver));
-            invoker.register("clear", new ClearCommand(receiver));
-            invoker.register("execute_script", new ExecuteScriptCommand(receiver));
-            invoker.register("exit", new ExitCommand(receiver));
-            invoker.register("head", new HeadCommand(receiver));
-            invoker.register("add_if_max", new AddIfMaxCommand(receiver));
-            invoker.register("remove_lower", new RemoveLowerCommand(receiver));
-            invoker.register("min_by_creation_date", new MinByCreationDateCommand(receiver));
-            invoker.register("filter_starts_with_full_name", new FilterStartsWFullNameCommand(receiver));
-            invoker.register("print_unique_postal_address", new PrintUniqPostalAddCommand(receiver));
-            while (scanner.hasNextLine()) {
-                invoker.executeCommand(scanner.nextLine().trim().split(" "));
+    public static void interactive(String host, String port) throws IOException {
+        try {
+            while (true) {
+                try {
+                    communicator = new Communicator(host, Integer.parseInt(port), RECONNECTION_TIMEOUT, MAX_RECONNECTION_ATTEMPTS);
+                    communicator.startCommunication();
+                    if (communicator.getSocket() != null && communicator.getSocket().isConnected()) {
+                        ConsolePrinter.printResult("Connected to server successfully!");
+                        ConsolePrinter.printInformation("Welcome to our application!");
+                        ConsolePrinter.printInformation("You need help ? Use command 'help' to get the available command list!");
+                        break;
+                    }
+                } catch (ConnectionErrorException exception) {
+                    if (communicator.getReconnectionAttempts() >= MAX_RECONNECTION_ATTEMPTS) {
+                        ConsolePrinter.printError("The number of connection attempts has been exceeded!");
+                        break;
+                    }
+                    try {
+                        Thread.sleep(RECONNECTION_TIMEOUT);
+                    } catch (IllegalArgumentException | InterruptedException timeoutException) {
+                        ConsolePrinter.printError("Connection timeout is out of the range of possible values!");
+                        ConsolePrinter.printError("Reconnection will be made immediately!");
+                    } catch (Exception timeoutException) {
+                        ConsolePrinter.printError("An error occurred while trying to wait for a connection!");
+                        ConsolePrinter.printError("Reconnection will be made immediately!");
+                    }
+                }
             }
-            communicator.endCommunication();
         } catch (NumberFormatException exception) {
             ConsolePrinter.printError("Something went wrong with arguments!");
             System.exit(0);
+        } catch (NotInDeclaredLimitsException exception) {
+            ConsolePrinter.printError("The client cannot be started!");
         }
+        Sender sender = new Sender(communicator);
+        Invoker invoker = new Invoker();
+        receiver = new Receiver(invoker, sender, communicator.getSocket());
+        CommandManager.startCommand(receiver);
+        UserInputMode userInputMode = new UserInputMode();
+        userInputMode.executeMode();
+        communicator.endCommunication();
+    }
+
+    public static Receiver getReceiver() {
+        return receiver;
     }
 }

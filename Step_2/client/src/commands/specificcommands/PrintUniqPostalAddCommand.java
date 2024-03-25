@@ -2,10 +2,10 @@ package commands.specificcommands;
 
 import client.Receiver;
 import commands.AbstractCommand;
-import exceptions.WrongAmountOfElementsException;
 import utility.ConsolePrinter;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -13,6 +13,7 @@ import java.io.Serializable;
  */
 public class PrintUniqPostalAddCommand extends AbstractCommand implements Serializable {
     transient private Receiver receiver;
+    @Serial
     private static final long serialVersionUID = 32L;
 
     /**
@@ -28,20 +29,11 @@ public class PrintUniqPostalAddCommand extends AbstractCommand implements Serial
         super("print_unique_postal_address", "print the unique values of the postalAddress field of all elements in the collection.");
     }
 
-    /**
-     * Executes the command to print unique postal addresses.
-     *
-     * @param arg the command arguments (not used for this command)
-     * @throws WrongAmountOfElementsException if the number of command arguments is incorrect
-     */
     @Override
     public void execute(String[] arg) throws IOException {
         receiver.printUniquePostalAddress();
     }
 
-    /**
-     * Displays information about the PrintUniqPostalAddCommand.
-     */
     @Override
     public void getCommandInformation() {
         ConsolePrinter.printInformation(super.toString());

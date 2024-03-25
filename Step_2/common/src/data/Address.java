@@ -1,15 +1,17 @@
 package data;
 
+import java.io.Serializable;
+
 /**
  * The {@code Address} class represents a street address.
  * It encapsulates the street information and provides methods for retrieval,
  * equality comparison, and generating a hash code.
  */
-public class Address {
+public class Address implements Serializable {
     /**
      * The street information of the address.
      */
-    private String street; //Поле может быть null
+    private final String street; //Поле может быть null
 
     /**
      * Constructs an {@code Address} object with the specified street.

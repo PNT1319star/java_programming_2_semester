@@ -32,16 +32,14 @@ public class Invoker {
                 AbstractCommand command = commands.get(name[0]);
                 command.execute(name);
                 return 1;
+            } else {
+                ConsolePrinter.printError("You have not entered the command !");
             }
-            ConsolePrinter.printError("You have not entered the command !");
-
         } catch (IllegalStateException | NullPointerException exception) {
             if (!name[0].isEmpty() && (!name[0].equals("execute_script"))) {
                 ConsolePrinter.printError("The command " + name[0] + " does not exist! Use command 'help' to get the available command list !");
             }
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (WrongAmountOfElementsException e) {
+        } catch (IOException | ClassNotFoundException | WrongAmountOfElementsException e) {
             throw new RuntimeException(e);
         }
         return 0;

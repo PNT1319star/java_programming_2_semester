@@ -1,4 +1,4 @@
-package utility.creator;
+package utility;
 
 import java.util.HashSet;
 import java.util.Random;
@@ -7,7 +7,7 @@ import java.util.Random;
  * Utility class for generating unique IDs.
  */
 public class IDGenerator {
-    private static HashSet<Integer> IDs = new HashSet<>();
+    private static final HashSet<Integer> IDs = new HashSet<>();
 
     /**
      * Generates a unique ID.

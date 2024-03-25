@@ -68,7 +68,7 @@ public class OrganizationBuilder {
                 ConsolePrinter.printInput(">");
                 name = userScanner.nextLine().trim();
                 if(fileMode) ConsolePrinter.printInformation(name);
-                if (name.equals("")) throw new NotDeclaredValueException();
+                if (name.isEmpty()) throw new NotDeclaredValueException();
                 break;
             } catch (NotDeclaredValueException exception) {
                 ConsolePrinter.printError("The 'name' value cannot be empty! Try again!");
@@ -111,7 +111,7 @@ public class OrganizationBuilder {
                 ConsolePrinter.printError("Unexpected error!");
                 System.exit(0);
             } catch (NoSuchElementException exception) {
-                ConsolePrinter.printError("Coordinate x isn't recodnized!");
+                ConsolePrinter.printError("Coordinate x isn't recognized!");
                 if (fileMode) throw new WrongInputInScriptException();
             }
         }

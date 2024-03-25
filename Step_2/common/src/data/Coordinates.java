@@ -1,13 +1,15 @@
 package data;
 
+import java.io.Serializable;
+
 /**
  * The {@code Coordinates} class represents a set of geographical coordinates.
  * It encapsulates the x and y coordinates and provides methods for retrieval,
  * equality comparison, and generating a hash code.
  */
-public class Coordinates {
-    private Long x; //Поле не может быть null
-    private long y;
+public class Coordinates implements Serializable {
+    private final Long x; //Поле не может быть null
+    private final long y;
 
     /**
      * Constructs a {@code Coordinates} object with the specified x and y coordinates.
@@ -29,10 +31,6 @@ public class Coordinates {
         return x;
     }
 
-    public void setX(Long x) {
-        this.x = x;
-    }
-
     /**
      * Gets the y-coordinate.
      *
@@ -41,9 +39,7 @@ public class Coordinates {
     public long getY() {
         return y;
     }
-    public void setY(long y) {
-        this.y = y;
-    }
+
     @Override
     public String toString() {
         return "x = " + getX() + ", y = " + getY();
@@ -56,8 +52,8 @@ public class Coordinates {
 
     @Override
     public boolean equals(Object obj) {
-        if(this == obj) return true;
-        if(obj == null || getClass() != obj.getClass()) return false;
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
         Coordinates coord = (Coordinates) obj;
         return x.equals(coord.x) && y == coord.y;
     }

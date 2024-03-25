@@ -1,5 +1,6 @@
 package data;
 
+import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 
@@ -8,11 +9,11 @@ import java.util.Objects;
  * It includes details such as ID, name, coordinates, creation date, annual turnover,
  * full name, employees count, type, and postal address.
  */
-public class Organization  implements  Comparable<Organization>, Cloneable {
+public class Organization  implements  Comparable<Organization>, Cloneable, Serializable {
     private Integer id;
     private String name;
     private Coordinates coordinates;
-    private ZonedDateTime creationDate;
+    private final ZonedDateTime creationDate;
     private Float annualTurnover;
     private String fullName;
     private Integer employeesCount;
@@ -114,6 +115,7 @@ public class Organization  implements  Comparable<Organization>, Cloneable {
         info += "Employees Count: " + employeesCount + "\n";
         info += "Type: " + type + "\n";
         info += "Postal Address: " + postalAddress + "\n";
+        info += "\n";
 
         return info;
     }
@@ -146,8 +148,7 @@ public class Organization  implements  Comparable<Organization>, Cloneable {
     @Override
     public Organization clone() {
         try {
-            Organization cloned = (Organization) super.clone();
-            return cloned;
+            return (Organization) super.clone();
         } catch (CloneNotSupportedException exception) {
             return null;
         }

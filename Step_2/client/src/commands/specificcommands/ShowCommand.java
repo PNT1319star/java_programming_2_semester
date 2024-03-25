@@ -5,6 +5,7 @@ import commands.AbstractCommand;
 import utility.ConsolePrinter;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.io.Serializable;
 
 
@@ -14,6 +15,7 @@ import java.io.Serializable;
  */
 public class ShowCommand extends AbstractCommand implements Serializable {
     transient private Receiver receiver;
+    @Serial
     private static final long serialVersionUID = 32L;
 
     /**

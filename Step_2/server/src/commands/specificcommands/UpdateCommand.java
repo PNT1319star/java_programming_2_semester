@@ -1,14 +1,16 @@
 package commands.specificcommands;
 
-import commands.AbstractCommand;
+import commands.AbstractCommand2;
 import commands.serializedcommands.SerializedCommandWithObjectAndArgument;
 import server.Receiver;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.io.Serializable;
 import java.net.Socket;
 
-public class UpdateCommand extends AbstractCommand implements Serializable {
+public class UpdateCommand extends AbstractCommand2 implements Serializable {
+    @Serial
     private static final long serialVersionUID = 32L;
 
     @Override

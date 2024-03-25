@@ -2,10 +2,10 @@ package commands.specificcommands;
 
 import client.Receiver;
 import commands.AbstractCommand;
-import exceptions.WrongAmountOfElementsException;
 import utility.ConsolePrinter;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Scanner;
 
@@ -15,6 +15,7 @@ import java.util.Scanner;
  */
 public class RemoveLowerCommand extends AbstractCommand implements Serializable {
     transient private Receiver receiver;
+    @Serial
     private static final long serialVersionUID = 32L;
 
     /**
@@ -34,7 +35,6 @@ public class RemoveLowerCommand extends AbstractCommand implements Serializable 
      * Executes the remove_lower command, removing all elements smaller than a given one from the collection.
      *
      * @param arg the command arguments
-     * @throws WrongAmountOfElementsException if the number of arguments is incorrect
      */
     @Override
     public void execute(String[] arg) throws IOException {
