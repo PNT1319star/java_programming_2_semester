@@ -1,34 +1,29 @@
 package processing.specificcommands;
 
+
 import processing.ClientCommandProcessor;
 import utility.ConsolePrinter;
 
-import java.io.IOException;
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Scanner;
 
-public class AddCommand extends AbstractCommand implements Serializable {
+public class HelpCommand extends AbstractCommand implements Serializable {
     transient private ClientCommandProcessor commandProcessor;
     @Serial
     private static final long serialVersionUID = 32L;
 
-    public AddCommand(ClientCommandProcessor commandProcessor) {
-        super("add {element}", "add a new element to the collection");
+    public HelpCommand(ClientCommandProcessor commandProcessor) {
+        super("help", "display help on available commands");
         this.commandProcessor = commandProcessor;
     }
 
-    public AddCommand() {
-        super("add {element}", "add a new element to the collection");
+    public HelpCommand() {
+        super("help", "display help on available commands");
     }
 
     @Override
     public void execute(String[] arg) {
-        try {
-            commandProcessor.add(new Scanner(System.in));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        commandProcessor.help();
     }
 
     @Override

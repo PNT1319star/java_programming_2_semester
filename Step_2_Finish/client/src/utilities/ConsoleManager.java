@@ -6,8 +6,6 @@ import connector.Sender;
 import mode.UserInputMode;
 import processing.ClientCommandProcessor;
 import processing.CommandManager;
-import run.Client;
-import utility.ConsolePrinter;
 
 import java.net.Socket;
 

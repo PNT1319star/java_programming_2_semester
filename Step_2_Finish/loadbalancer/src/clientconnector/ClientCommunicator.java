@@ -15,16 +15,20 @@ public class ClientCommunicator {
     public int soTimeout;
     private ServerSocket serverSocket;
     private Socket clientSocket;
+    private boolean serverRunning;
 
     public ClientCommunicator(int port, int soTimeout) {
         this.port = port;
         this.soTimeout = soTimeout;
+        this.serverRunning = false;
     }
 
     private void openServerSocket() throws OpeningServerSocketException {
         try {
             serverSocket = new ServerSocket(port);
             serverSocket.setSoTimeout(soTimeout);
+            ConsolePrinter.printResult("Server socket is opened at port " + port + ".");
+            serverRunning = true;
         } catch (IllegalArgumentException exception) {
             ConsolePrinter.printError("Port " + port + " is out of range!");
             throw new OpeningServerSocketException();
@@ -34,12 +38,12 @@ public class ClientCommunicator {
         }
     }
 
-    private Socket connectToClient() throws ConnectionErrorException, SocketTimeoutException {
+    private void handleClientConnection() throws ConnectionErrorException, SocketTimeoutException {
         try {
             ConsolePrinter.printInformation("Listening to port '" + port + "'...");
-            Socket clientSocket = serverSocket.accept();
+            clientSocket = serverSocket.accept();
             ConsolePrinter.printResult("The connection from the client was successfully established!");
-            return clientSocket;
+            ConsolePrinter.printResult(clientSocket);
         } catch (SocketTimeoutException exception) {
             ConsolePrinter.printError("Connection timed out!");
             throw new SocketTimeoutException();
@@ -54,6 +58,7 @@ public class ClientCommunicator {
             if (serverSocket == null) throw new ClosingSocketException();
             serverSocket.close();
             ConsolePrinter.printResult("The server has been shut down successfully.");
+            serverRunning = false;
         } catch (ClosingSocketException exception) {
             ConsolePrinter.printError("It is impossible to shut down a server that has not yet started!");
         } catch (IOException exception) {
@@ -64,14 +69,16 @@ public class ClientCommunicator {
     public void connect() {
         try {
             openServerSocket();
-            try  {
-                this.clientSocket = connectToClient();
-            } catch (ConnectionErrorException | SocketTimeoutException exception) {
-                ConsolePrinter.printError("Time out!");
-            } catch (IOException exception) {
-                ConsolePrinter.printError("An error occurred while trying to terminate the connection to the client!");
-            }
-//            closeServerSocket();
+            Thread serverThread = new Thread(() -> {
+                while (serverRunning) {
+                    try {
+                        handleClientConnection();
+                    } catch (ConnectionErrorException | SocketTimeoutException exception) {
+                        ConsolePrinter.printError("Error occurred while handling client connection: " + exception.getMessage());
+                    }
+                }
+            });
+            serverThread.start();
         } catch (OpeningServerSocketException exception) {
             ConsolePrinter.printError("The server cannot be started!");
         }

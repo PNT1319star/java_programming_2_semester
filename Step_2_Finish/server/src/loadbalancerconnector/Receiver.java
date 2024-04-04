@@ -1,5 +1,6 @@
 package loadbalancerconnector;
 
+import processing.serializedcommands.SerializedCommandWithObject;
 import utility.ConsolePrinter;
 
 import java.io.ByteArrayInputStream;
@@ -33,6 +34,8 @@ public class Receiver {
                         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(ib);
                         ObjectInputStream inputStream = new ObjectInputStream(byteArrayInputStream);
                         object = inputStream.readObject();
+                        ConsolePrinter.printResult(object);
+                        break;
                     } catch (EOFException | SocketException exception) {
                         System.out.println("Проблемы с клиентом.");
                     } catch (ClassNotFoundException exception) {

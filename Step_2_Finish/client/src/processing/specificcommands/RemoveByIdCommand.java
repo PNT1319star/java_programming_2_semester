@@ -6,28 +6,27 @@ import utility.ConsolePrinter;
 import java.io.IOException;
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Scanner;
 
-public class AddCommand extends AbstractCommand implements Serializable {
+public class RemoveByIdCommand extends AbstractCommand implements Serializable {
     transient private ClientCommandProcessor commandProcessor;
     @Serial
     private static final long serialVersionUID = 32L;
 
-    public AddCommand(ClientCommandProcessor commandProcessor) {
-        super("add {element}", "add a new element to the collection");
-        this.commandProcessor = commandProcessor;
+    public RemoveByIdCommand(ClientCommandProcessor processor) {
+        super("remove_by_id ", "remove an element from a collection by its id");
+        this.commandProcessor = processor;
     }
 
-    public AddCommand() {
-        super("add {element}", "add a new element to the collection");
+    public RemoveByIdCommand() {
+        super("remove_by_id ", "remove an element from a collection by its id");
     }
 
     @Override
     public void execute(String[] arg) {
         try {
-            commandProcessor.add(new Scanner(System.in));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            commandProcessor.removeById(arg[1]);
+        } catch (IOException exception) {
+            throw new RuntimeException(exception);
         }
     }
 

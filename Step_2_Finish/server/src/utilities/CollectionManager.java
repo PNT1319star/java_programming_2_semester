@@ -1,6 +1,7 @@
 package utilities;
 
 import data.Organization;
+import file.CSVProcess;
 import utility.IDGenerator;
 
 import java.time.ZonedDateTime;
@@ -112,8 +113,8 @@ public class CollectionManager {
             }
         });
     }
-//    public static void getCollectionFromFile(String fileName) {
-//        arrayDeque = CSVProcess.loadCollection(fileName);
-//    }
+    public static void getCollectionFromFile(String fileName) {
+        arrayDeque = CSVProcess.loadCollection(fileName);
+    }
 }
 

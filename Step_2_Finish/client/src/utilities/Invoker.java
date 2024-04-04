@@ -1,12 +1,12 @@
 package utilities;
 
-import processing.specificcommands.ClientAbstractCommand;
+import processing.specificcommands.AbstractCommand;
 import utility.ConsolePrinter;
 
 import java.util.HashMap;
 
 public class Invoker {
-    private final HashMap<String, ClientAbstractCommand> commands = new HashMap<>();
+    private final HashMap<String, AbstractCommand> commands = new HashMap<>();
 
     /**
      * Registers a command with its name in the commands map.
@@ -14,7 +14,7 @@ public class Invoker {
      * @param name    the name of the command
      * @param command the command object
      */
-    public void register(String name, ClientAbstractCommand command) {
+    public void register(String name, AbstractCommand command) {
         commands.put(name, command);
     }
 
@@ -27,7 +27,7 @@ public class Invoker {
     public int executeCommand(String[] name) {
         try {
             if (name.length > 0) {
-                ClientAbstractCommand command = commands.get(name[0]);
+                AbstractCommand command = commands.get(name[0]);
                 command.execute(name);
                 return 1;
             } else {
@@ -46,7 +46,7 @@ public class Invoker {
      *
      * @return the map of commands
      */
-    public HashMap<String, ClientAbstractCommand> getCommands() {
+    public HashMap<String, AbstractCommand> getCommands() {
         return commands;
     }
 }

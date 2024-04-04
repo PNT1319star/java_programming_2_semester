@@ -10,7 +10,7 @@ public class SerializedCommandWithObject implements Serializable {
     private static final long serialVersionUID = 32L;
     private final AbstractCommand command;
     private final Object object;
-    public SerializedCommandWithObject(AbstractCommand command, Object object){
+    public SerializedCommandWithObject(AbstractCommand command, Object object) {
         this.command = command;
         this.object = object;
     }

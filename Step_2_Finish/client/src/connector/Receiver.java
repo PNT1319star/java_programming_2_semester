@@ -1,8 +1,5 @@
 package connector;
 
-import utility.ConsolePrinter;
-
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;

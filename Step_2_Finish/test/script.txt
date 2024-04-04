@@ -1,0 +1,3 @@
+help
+execute_script D:\Admin\IdeaProjects\Step_2_Finish\test\script.txt
+exit

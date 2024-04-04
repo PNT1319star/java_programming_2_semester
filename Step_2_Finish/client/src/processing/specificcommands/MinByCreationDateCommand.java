@@ -6,26 +6,25 @@ import utility.ConsolePrinter;
 import java.io.IOException;
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Scanner;
 
-public class AddCommand extends AbstractCommand implements Serializable {
+public class MinByCreationDateCommand extends AbstractCommand implements Serializable {
     transient private ClientCommandProcessor commandProcessor;
     @Serial
     private static final long serialVersionUID = 32L;
 
-    public AddCommand(ClientCommandProcessor commandProcessor) {
-        super("add {element}", "add a new element to the collection");
-        this.commandProcessor = commandProcessor;
+    public MinByCreationDateCommand(ClientCommandProcessor processor) {
+        super("min_by_creation_date", "print any object from the collection whose creationDate field value is minimal.");
+        this.commandProcessor = processor;
     }
 
-    public AddCommand() {
-        super("add {element}", "add a new element to the collection");
+    public MinByCreationDateCommand() {
+        super("min_by_creation_date", "print any object from the collection whose creationDate field value is minimal.");
     }
 
     @Override
     public void execute(String[] arg) {
         try {
-            commandProcessor.add(new Scanner(System.in));
+            commandProcessor.minByCreationDate();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

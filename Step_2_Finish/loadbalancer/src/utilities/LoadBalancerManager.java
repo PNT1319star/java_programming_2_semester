@@ -6,6 +6,7 @@ import clientconnector.SenderToClient;
 import serverconnector.ReceiverFromServer;
 import serverconnector.SenderToServer;
 import serverconnector.ServerCommunicator;
+import utility.ConsolePrinter;
 
 import java.io.IOException;
 import java.net.DatagramSocket;
@@ -29,7 +30,7 @@ public class LoadBalancerManager {
             senderToServer.sendToServer(transferredRequest);
             byte[] transferredResponse = receiverFromServer.receive();
             senderToClient.sentToClient(transferredResponse);
-        } catch (IOException  exception) {
+        } catch (IOException exception) {
             exception.printStackTrace();
         }
     }
