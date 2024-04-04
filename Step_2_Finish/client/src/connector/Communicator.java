@@ -62,14 +62,22 @@ public class Communicator {
                 }
                 reconnectionAttempts++;
             }
-//            if (socketChannel != null) socketChannel.close();
-//            ConsolePrinter.printResult("The client's work has completed successfully.");
         } catch (NotInDeclaredLimitsException exception) {
             ConsolePrinter.printError("The client cannot be started!");
         }
-//        } catch (IOException exception) {
-//            ConsolePrinter.printError("An error occurred while trying to complete the connection to the server!");
-//        }
+    }
+
+    public void closeConnection() {
+        try {
+            if (socketChannel != null && socketChannel.isOpen()) {
+                socketChannel.close();
+                ConsolePrinter.printResult("Socket connection closed successfully.");
+            } else {
+                ConsolePrinter.printError("Socket channel is not initialized or already closed.");
+            }
+        } catch (IOException e) {
+            ConsolePrinter.printError("An error occurred while closing the socket connection: " + e.getMessage());
+        }
     }
 
     public SocketChannel getSocketChannel() {

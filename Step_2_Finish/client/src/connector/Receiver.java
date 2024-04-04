@@ -11,7 +11,7 @@ public class Receiver {
     }
     public byte[] receive() throws IOException {
         InputStream inputStream = socket.getInputStream();
-        byte[] buffer = new byte[4096];
+        byte[] buffer = new byte[8192];
         int bytesRead = inputStream.read(buffer);
         byte[] data = new byte[bytesRead];
         System.arraycopy(buffer, 0, data, 0, bytesRead);

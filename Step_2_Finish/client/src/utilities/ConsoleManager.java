@@ -18,12 +18,8 @@ public class ConsoleManager {
         int port = Integer.parseInt(sPort);
         try {
             communicator = new Communicator(host, port, RECONNECTION_TIMEOUT, MAX_RECONNECTION_ATTEMPTS);
-            communicator.connect();
-            Socket socket = communicator.getSocketChannel().socket();
-            Sender sender = new Sender(socket);
-            Receiver receiver = new Receiver(socket);
             Invoker invoker = new Invoker();
-            processor = new ClientCommandProcessor(invoker, sender, receiver);
+            processor = new ClientCommandProcessor(invoker, communicator);
             CommandManager.startCommand(processor);
             UserInputMode userInputMode = new UserInputMode();
             userInputMode.executeMode();

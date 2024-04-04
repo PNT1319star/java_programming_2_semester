@@ -23,7 +23,7 @@ public class ClientCommunicator {
         this.serverRunning = false;
     }
 
-    private void openServerSocket() throws OpeningServerSocketException {
+    public void openServerSocket() throws OpeningServerSocketException {
         try {
             serverSocket = new ServerSocket(port);
             serverSocket.setSoTimeout(soTimeout);
@@ -38,12 +38,12 @@ public class ClientCommunicator {
         }
     }
 
-    private void handleClientConnection() throws ConnectionErrorException, SocketTimeoutException {
+    public void handleClientConnection() throws ConnectionErrorException, SocketTimeoutException {
         try {
             ConsolePrinter.printInformation("Listening to port '" + port + "'...");
             clientSocket = serverSocket.accept();
+            ReceiverFromClient.setClientSocket(clientSocket);
             ConsolePrinter.printResult("The connection from the client was successfully established!");
-            ConsolePrinter.printResult(clientSocket);
         } catch (SocketTimeoutException exception) {
             ConsolePrinter.printError("Connection timed out!");
             throw new SocketTimeoutException();
@@ -63,24 +63,6 @@ public class ClientCommunicator {
             ConsolePrinter.printError("It is impossible to shut down a server that has not yet started!");
         } catch (IOException exception) {
             ConsolePrinter.printError("An error occurred while shutting down the server!");
-        }
-    }
-
-    public void connect() {
-        try {
-            openServerSocket();
-            Thread serverThread = new Thread(() -> {
-                while (serverRunning) {
-                    try {
-                        handleClientConnection();
-                    } catch (ConnectionErrorException | SocketTimeoutException exception) {
-                        ConsolePrinter.printError("Error occurred while handling client connection: " + exception.getMessage());
-                    }
-                }
-            });
-            serverThread.start();
-        } catch (OpeningServerSocketException exception) {
-            ConsolePrinter.printError("The server cannot be started!");
         }
     }
 
