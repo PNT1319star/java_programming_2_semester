@@ -9,13 +9,13 @@ public class SerializedCommandWithObjectAndArgument implements Serializable {
     @Serial
     private static final long serialVersionUID = 32L;
     private final AbstractCommand command;
-    private final Object objectToSend;
+    private final Object object;
     private final String argument;
 
 
-    public SerializedCommandWithObjectAndArgument(AbstractCommand command, Object objectToSend, String argument) {
+    public SerializedCommandWithObjectAndArgument(AbstractCommand command, Object object, String argument) {
         this.command = command;
-        this.objectToSend = objectToSend;
+        this.object = object;
         this.argument = argument;
     }
 
@@ -24,7 +24,7 @@ public class SerializedCommandWithObjectAndArgument implements Serializable {
     }
 
     public Object getObject() {
-        return objectToSend;
+        return object;
     }
 
     public String getArgument() {

@@ -41,7 +41,7 @@ public class ServerProcessor {
         if (receivedObject instanceof SerializedCommandWithObjectAndArgument) {
             SerializedCommandWithObjectAndArgument commandWithObjectAndArgument = (SerializedCommandWithObjectAndArgument) receivedObject;
             AbstractCommand command = commandWithObjectAndArgument.getCommand();
-            command.execute(command);
+            command.execute(commandWithObjectAndArgument);
         }
     }
 

@@ -1,3 +1,22 @@
 help
+add
+1
+2
+3
+4
+5
+6
+7
+public
+add
+2
+3
+4
+5
+6
+7
+8
+public
+show
 execute_script D:\Admin\IdeaProjects\Step_2_Finish\test\script.txt
 exit
