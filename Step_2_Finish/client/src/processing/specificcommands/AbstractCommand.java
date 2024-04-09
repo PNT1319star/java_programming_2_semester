@@ -1,5 +1,9 @@
 package processing.specificcommands;
 
+import exceptions.WrongAmountOfElementsException;
+
+import java.io.IOException;
+
 public abstract class AbstractCommand {
 
     /** The name of the command. */
@@ -15,7 +19,7 @@ public abstract class AbstractCommand {
     }
 
 
-    public abstract void execute(String[] arg);
+    public abstract void execute(String[] arg) throws IOException, WrongAmountOfElementsException;
 
     /**
      * Retrieves the name of the command.

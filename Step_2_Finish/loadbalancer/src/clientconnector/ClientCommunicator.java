@@ -15,12 +15,10 @@ public class ClientCommunicator {
     public int soTimeout;
     private ServerSocket serverSocket;
     private Socket clientSocket;
-    private boolean serverRunning;
 
     public ClientCommunicator(int port, int soTimeout) {
         this.port = port;
         this.soTimeout = soTimeout;
-        this.serverRunning = false;
     }
 
     public void openServerSocket() throws OpeningServerSocketException {
@@ -28,7 +26,6 @@ public class ClientCommunicator {
             serverSocket = new ServerSocket(port);
             serverSocket.setSoTimeout(soTimeout);
             ConsolePrinter.printResult("Server socket is opened at port " + port + ".");
-            serverRunning = true;
         } catch (IllegalArgumentException exception) {
             ConsolePrinter.printError("Port " + port + " is out of range!");
             throw new OpeningServerSocketException();
@@ -53,18 +50,17 @@ public class ClientCommunicator {
         }
     }
 
-    private void closeServerSocket() {
-        try {
-            if (serverSocket == null) throw new ClosingSocketException();
-            serverSocket.close();
-            ConsolePrinter.printResult("The server has been shut down successfully.");
-            serverRunning = false;
-        } catch (ClosingSocketException exception) {
-            ConsolePrinter.printError("It is impossible to shut down a server that has not yet started!");
-        } catch (IOException exception) {
-            ConsolePrinter.printError("An error occurred while shutting down the server!");
-        }
-    }
+//    private void closeServerSocket() {
+//        try {
+//            if (serverSocket == null) throw new ClosingSocketException();
+//            serverSocket.close();
+//            ConsolePrinter.printResult("The server has been shut down successfully.");
+//        } catch (ClosingSocketException exception) {
+//            ConsolePrinter.printError("It is impossible to shut down a server that has not yet started!");
+//        } catch (IOException exception) {
+//            ConsolePrinter.printError("An error occurred while shutting down the server!");
+//        }
+//    }
 
     public Socket getClientSocket() {
         return clientSocket;

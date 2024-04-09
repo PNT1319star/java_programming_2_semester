@@ -1,7 +1,5 @@
 package mode;
 
-import java.util.Scanner;
-
 public interface IMode {
 
     /**
@@ -9,10 +7,4 @@ public interface IMode {
      */
     void executeMode();
 
-    /**
-     * Retrieves a scanner object.
-     *
-     * @return a scanner object for input processing.
-     */
-    Scanner getScanner();
 }

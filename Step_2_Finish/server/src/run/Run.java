@@ -1,19 +1,20 @@
 package run;
 
+import file.CSVProcess;
 import server.Server;
+import utilities.CollectionManager;
+import utility.ConsolePrinter;
 
 public class Run {
     public static void main(String[] args) {
-        Thread thread1 = new Thread(() -> {
-            Server server1 = new Server("5000","D:\\Admin\\IdeaProjects\\Step_2_Finish\\test\\test.csv");
-            server1.run();
-        });
-        Thread thread2 = new Thread(() -> {
-            Server server2 = new Server("5001","D:\\Admin\\IdeaProjects\\Step_2_Finish\\test\\test.csv");
-            server2.run();
-        });
-        thread1.start();
-        thread2.start();
+//        String pathToFile = args[1];
+        String pathToFile = "D:\\Admin\\IdeaProjects\\Step_2_Finish\\test\\test.csv";
+        CSVProcess.setPathToFile(pathToFile);
+        CollectionManager.getCollectionFromFile(pathToFile);
+        Runtime.getRuntime().addShutdownHook(new Thread(CSVProcess::writeCollection));
+        Server server1 = new Server("5000");
+        server1.run();
+
 
     }
 }

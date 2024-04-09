@@ -1,8 +1,10 @@
 package utilities;
 
+import exceptions.WrongAmountOfElementsException;
 import processing.specificcommands.AbstractCommand;
 import utility.ConsolePrinter;
 
+import java.io.IOException;
 import java.util.HashMap;
 
 public class Invoker {
@@ -37,6 +39,11 @@ public class Invoker {
             if (!name[0].isEmpty() && (!name[0].equals("execute_script"))) {
                 ConsolePrinter.printError("The command " + name[0] + " does not exist! Use command 'help' to get the available command list !");
             }
+        } catch (WrongAmountOfElementsException exception) {
+            ConsolePrinter.printError("Invalid command format!");
+        } catch (IOException exception) {
+            ConsolePrinter.printError("Nothing");
+            exception.printStackTrace();
         }
         return 0;
     }

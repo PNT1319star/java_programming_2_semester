@@ -1,5 +1,7 @@
 package connector;
 
+import utility.ConsolePrinter;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
@@ -11,7 +13,7 @@ public class Receiver {
     }
     public byte[] receive() throws IOException {
         InputStream inputStream = socket.getInputStream();
-        byte[] buffer = new byte[8192];
+        byte[] buffer = new byte[16384];
         int bytesRead = inputStream.read(buffer);
         byte[] data = new byte[bytesRead];
         System.arraycopy(buffer, 0, data, 0, bytesRead);

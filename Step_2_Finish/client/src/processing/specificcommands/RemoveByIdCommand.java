@@ -1,5 +1,6 @@
 package processing.specificcommands;
 
+import exceptions.WrongAmountOfElementsException;
 import processing.ClientCommandProcessor;
 import utility.ConsolePrinter;
 
@@ -22,12 +23,9 @@ public class RemoveByIdCommand extends AbstractCommand implements Serializable {
     }
 
     @Override
-    public void execute(String[] arg) {
-        try {
-            commandProcessor.removeById(arg[1]);
-        } catch (IOException exception) {
-            throw new RuntimeException(exception);
-        }
+    public void execute(String[] arg) throws IOException, WrongAmountOfElementsException {
+        if (arg.length != 2) throw new WrongAmountOfElementsException();
+        commandProcessor.removeById(arg[1]);
     }
 
     @Override

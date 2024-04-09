@@ -1,5 +1,6 @@
 package processing.specificcommands;
 
+import exceptions.WrongAmountOfElementsException;
 import processing.ClientCommandProcessor;
 import utility.ConsolePrinter;
 
@@ -23,12 +24,9 @@ public class AddCommand extends AbstractCommand implements Serializable {
     }
 
     @Override
-    public void execute(String[] arg) {
-        try {
-            commandProcessor.add(new Scanner(System.in));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public void execute(String[] arg) throws IOException, WrongAmountOfElementsException {
+        if (arg.length == 0) throw new WrongAmountOfElementsException();
+        commandProcessor.add(new Scanner(System.in));
     }
 
     @Override

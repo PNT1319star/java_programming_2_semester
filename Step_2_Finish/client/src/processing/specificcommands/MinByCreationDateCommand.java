@@ -1,5 +1,6 @@
 package processing.specificcommands;
 
+import exceptions.WrongAmountOfElementsException;
 import processing.ClientCommandProcessor;
 import utility.ConsolePrinter;
 
@@ -22,12 +23,9 @@ public class MinByCreationDateCommand extends AbstractCommand implements Seriali
     }
 
     @Override
-    public void execute(String[] arg) {
-        try {
-            commandProcessor.minByCreationDate();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public void execute(String[] arg) throws IOException, WrongAmountOfElementsException {
+        if (arg.length == 0) throw new WrongAmountOfElementsException();
+        commandProcessor.minByCreationDate();
     }
 
     @Override

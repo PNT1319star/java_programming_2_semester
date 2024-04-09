@@ -7,17 +7,13 @@ import java.io.Serial;
 import java.io.Serializable;
 
 public class ExitCommand extends AbstractCommand implements Serializable {
-    transient private ClientCommandProcessor commandProcessor;
+    final transient private ClientCommandProcessor commandProcessor;
     @Serial
     private static final long serialVersionUID = 32L;
 
     public ExitCommand(ClientCommandProcessor processor) {
         super("exit", "end the program (without saving to a file).");
         this.commandProcessor = processor;
-    }
-
-    public ExitCommand() {
-        super("exit", "end the program (without saving to a file).");
     }
 
     @Override

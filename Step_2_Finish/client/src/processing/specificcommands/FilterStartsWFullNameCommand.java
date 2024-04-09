@@ -1,5 +1,6 @@
 package processing.specificcommands;
 
+import exceptions.WrongAmountOfElementsException;
 import processing.ClientCommandProcessor;
 import utility.ConsolePrinter;
 
@@ -11,21 +12,20 @@ public class FilterStartsWFullNameCommand extends AbstractCommand implements Ser
     transient private ClientCommandProcessor commandProcessor;
     @Serial
     private static final long serialVersionUID = 32L;
+
     public FilterStartsWFullNameCommand(ClientCommandProcessor processor) {
         super("filter_starts_with_full_name fullName", "display elements whose fullName field value begins with a given substring");
         this.commandProcessor = processor;
     }
+
     public FilterStartsWFullNameCommand() {
         super("filter_starts_with_full_name fullName", "display elements whose fullName field value begins with a given substring");
     }
 
     @Override
-    public void execute(String[] arg) {
-        try {
-            commandProcessor.filterStartsWithFullName(arg[1]);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public void execute(String[] arg) throws IOException, WrongAmountOfElementsException {
+        if (arg.length != 2) throw new WrongAmountOfElementsException();
+        commandProcessor.filterStartsWithFullName(arg[1]);
     }
 
     @Override

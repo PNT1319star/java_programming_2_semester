@@ -1,5 +1,6 @@
 package processing.specificcommands;
 
+import exceptions.WrongAmountOfElementsException;
 import processing.ClientCommandProcessor;
 
 import java.io.IOException;
@@ -21,12 +22,9 @@ public class HeadCommand extends AbstractCommand implements Serializable {
     }
 
     @Override
-    public void execute(String[] arg) {
-        try {
-            commandProcessor.head();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public void execute(String[] arg) throws IOException, WrongAmountOfElementsException {
+        if (arg.length == 0) throw new WrongAmountOfElementsException();
+        commandProcessor.head();
     }
 
     @Override

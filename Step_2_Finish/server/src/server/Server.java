@@ -14,11 +14,9 @@ import java.nio.channels.DatagramChannel;
 
 public class Server {
     private final String sPort;
-    private final String pathToFile;
 
-    public Server(String port, String pathToFile) {
+    public Server(String port) {
         this.sPort = port;
-        this.pathToFile = pathToFile;
     }
 
     public void run() {
@@ -29,8 +27,6 @@ public class Server {
             Receiver receiver = new Receiver(datagramChannel);
             Sender.setDatagramChannel(datagramChannel);
             ServerProcessor serverProcessor = new ServerProcessor(receiver);
-            CSVProcess.setPathToFile(pathToFile);
-            CollectionManager.getCollectionFromFile(pathToFile);
             while (true) {
                 serverProcessor.decodeAndProcessCommand();
             }

@@ -1,5 +1,6 @@
 package processing.specificcommands;
 
+import exceptions.WrongAmountOfElementsException;
 import processing.ClientCommandProcessor;
 import utility.ConsolePrinter;
 
@@ -22,12 +23,9 @@ public class InfoCommand extends AbstractCommand implements Serializable {
     }
 
     @Override
-    public void execute(String[] arg) {
-        try {
-            commandProcessor.info();
-        } catch (IOException exception) {
-            exception.printStackTrace();
-        }
+    public void execute(String[] arg) throws IOException, WrongAmountOfElementsException {
+        if (arg.length == 0) throw new WrongAmountOfElementsException();
+        commandProcessor.info();
     }
 
     @Override

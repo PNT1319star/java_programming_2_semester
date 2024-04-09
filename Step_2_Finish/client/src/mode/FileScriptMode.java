@@ -29,9 +29,10 @@ public class FileScriptMode implements IMode {
      *
      * @param argument The path to the script file.
      */
-    public FileScriptMode (String argument) {
+    public FileScriptMode(String argument) {
         this.argument = argument;
     }
+
     /**
      * Executes the commands from the specified script file.
      */
@@ -69,9 +70,9 @@ public class FileScriptMode implements IMode {
      * @throws FileNotFoundException  if the script file is not found.
      * @throws NoSuchElementException if the script file is empty.
      */
-    public void initializeScript (String argument) throws FileNotFoundException, NoSuchElementException {
+    public void initializeScript(String argument) throws FileNotFoundException, NoSuchElementException {
         this.userScanner = new Scanner(new File(argument));
-        if(!userScanner.hasNext()) throw new NoSuchElementException();
+        if (!userScanner.hasNext()) throw new NoSuchElementException();
         scriptStack.add(argument);
     }
 
@@ -92,36 +93,36 @@ public class FileScriptMode implements IMode {
      * @param userCommand The user command to be executed.
      */
     public void handleUserCommand(String userCommand) throws IOException {
-        String[] commandPart = userCommand.split(" ",2);
+        String[] commandPart = userCommand.split(" ", 2);
         String commandName = commandPart[0].trim();
         String commandArgument = commandPart.length > 1 ? commandPart[1].trim() : "";
         while (this.userScanner.hasNextLine() && commandName.isEmpty()) {
-            commandPart = userCommand.split(" ",2);
+            commandPart = userCommand.split(" ", 2);
             commandName = commandPart[0].trim();
             commandArgument = commandPart.length > 1 ? commandPart[1].trim() : "";
         }
         switch (commandName) {
-            case "add" :
+            case "add":
                 processor.add(this.userScanner);
                 commandStatus = 1;
                 break;
-            case "update" :
+            case "update":
                 processor.update(commandArgument, userScanner);
                 commandStatus = 1;
                 break;
-            case "remove_lower" :
+            case "remove_lower":
                 processor.removeLower(userScanner);
                 commandStatus = 1;
                 break;
-            case "add_if_max" :
+            case "add_if_max":
                 processor.addIfMax(userScanner);
                 commandStatus = 1;
                 break;
-            case "execute_script" :
+            case "execute_script":
                 handleExecuteScriptCommand(commandArgument);
                 commandStatus = 1;
                 break;
-            default :
+            default:
                 commandStatus = processor.getInvoker().executeCommand(commandPart);
         }
     }
@@ -131,7 +132,7 @@ public class FileScriptMode implements IMode {
      *
      * @param scriptFile The path to the script file to be executed.
      */
-    public void handleExecuteScriptCommand (String scriptFile) {
+    public void handleExecuteScriptCommand(String scriptFile) {
         for (String script : scriptStack) {
             if (scriptFile.toLowerCase().equals(script)) {
                 if (this.flag) {
@@ -139,7 +140,7 @@ public class FileScriptMode implements IMode {
                 }
                 count += 1;
                 this.flag = false;
-                while(count <= number) {
+                while (count <= number) {
                     ConsolePrinter.printResult("The execute_script command has been execute " + count + " - time!");
                     scriptStack.clear();
                     this.executeMode();
@@ -157,7 +158,7 @@ public class FileScriptMode implements IMode {
     /**
      * Asks the user for the number of times to execute the execute_script command.
      */
-    public void askTimes () {
+    public void askTimes() {
         while (true) {
             ConsolePrinter.printResult("How many times do you want to execute this command?");
             Scanner scanner2 = new Scanner(System.in);
@@ -179,7 +180,7 @@ public class FileScriptMode implements IMode {
         ConsolePrinter.printResult("Do you want to execute this command? (yes / no)");
         Scanner scanner1 = new Scanner(System.in);
         String scn1 = scanner1.nextLine().trim().toLowerCase();
-        while(true) {
+        while (true) {
             if (scn1.equals("yes")) {
                 this.askTimes();
                 break;
@@ -191,15 +192,4 @@ public class FileScriptMode implements IMode {
             }
         }
     }
-
-    /**
-     * Retrieves the scanner used for reading input from the script file.
-     *
-     * @return The scanner used for reading input from the script file.
-     */
-    @Override
-    public Scanner getScanner() {
-        return userScanner;
-    }
-
 }

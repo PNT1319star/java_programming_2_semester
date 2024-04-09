@@ -1,5 +1,7 @@
 package loadbalancerconnector;
 
+import utility.ConsolePrinter;
+
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;

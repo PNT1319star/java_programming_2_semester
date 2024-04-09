@@ -1,6 +1,7 @@
 package processing.specificcommands;
 
 
+import exceptions.WrongAmountOfElementsException;
 import processing.ClientCommandProcessor;
 import utility.ConsolePrinter;
 
@@ -22,7 +23,8 @@ public class HelpCommand extends AbstractCommand implements Serializable {
     }
 
     @Override
-    public void execute(String[] arg) {
+    public void execute(String[] arg) throws WrongAmountOfElementsException {
+        if (arg.length == 0) throw new WrongAmountOfElementsException();
         commandProcessor.help();
     }
 

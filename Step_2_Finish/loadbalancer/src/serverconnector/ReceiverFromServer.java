@@ -18,11 +18,14 @@ public class ReceiverFromServer {
     public byte[] receive() {
         byte[] answer = null;
         try {
-            byte[] ib = new byte[256];
+            byte[] ib = new byte[4096];
             DatagramPacket ip = new DatagramPacket(ib, ib.length);
             datagramSocket.setSoTimeout(5000);
             datagramSocket.receive(ip);
-            answer = ip.getData();
+            int actualLength = ip.getLength();
+            byte[] receivedData = new byte[actualLength];
+            System.arraycopy(ib, 0, receivedData,0, actualLength);
+            answer = receivedData;
         } catch (IOException e) {
             ConsolePrinter.printError("The server has problems, the command will not be executed.");
         }

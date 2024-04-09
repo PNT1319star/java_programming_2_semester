@@ -27,9 +27,6 @@ public class Communicator {
         try {
             if (reconnectionAttempts >= 1) ConsolePrinter.printResult("Reconnecting to the server...");
             socketChannel = SocketChannel.open(new InetSocketAddress(host, port));
-            ConsolePrinter.printResult("The connection to the load balancer was successfully established!");
-            ConsolePrinter.printResult("Waiting for permission to share data...");
-            ConsolePrinter.printResult("Permission to share data has been received!");
         } catch (IllegalArgumentException exception) {
             ConsolePrinter.printError("The server address was entered incorrectly!");
             throw new NotInDeclaredLimitsException();
@@ -54,7 +51,7 @@ public class Communicator {
                     try {
                         Thread.sleep(reconnectionTimeout);
                     } catch (IllegalArgumentException timeoutException) {
-                        ConsolePrinter.printError("Connection timeout '\" + reconnectionTimeout +\n" + "\"' is outside the range of possible values!");
+                        ConsolePrinter.printError("Connection timeout " + reconnectionTimeout  + " is outside the range of possible values!");
                     } catch (Exception timeoutException) {
                         ConsolePrinter.printError("An error occurred while trying to wait for a connection!");
                         ConsolePrinter.printInformation("Reconnection will be made immediately.");
@@ -71,7 +68,6 @@ public class Communicator {
         try {
             if (socketChannel != null && socketChannel.isOpen()) {
                 socketChannel.close();
-                ConsolePrinter.printResult("Socket connection closed successfully.");
             } else {
                 ConsolePrinter.printError("Socket channel is not initialized or already closed.");
             }

@@ -1,6 +1,7 @@
 package processing.specificcommands;
 
 
+import exceptions.WrongAmountOfElementsException;
 import processing.ClientCommandProcessor;
 import utility.ConsolePrinter;
 
@@ -23,12 +24,9 @@ public class ClearCommand extends AbstractCommand implements Serializable {
     }
 
     @Override
-    public void execute(String[] arg) {
-        try {
-            commandProcessor.clear();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public void execute(String[] arg) throws IOException, WrongAmountOfElementsException {
+        if(arg.length == 0) throw new WrongAmountOfElementsException();
+        commandProcessor.clear();
     }
 
     @Override
