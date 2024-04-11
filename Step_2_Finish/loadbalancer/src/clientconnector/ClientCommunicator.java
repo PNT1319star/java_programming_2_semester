@@ -1,8 +1,8 @@
 package clientconnector;
 
-import exceptions.ClosingSocketException;
 import exceptions.ConnectionErrorException;
 import exceptions.OpeningServerSocketException;
+import serverconnector.SenderToServer;
 import utility.ConsolePrinter;
 
 import java.io.IOException;
@@ -35,7 +35,7 @@ public class ClientCommunicator {
         }
     }
 
-    public void handleClientConnection() throws ConnectionErrorException, SocketTimeoutException {
+    public void handleClientConnection() throws ConnectionErrorException, IOException {
         try {
             ConsolePrinter.printInformation("Listening to port '" + port + "'...");
             clientSocket = serverSocket.accept();
@@ -49,18 +49,6 @@ public class ClientCommunicator {
             throw new ConnectionErrorException();
         }
     }
-
-//    private void closeServerSocket() {
-//        try {
-//            if (serverSocket == null) throw new ClosingSocketException();
-//            serverSocket.close();
-//            ConsolePrinter.printResult("The server has been shut down successfully.");
-//        } catch (ClosingSocketException exception) {
-//            ConsolePrinter.printError("It is impossible to shut down a server that has not yet started!");
-//        } catch (IOException exception) {
-//            ConsolePrinter.printError("An error occurred while shutting down the server!");
-//        }
-//    }
 
     public Socket getClientSocket() {
         return clientSocket;

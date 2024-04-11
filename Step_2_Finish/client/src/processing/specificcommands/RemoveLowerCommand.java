@@ -2,6 +2,7 @@ package processing.specificcommands;
 
 import exceptions.WrongAmountOfElementsException;
 import processing.ClientCommandProcessor;
+import utility.ConsolePrinter;
 
 import java.io.IOException;
 import java.io.Serial;
@@ -30,6 +31,6 @@ public class RemoveLowerCommand extends AbstractCommand implements Serializable 
 
     @Override
     public void getCommandInformation() {
-
+        ConsolePrinter.printInformation(super.toString());
     }
 }

@@ -1,6 +1,7 @@
 package utilities;
 
 import connector.Communicator;
+import file.ClientInfoWriter;
 import mode.UserInputMode;
 import processing.ClientCommandProcessor;
 import processing.CommandManager;
@@ -8,13 +9,14 @@ import utility.ConsolePrinter;
 
 public class ConsoleManager {
     private static final int MAX_RECONNECTION_ATTEMPTS = 5;
-    private static final int RECONNECTION_TIMEOUT = 5*1000;
-    private static Communicator communicator;
+    private static final int RECONNECTION_TIMEOUT = 5 * 1000;
     private static ClientCommandProcessor processor;
+
     public static void interactive(String host, String sPort) {
-        int port = Integer.parseInt(sPort);
         try {
-            communicator = new Communicator(host, port, RECONNECTION_TIMEOUT, MAX_RECONNECTION_ATTEMPTS);
+            ClientInfoWriter.writeClientInfo(host, sPort);
+            int port = Integer.parseInt(sPort);
+            Communicator communicator = new Communicator(host, port, RECONNECTION_TIMEOUT, MAX_RECONNECTION_ATTEMPTS);
             Invoker invoker = new Invoker();
             processor = new ClientCommandProcessor(invoker, communicator);
             CommandManager.startCommand(processor);
@@ -27,6 +29,7 @@ public class ConsoleManager {
             throw new RuntimeException(e);
         }
     }
+
     public static ClientCommandProcessor getProcessor() {
         return processor;
     }

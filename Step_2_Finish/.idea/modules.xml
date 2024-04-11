@@ -6,7 +6,8 @@
       <module fileurl="file://$PROJECT_DIR$/client/client.iml" filepath="$PROJECT_DIR$/client/client.iml" />
       <module fileurl="file://$PROJECT_DIR$/common/common.iml" filepath="$PROJECT_DIR$/common/common.iml" />
       <module fileurl="file://$PROJECT_DIR$/loadbalancer/loadbalancer.iml" filepath="$PROJECT_DIR$/loadbalancer/loadbalancer.iml" />
-      <module fileurl="file://$PROJECT_DIR$/server/server.iml" filepath="$PROJECT_DIR$/server/server.iml" />
+      <module fileurl="file://$PROJECT_DIR$/server1/server1.iml" filepath="$PROJECT_DIR$/server1/server1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/server2/server2.iml" filepath="$PROJECT_DIR$/server2/server2.iml" />
     </modules>
   </component>
 </project>

@@ -6,10 +6,11 @@ import java.net.*;
 
 public class ServerCommunicator {
     private DatagramSocket datagramSocket;
-    private final String HOST = "localhost";
-    private int serverPort;
+    private final String host;
+    private final int serverPort;
 
-    public ServerCommunicator(int port) {
+    public ServerCommunicator(String host, int port) {
+        this.host = host;
         this.serverPort = port;
     }
 
@@ -17,7 +18,7 @@ public class ServerCommunicator {
         try {
             ConsolePrinter.printResult("Connecting to server....");
             datagramSocket = new DatagramSocket();
-            datagramSocket.connect(InetAddress.getByName(HOST), serverPort);
+            datagramSocket.connect(InetAddress.getByName(host), serverPort);
             ConsolePrinter.printResult("The connection to the server was successfully established!");
         } catch (SocketException exception) {
             ConsolePrinter.printError("An error occurred while connecting to the server!");
@@ -28,11 +29,6 @@ public class ServerCommunicator {
         }
     }
 
-    public void stopConnectingToServer() {
-        if (datagramSocket != null) {
-            datagramSocket.close();
-        }
-    }
     public DatagramSocket getDatagramSocket() {
         return datagramSocket;
     }

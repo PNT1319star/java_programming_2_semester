@@ -5,16 +5,14 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 
 public class SenderToServer {
-    private final DatagramSocket datagramSocket;
-    private final ServerCommunicator serverCommunicator;
+    private static ServerCommunicator serverCommunicator;
 
-    public SenderToServer(ServerCommunicator serverCommunicator) {
-        this.serverCommunicator = serverCommunicator;
-        this.datagramSocket = serverCommunicator.getDatagramSocket();
-    }
-
-    public void sendToServer(byte[] data) throws IOException {
+    public static void sendToServer(byte[] data) throws IOException {
+        DatagramSocket datagramSocket = serverCommunicator.getDatagramSocket();
         DatagramPacket datagramPacket = new DatagramPacket(data, data.length, datagramSocket.getInetAddress(), serverCommunicator.getServerPort());
         datagramSocket.send(datagramPacket);
+    }
+    public static void setServerCommunicator(ServerCommunicator serverCommunicator) {
+        SenderToServer.serverCommunicator = serverCommunicator;
     }
 }
