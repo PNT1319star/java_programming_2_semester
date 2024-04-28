@@ -1,6 +1,6 @@
 package processing;
 
-import interaction.CommandRequest;
+import interaction.Request;
 import interaction.Response;
 import connector.Sender;
 import connector.Receiver;
@@ -19,7 +19,7 @@ public class ServerProcessor {
     }
 
     public void decodeAndProcessCommand() throws IOException, ClassNotFoundException {
-        CommandRequest request = receiver.receive();
+        Request request = receiver.receive();
         ConsolePrinter.printResult(request);
         Response response = new Response(Invoker.executeCommand(request));
         sender.send(response);

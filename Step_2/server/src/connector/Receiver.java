@@ -1,6 +1,6 @@
 package connector;
 
-import interaction.CommandRequest;
+import interaction.Request;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,10 +12,10 @@ public class Receiver {
     public Receiver(Socket socket) {
         this.socket = socket;
     }
-    public CommandRequest receive() throws IOException, ClassNotFoundException {
+    public Request receive() throws IOException, ClassNotFoundException {
         InputStream inputStream = socket.getInputStream();
         ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
         Object object = objectInputStream.readObject();
-        return (CommandRequest) object;
+        return (Request) object;
     }
 }

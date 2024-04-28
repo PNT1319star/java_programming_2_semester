@@ -4,7 +4,7 @@ import connector.Communicator;
 import connector.Receiver;
 import connector.Sender;
 import exceptions.WrongAmountOfElementsException;
-import interaction.CommandRequest;
+import interaction.Request;
 import interaction.Response;
 import mode.FileScriptMode;
 import utilities.CommandType;
@@ -26,19 +26,19 @@ public class CommandHandler {
         CommandType commandType = checkCommand(commandSet[0], commandSet[1]);
         try {
             if (commandType.equals(CommandType.SIMPLE)) {
-                CommandRequest commandRequest = new CommandRequest(commandSet[0]);
+                Request commandRequest = new Request(commandSet[0]);
                 processCommand(commandRequest);
                 return 1;
             } else if (commandType.equals(CommandType.OBJECT)) {
-                CommandRequest commandRequest = new CommandRequest(commandSet[0], OrganizationCreator.organizationCreator(scanner));
+                Request commandRequest = new Request(commandSet[0], OrganizationCreator.organizationCreator(scanner));
                 processCommand(commandRequest);
                 return 1;
             } else if (commandType.equals(CommandType.ARGUMENT)) {
-                CommandRequest commandRequest = new CommandRequest(commandSet[0], commandSet[1]);
+                Request commandRequest = new Request(commandSet[0], commandSet[1]);
                 processCommand(commandRequest);
                 return 1;
             } else if (commandType.equals(CommandType.UPDATE)) {
-                CommandRequest commandRequest = new CommandRequest(commandSet[0], OrganizationCreator.organizationCreator(scanner), commandSet[1]);
+                Request commandRequest = new Request(commandSet[0], OrganizationCreator.organizationCreator(scanner), commandSet[1]);
                 processCommand(commandRequest);
                 return 1;
             } else if (commandType.equals(CommandType.SCRIPT)) {
@@ -56,7 +56,7 @@ public class CommandHandler {
     }
 
 
-    private void processCommand(CommandRequest request) throws IOException, ClassNotFoundException {
+    private void processCommand(Request request) throws IOException, ClassNotFoundException {
         communicator.connect();
         Sender sender = new Sender(communicator.getSocketChannel().socket());
         sender.sendObject(request);
@@ -103,5 +103,3 @@ public class CommandHandler {
     }
 
 }
-
-

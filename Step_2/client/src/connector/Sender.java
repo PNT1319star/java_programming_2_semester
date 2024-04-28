@@ -1,6 +1,6 @@
 package connector;
 
-import interaction.CommandRequest;
+import interaction.Request;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -14,10 +14,10 @@ public class Sender {
         this.socket = socket;
     }
 
-    public void sendObject(CommandRequest commandRequest) throws IOException {
+    public void sendObject(Request request) throws IOException {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
-        outputStream.writeObject(commandRequest);
+        outputStream.writeObject(request);
         outputStream.flush();
         byte[] data = byteArrayOutputStream.toByteArray();
         socket.getOutputStream().write(data);

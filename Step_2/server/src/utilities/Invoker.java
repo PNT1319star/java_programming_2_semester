@@ -1,6 +1,6 @@
 package utilities;
 
-import interaction.CommandRequest;
+import interaction.Request;
 import processing.specificcommands.AbstractCommand;
 
 import java.util.HashMap;
@@ -16,11 +16,11 @@ public class Invoker {
         return commands;
     }
 
-    public static String executeCommand(CommandRequest commandRequest) {
-        String name = commandRequest.getCommand();
+    public static String executeCommand(Request request) {
+        String name = request.getCommand();
         AbstractCommand command = commands.get(name);
-        String argument = commandRequest.getArgument();
-        Object object = commandRequest.getObject();
+        String argument = request.getArgument();
+        Object object = request.getObject();
         return  command.execute(argument, object);
     }
 }
