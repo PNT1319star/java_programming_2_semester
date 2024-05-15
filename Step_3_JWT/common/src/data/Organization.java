@@ -11,7 +11,7 @@ import java.util.Objects;
  * It includes details such as ID, name, coordinates, creation date, annual turnover,
  * full name, employees count, type, and postal address.
  */
-public class Organization implements Comparable<Organization>, Cloneable, Serializable {
+public class Organization implements Cloneable, Serializable {
     private Integer id;
     private String name;
     private Coordinates coordinates;
@@ -123,10 +123,10 @@ public class Organization implements Comparable<Organization>, Cloneable, Serial
         return userName;
     }
 
-    @Override
-    public int compareTo(Organization organization) {
-        if (this.annualTurnover - organization.getAnnualTurnover() > 0) return 1;
-        if (this.annualTurnover - organization.getAnnualTurnover() == 0) return 0;
+
+    public int compareTo(Float annualTurnover) {
+        if (this.annualTurnover - annualTurnover > 0) return 1;
+        if (this.annualTurnover - annualTurnover == 0) return 0;
         else return -1;
     }
 

@@ -45,8 +45,7 @@ public class Server {
                 DatabaseUserManager databaseUserManager = new DatabaseUserManager(databaseConnector);
                 DatabaseHandler databaseHandler = new DatabaseHandler(databaseConnector);
                 DatabaseCollectionManager databaseCollectionManager = new DatabaseCollectionManager(databaseConnector,databaseUserManager,databaseHandler);
-                CollectionManager collectionManager = new CollectionManager(databaseCollectionManager);
-                ServerCommandProcessor serverCommandProcessor = new ServerCommandProcessor(databaseUserManager, collectionManager);
+                ServerCommandProcessor serverCommandProcessor = new ServerCommandProcessor(databaseUserManager,databaseCollectionManager);
                 CommandManager.invokeCommand(serverCommandProcessor);
                 serverProcessor.decodeAndProcessCommand();
             }

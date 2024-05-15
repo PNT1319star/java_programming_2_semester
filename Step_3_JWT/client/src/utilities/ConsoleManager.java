@@ -1,12 +1,15 @@
 package utilities;
 
 import connector.Communicator;
+import exceptions.ConnectionErrorException;
+import exceptions.LoginException;
 import interaction.User;
 import mode.UserInputMode;
 import processing.CommandHandler;
 import processing.UserAuthHandler;
 import utility.ConsolePrinter;
 
+import java.util.Locale;
 import java.util.Scanner;
 
 public class ConsoleManager {
@@ -21,12 +24,15 @@ public class ConsoleManager {
             UserInputMode userInputMode = new UserInputMode();
             ConsolePrinter.printInformation("Welcome to my application!");
             ConsolePrinter.printInformation("You have to log in or register!");
-            String token = userAuthHandler.processAuthentication();
+            userAuthHandler.processAuthentication();
+            String token = userAuthHandler.getToken();
             CommandHandler commandHandler = new CommandHandler(communicator, token);
             userInputMode.executeMode(commandHandler);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
+        } catch (ConnectionErrorException exception) {
+            ConsolePrinter.printError("The number of connection attempts has been exceeded!");
+            ConsolePrinter.printError("Can not connect to server!");
+        } catch (LoginException exception) {
+            ConsolePrinter.printError("Something wrong with the login!");
         }
     }
 }

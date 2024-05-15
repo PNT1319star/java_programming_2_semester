@@ -3,11 +3,14 @@ package database;
 import exceptions.HandlingDatabaseException;
 import interaction.User;
 import utilities.PasswordEncryptor;
+import utilities.Roles;
 import utility.ConsolePrinter;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DatabaseUserManager {
     private final DatabaseConnector databaseConnector;
@@ -24,7 +27,7 @@ public class DatabaseUserManager {
             preparedSelectedUserByIdStatement.setInt(1, userId);
             ResultSet resultSet = preparedSelectedUserByIdStatement.executeQuery();
             if (resultSet.next()) {
-                user =  resultSet.getString(DatabaseConstants.USER_TABLE_USERNAME_COLUMN);
+                user = resultSet.getString(DatabaseConstants.USER_TABLE_USERNAME_COLUMN);
             } else throw new SQLException();
         } catch (SQLException exception) {
             ConsolePrinter.printError("An error occurred while executing the SELECT_USER_BY_ID query!");
@@ -80,18 +83,77 @@ public class DatabaseUserManager {
         try {
             if (selectUserIdByUsername(user.getUsername()) != -1) return false;
             preparedInsertedUserStatement =
-                    StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.INSERT_USER, false);
+                    StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.INSERT_USER, true);
             String username = user.getUsername();
             String hashedPassword = PasswordEncryptor.hashPassword(user.getPassword());
-            preparedInsertedUserStatement.setString(1, username);
-            preparedInsertedUserStatement.setString(2, hashedPassword);
-            if (preparedInsertedUserStatement.executeUpdate() == 0) throw new SQLException();
-            return true;
+            if (username.equals("admin")) {
+                preparedInsertedUserStatement.setString(1, username);
+                preparedInsertedUserStatement.setString(2, hashedPassword);
+                preparedInsertedUserStatement.setInt(3, 1);
+            } else {
+                preparedInsertedUserStatement.setString(1, username);
+                preparedInsertedUserStatement.setString(2, hashedPassword);
+                preparedInsertedUserStatement.setInt(3, 3);
+            }
+            ResultSet resultSet = preparedInsertedUserStatement.executeQuery();
+            return resultSet.next();
         } catch (SQLException exception) {
             ConsolePrinter.printError("An error occurred while executing the INSERT_USER query!");
             throw new HandlingDatabaseException();
         } finally {
             StatementBuilder.closedPreparedStatement(preparedInsertedUserStatement);
+        }
+    }
+
+    public Roles getUserRole(User user) throws HandlingDatabaseException {
+        PreparedStatement getRoleIdStatement = null;
+        String username = user.getUsername();
+        Roles userRole;
+        try {
+            getRoleIdStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.SELECT_ROLE_ID_BY_USERNAME, false);
+            getRoleIdStatement.setString(1, username);
+            ResultSet resultSet = getRoleIdStatement.executeQuery();
+            if (resultSet.next()) {
+                int roleID = resultSet.getInt(DatabaseConstants.USER_TABLE_ROLE_ID_COLUMN);
+                PreparedStatement getRoleStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.SELECT_ROLE_BY_ROLE_ID, false);
+                getRoleStatement.setInt(1, roleID);
+                ResultSet resultSet1 = getRoleStatement.executeQuery();
+                if (resultSet1.next()) {
+                    userRole = Roles.valueOf(resultSet1.getString("id"));
+                } else throw new SQLException();
+                getRoleStatement.close();
+            } else throw new SQLException();
+            return userRole;
+        } catch (SQLException exception) {
+            throw new HandlingDatabaseException();
+        } finally {
+            StatementBuilder.closedPreparedStatement(getRoleIdStatement);
+        }
+    }
+
+    public List<String> getFunctionList(Roles role) throws HandlingDatabaseException {
+        List<String> functionList = new ArrayList<>();
+        PreparedStatement getFunctionStatement = null;
+        try {
+            getFunctionStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.SELECT_FUNCTION_BY_ROLE, false);
+            getFunctionStatement.setString(1, role.toString().toLowerCase());
+            ResultSet resultSet = getFunctionStatement.executeQuery();
+            while (resultSet.next()) {
+                String function = resultSet.getString("function");
+                functionList.add(function);
+            }
+        } catch (SQLException exception) {
+            throw new HandlingDatabaseException();
+        } finally {
+            StatementBuilder.closedPreparedStatement(getFunctionStatement);
+        }
+        return functionList;
+    }
+    public boolean updateUserRole(Roles role) throws HandlingDatabaseException {
+        String sRole = role.toString().toLowerCase();
+        PreparedStatement updateUserRoleStatement = null;
+        try {
+
         }
     }
 }

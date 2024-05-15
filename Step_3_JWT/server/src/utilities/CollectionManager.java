@@ -5,8 +5,8 @@ import database.DatabaseCollectionManager;
 import exceptions.HandlingDatabaseException;
 import interaction.OrganizationRaw;
 import utility.ConsolePrinter;
-import utility.IDGenerator;
 
+import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.ArrayDeque;
 import java.util.Comparator;
@@ -29,20 +29,44 @@ public class CollectionManager {
         return arrayDeque;
     }
 
-    public String add(OrganizationRaw organization) {
-        databaseCollectionManager.insertOrganization(organization,)
-        return "Organization has been added to the collection!";
+    public String add(OrganizationRaw organization, String userName) throws IOException {
+        try {
+            if (databaseCollectionManager.insertOrganization(organization, userName)) {
+                databaseCollectionManager.loadCollection();
+                return "Organization has been added to the collection!";
+            } else {
+                throw new HandlingDatabaseException();
+            }
+        } catch (HandlingDatabaseException exception) {
+            throw new IOException();
+        }
     }
 
-    public String clear() {
-        arrayDeque.clear();
-        return "The collection is empty!";
+    public String clear(String userName) throws IOException {
+        try {
+            if (databaseCollectionManager.deleteOrganizationByUsername(userName)) {
+                databaseCollectionManager.loadCollection();
+                return "All your organizations have been deleted!";
+            } else {
+                throw new HandlingDatabaseException();
+            }
+        } catch (HandlingDatabaseException exception) {
+            throw new IOException();
+        }
     }
 
-    public String addIfMax(Organization organization) {
-        if (arrayDeque.isEmpty() || arrayDeque.stream().allMatch(org -> org.compareTo(organization) <= 0)) {
-            add(organization);
-            return "The organization has been added to the collection!";
+    public String addIfMax(OrganizationRaw organization, String userName) throws IOException {
+        if (arrayDeque.isEmpty() || arrayDeque.stream().allMatch(org -> org.compareTo(organization.getAnnualTurnover()) <= 0)) {
+            try {
+                if (databaseCollectionManager.insertOrganization(organization, userName)) {
+                    databaseCollectionManager.loadCollection();
+                    return "Organization has been added to the collection!";
+                } else {
+                    throw new HandlingDatabaseException();
+                }
+            } catch (HandlingDatabaseException exception) {
+                throw new IOException();
+            }
         }
         return "The organization can not be added to the collection!";
     }
@@ -82,16 +106,25 @@ public class CollectionManager {
                 .collect(Collectors.joining());
     }
 
-    public String removeByID(String sID) {
+    public String removeByID(String sID, String userName) throws IOException {
         if (arrayDeque.isEmpty()) return "The collection is empty!";
-        Integer ID = Integer.parseInt(sID);
-        arrayDeque.removeIf(organization -> organization.getId().equals(ID));
-        return "The organization with this ID has been removed!";
+        try {
+            int Id = Integer.parseInt(sID);
+            if (databaseCollectionManager.deleteOrganizationById(Id,userName)) {
+                databaseCollectionManager.loadCollection();
+                return "The organization with this ID has been removed!";
+            } else {
+                throw new HandlingDatabaseException();
+            }
+        } catch (HandlingDatabaseException exception) {
+            throw new IOException();
+        }
     }
 
-    public String removeLower(Organization organization) {
+    public String removeLower(OrganizationRaw organization, String userName) {
         if (arrayDeque.isEmpty()) return "The collection is empty!";
-        arrayDeque.removeIf(org -> org.compareTo(organization) < 0);
+
+        arrayDeque.removeIf(org -> org.compareTo(organization.getAnnualTurnover()) < 0);
         return "All organizations that meet the conditions have been deleted!";
     }
 

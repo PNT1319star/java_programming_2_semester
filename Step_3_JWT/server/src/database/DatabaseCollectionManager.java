@@ -6,6 +6,7 @@ import data.Organization;
 import data.OrganizationType;
 import exceptions.HandlingDatabaseException;
 import interaction.OrganizationRaw;
+import interaction.User;
 import utility.ConsolePrinter;
 
 import java.sql.PreparedStatement;
@@ -29,7 +30,7 @@ public class DatabaseCollectionManager {
     }
 
     // add command, add_if_max command
-    public boolean insertOrganization(OrganizationRaw rawOrganization, String user) throws HandlingDatabaseException {
+    public boolean insertOrganization(OrganizationRaw rawOrganization, String userName) throws HandlingDatabaseException {
         PreparedStatement preparedInsertOrganizationStatement = null;
         PreparedStatement preparedInsertCoordinatesStatement = null;
         PreparedStatement preparedInsertAddressStatement = null;
@@ -85,7 +86,7 @@ public class DatabaseCollectionManager {
             preparedInsertOrganizationStatement.setInt(6, rawOrganization.getEmployeesCount());
             preparedInsertOrganizationStatement.setString(7, rawOrganization.getType().toString());
             preparedInsertOrganizationStatement.setInt(8, addressId);
-            preparedInsertOrganizationStatement.setInt(9, databaseUserManager.selectUserIdByUsername(user));
+            preparedInsertOrganizationStatement.setInt(9, databaseUserManager.selectUserIdByUsername(userName));
 
             databaseHandler.commitTransaction();
             return true;
@@ -151,6 +152,121 @@ public class DatabaseCollectionManager {
         } finally {
             StatementBuilder.closedPreparedStatement(preparedDeleteOrganizationByIdStatement);
         }
+    }
+
+
+    // update command
+    public void updateOrganizationById(int organizationId, OrganizationRaw organizationRaw, String userName) throws
+            HandlingDatabaseException {
+        PreparedStatement preparedUpdateOrganizationNameByIdStatement = null;
+        PreparedStatement preparedUpdateOrganizationTurnoverByIdStatement = null;
+        PreparedStatement preparedUpdateOrganizationFullNameByIdStatement = null;
+        PreparedStatement preparedUpdateOrganizationEmployeesCountByIdStatement = null;
+        PreparedStatement preparedUpdateOrganizationTypeByIdStatement = null;
+        PreparedStatement preparedUpdateCoordinatesByOrganizationIdStatement = null;
+        PreparedStatement preparedUpdateAddressByIdStatement = null;
+        try {
+            databaseHandler.startTransaction();
+            databaseHandler.setSavepoint();
+
+            preparedUpdateOrganizationNameByIdStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.UPDATE_ORGANIZATION_NAME_BY_ID, false);
+            preparedUpdateOrganizationTurnoverByIdStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.UPDATE_ORGANIZATION_TURNOVER_BY_ID, false);
+            preparedUpdateOrganizationFullNameByIdStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.UPDATE_ORGANIZATION_FULL_NAME_BY_ID, false);
+            preparedUpdateOrganizationEmployeesCountByIdStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.UPDATE_ORGANIZATION_EMPLOYEE_BY_ID, false);
+            preparedUpdateOrganizationTypeByIdStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.UPDATE_ORGANIZATION_TYPE_BY_ID, false);
+            preparedUpdateCoordinatesByOrganizationIdStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.UPDATE_ORGANIZATION_COORDINATES, false);
+            preparedUpdateAddressByIdStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.UPDATE_ORGANIZATION_ADDRESS_BY_ID, false);
+
+            if (organizationRaw.getName() != null) {
+                preparedUpdateOrganizationNameByIdStatement.setString(1, organizationRaw.getName());
+                preparedUpdateOrganizationNameByIdStatement.setInt(2, organizationId);
+                if (preparedUpdateOrganizationNameByIdStatement.executeUpdate() == 0) throw new SQLException();
+            }
+            if (organizationRaw.getCoordinates() != null) {
+                int coordinatesId = 0;
+                PreparedStatement insertCoordinatesStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.INSERT_COORDINATES, true);
+                insertCoordinatesStatement.setLong(1, organizationRaw.getCoordinates().getX());
+                insertCoordinatesStatement.setLong(2, organizationRaw.getCoordinates().getY());
+                if (insertCoordinatesStatement.executeUpdate() == 0) {
+                    PreparedStatement selectCoordinateIdStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.SELECT_COORDINATE_ID_BY_X_AND_Y, false);
+                    selectCoordinateIdStatement.setLong(1, organizationRaw.getCoordinates().getX());
+                    selectCoordinateIdStatement.setLong(2, organizationRaw.getCoordinates().getY());
+                    ResultSet resultSet = selectCoordinateIdStatement.executeQuery();
+                    if (resultSet.next()) {
+                        coordinatesId = resultSet.getInt(DatabaseConstants.COORDINATES_TABLE_ID_COLUMN);
+                    }
+                    selectCoordinateIdStatement.close();
+                } else {
+                    ResultSet generatedCoordinatesKeys = insertCoordinatesStatement.getGeneratedKeys();
+                    if (generatedCoordinatesKeys.next()) {
+                        coordinatesId = generatedCoordinatesKeys.getInt(1);
+                    } else throw new SQLException();
+                }
+                preparedUpdateCoordinatesByOrganizationIdStatement.setInt(1, coordinatesId);
+                preparedUpdateOrganizationNameByIdStatement.setInt(2, organizationId);
+                if (preparedUpdateCoordinatesByOrganizationIdStatement.executeUpdate() == 0)
+                    throw new SQLException();
+            }
+
+            if (organizationRaw.getAnnualTurnover() != null) {
+                preparedUpdateOrganizationTurnoverByIdStatement.setFloat(1, organizationRaw.getAnnualTurnover());
+                preparedUpdateOrganizationTurnoverByIdStatement.setInt(2, organizationId);
+                if (preparedUpdateOrganizationTurnoverByIdStatement.executeUpdate() == 0) throw new SQLException();
+            }
+            if (organizationRaw.getFullName() != null) {
+                preparedUpdateOrganizationFullNameByIdStatement.setString(1, organizationRaw.getFullName());
+                preparedUpdateOrganizationFullNameByIdStatement.setInt(2, organizationId);
+                if (preparedUpdateOrganizationFullNameByIdStatement.executeUpdate() == 0) throw new SQLException();
+            }
+            if (organizationRaw.getEmployeesCount() != null) {
+                preparedUpdateOrganizationEmployeesCountByIdStatement.setInt(1, organizationRaw.getEmployeesCount());
+                preparedUpdateOrganizationEmployeesCountByIdStatement.setInt(2, organizationId);
+                if (preparedUpdateOrganizationEmployeesCountByIdStatement.executeUpdate() == 0)
+                    throw new SQLException();
+            }
+            if (organizationRaw.getType() != null) {
+                preparedUpdateOrganizationTypeByIdStatement.setString(1, organizationRaw.getType().toString());
+                preparedUpdateOrganizationTypeByIdStatement.setInt(2, organizationId);
+                if (preparedUpdateOrganizationTypeByIdStatement.executeUpdate() == 0) throw new SQLException();
+            }
+            if (organizationRaw.getAddress() != null) {
+                preparedUpdateAddressByIdStatement.setString(1, organizationRaw.getAddress().getStreet());
+                preparedUpdateAddressByIdStatement.setInt(2, getAddressIdById(organizationId));
+                if (preparedUpdateAddressByIdStatement.executeUpdate() == 0) throw new SQLException();
+            }
+            databaseHandler.commitTransaction();
+        } catch (SQLException exception) {
+            ConsolePrinter.printError("An error occurred while executing a group of requests to update an object!");
+            databaseHandler.rollbackTransaction();
+            throw new HandlingDatabaseException();
+        } finally {
+            StatementBuilder.closedPreparedStatement(preparedUpdateOrganizationNameByIdStatement);
+            StatementBuilder.closedPreparedStatement(preparedUpdateOrganizationTurnoverByIdStatement);
+            StatementBuilder.closedPreparedStatement(preparedUpdateOrganizationFullNameByIdStatement);
+            StatementBuilder.closedPreparedStatement(preparedUpdateOrganizationEmployeesCountByIdStatement);
+            StatementBuilder.closedPreparedStatement(preparedUpdateOrganizationTypeByIdStatement);
+            StatementBuilder.closedPreparedStatement(preparedUpdateCoordinatesByOrganizationIdStatement);
+            StatementBuilder.closedPreparedStatement(preparedUpdateAddressByIdStatement);
+            databaseHandler.stopTransaction();
+        }
+    }
+
+    //Load collection
+    public ArrayDeque<Organization> loadCollection() throws HandlingDatabaseException {
+        ArrayDeque<Organization> organizationArrayDeque = new ArrayDeque<>();
+        PreparedStatement preparedSelectAllStatement = null;
+        try {
+            preparedSelectAllStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.SELECT_ALL_ORGANIZATIONS, false);
+            ResultSet resultSet = preparedSelectAllStatement.executeQuery();
+            while (resultSet.next()) {
+                organizationArrayDeque.add(createOrganization(resultSet));
+            }
+        } catch (SQLException exception) {
+            throw new HandlingDatabaseException();
+        } finally {
+            StatementBuilder.closedPreparedStatement(preparedSelectAllStatement);
+        }
+        return organizationArrayDeque;
     }
 
     private Coordinates getCoordinatesByOrganizationId(int organizationId) throws SQLException {
@@ -225,117 +341,6 @@ public class DatabaseCollectionManager {
         Address address = getAddressById(resultSet.getInt(DatabaseConstants.ORGANIZATION_TABLE_ADDRESS_ID_COLUMN));
         String owner = databaseUserManager.selectUserById(resultSet.getInt(DatabaseConstants.ORGANIZATION_TABLE_USER_ID_COLUMN));
         return new Organization(id, name, coordinates, creationDate, annualTurnover, fullName, employeesCount, type, address, owner);
-    }
-
-    // update command
-    public void updateOrganizationById(int organizationId, OrganizationRaw organizationRaw) throws
-            HandlingDatabaseException {
-        PreparedStatement preparedUpdateOrganizationNameByIdStatement = null;
-        PreparedStatement preparedUpdateOrganizationTurnoverByIdStatement = null;
-        PreparedStatement preparedUpdateOrganizationFullNameByIdStatement = null;
-        PreparedStatement preparedUpdateOrganizationEmployeesCountByIdStatement = null;
-        PreparedStatement preparedUpdateOrganizationTypeByIdStatement = null;
-        PreparedStatement preparedUpdateCoordinatesByOrganizationIdStatement = null;
-        PreparedStatement preparedUpdateAddressByIdStatement = null;
-        try {
-            databaseHandler.startTransaction();
-            databaseHandler.setSavepoint();
-
-            preparedUpdateOrganizationNameByIdStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.UPDATE_ORGANIZATION_NAME_BY_ID, false);
-            preparedUpdateOrganizationTurnoverByIdStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.UPDATE_ORGANIZATION_TURNOVER_BY_ID, false);
-            preparedUpdateOrganizationFullNameByIdStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.UPDATE_ORGANIZATION_FULL_NAME_BY_ID, false);
-            preparedUpdateOrganizationEmployeesCountByIdStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.UPDATE_ORGANIZATION_EMPLOYEE_BY_ID, false);
-            preparedUpdateOrganizationTypeByIdStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.UPDATE_ORGANIZATION_TYPE_BY_ID, false);
-            preparedUpdateCoordinatesByOrganizationIdStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.UPDATE_COORDINATES_BY_ORGANIZATION_ID, false);
-            preparedUpdateAddressByIdStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.UPDATE_ORGANIZATION_ADDRESS_BY_ID, false);
-
-            if (organizationRaw.getName() != null) {
-                preparedUpdateOrganizationNameByIdStatement.setString(1, organizationRaw.getName());
-                preparedUpdateOrganizationNameByIdStatement.setInt(2, organizationId);
-                if (preparedUpdateOrganizationNameByIdStatement.executeUpdate() == 0) throw new SQLException();
-            }
-            if (organizationRaw.getCoordinates() != null) {
-                preparedUpdateCoordinatesByOrganizationIdStatement.setLong(1, organizationRaw.getCoordinates().getX());
-                preparedUpdateCoordinatesByOrganizationIdStatement.setLong(2, organizationRaw.getCoordinates().getY());
-                preparedUpdateCoordinatesByOrganizationIdStatement.setInt(3, organizationId);
-                if (preparedUpdateCoordinatesByOrganizationIdStatement.executeUpdate() == 0)
-                    throw new SQLException();
-            }
-            if (organizationRaw.getAnnualTurnover() != null) {
-                preparedUpdateOrganizationTurnoverByIdStatement.setFloat(1, organizationRaw.getAnnualTurnover());
-                preparedUpdateOrganizationTurnoverByIdStatement.setInt(2, organizationId);
-                if (preparedUpdateOrganizationTurnoverByIdStatement.executeUpdate() == 0) throw new SQLException();
-            }
-            if (organizationRaw.getFullName() != null) {
-                preparedUpdateOrganizationFullNameByIdStatement.setString(1, organizationRaw.getFullName());
-                preparedUpdateOrganizationFullNameByIdStatement.setInt(2, organizationId);
-                if (preparedUpdateOrganizationFullNameByIdStatement.executeUpdate() == 0) throw new SQLException();
-            }
-            if (organizationRaw.getEmployeesCount() != null) {
-                preparedUpdateOrganizationEmployeesCountByIdStatement.setInt(1, organizationRaw.getEmployeesCount());
-                preparedUpdateOrganizationEmployeesCountByIdStatement.setInt(2, organizationId);
-                if (preparedUpdateOrganizationEmployeesCountByIdStatement.executeUpdate() == 0)
-                    throw new SQLException();
-            }
-            if (organizationRaw.getType() != null) {
-                preparedUpdateOrganizationTypeByIdStatement.setString(1, organizationRaw.getType().toString());
-                preparedUpdateOrganizationTypeByIdStatement.setInt(2, organizationId);
-                if (preparedUpdateOrganizationTypeByIdStatement.executeUpdate() == 0) throw new SQLException();
-            }
-            if (organizationRaw.getAddress() != null) {
-                preparedUpdateAddressByIdStatement.setString(1, organizationRaw.getAddress().getStreet());
-                preparedUpdateAddressByIdStatement.setInt(2, getAddressIdById(organizationId));
-                if (preparedUpdateAddressByIdStatement.executeUpdate() == 0) throw new SQLException();
-            }
-            databaseHandler.commitTransaction();
-        } catch (SQLException exception) {
-            ConsolePrinter.printError("An error occurred while executing a group of requests to update an object!");
-            databaseHandler.rollbackTransaction();
-            throw new HandlingDatabaseException();
-        } finally {
-            StatementBuilder.closedPreparedStatement(preparedUpdateOrganizationNameByIdStatement);
-            StatementBuilder.closedPreparedStatement(preparedUpdateOrganizationTurnoverByIdStatement);
-            StatementBuilder.closedPreparedStatement(preparedUpdateOrganizationFullNameByIdStatement);
-            StatementBuilder.closedPreparedStatement(preparedUpdateOrganizationEmployeesCountByIdStatement);
-            StatementBuilder.closedPreparedStatement(preparedUpdateOrganizationTypeByIdStatement);
-            StatementBuilder.closedPreparedStatement(preparedUpdateCoordinatesByOrganizationIdStatement);
-            StatementBuilder.closedPreparedStatement(preparedUpdateAddressByIdStatement);
-            databaseHandler.stopTransaction();
-        }
-    }
-
-
-//    public boolean checkOrganizationUserById(int organizationId, User user) throws HandlingDatabaseException {
-//        PreparedStatement preparedSelectOrganizationIdAndUserIdStatement = null;
-//        try {
-//            preparedSelectOrganizationIdAndUserIdStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.SELECT_ORGANIZATION_BY_ID_AND_USER_ID, false);
-//            preparedSelectOrganizationIdAndUserIdStatement.setInt(1, organizationId);
-//            preparedSelectOrganizationIdAndUserIdStatement.setInt(2, databaseUserManager.selectUserIdByUsername(user));
-//            ResultSet resultSet = preparedSelectOrganizationIdAndUserIdStatement.executeQuery();
-//            return resultSet.next();
-//        } catch (SQLException exception) {
-//            ConsolePrinter.printError("An error occurred while executing the SELECT_ORGANIZATION_BY_ID_AND_USER_ID query!");
-//            throw new HandlingDatabaseException();
-//        } finally {
-//            StatementBuilder.closedPreparedStatement(preparedSelectOrganizationIdAndUserIdStatement);
-//        }
-//    }
-
-    public ArrayDeque<Organization> loadCollection() throws HandlingDatabaseException {
-        ArrayDeque<Organization> organizationArrayDeque = new ArrayDeque<>();
-        PreparedStatement preparedSelectAllStatement = null;
-        try {
-            preparedSelectAllStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.SELECT_ALL_ORGANIZATIONS, false);
-            ResultSet resultSet = preparedSelectAllStatement.executeQuery();
-            while (resultSet.next()) {
-                organizationArrayDeque.add(createOrganization(resultSet));
-            }
-        } catch (SQLException exception) {
-            throw new HandlingDatabaseException();
-        } finally {
-            StatementBuilder.closedPreparedStatement(preparedSelectAllStatement);
-        }
-        return organizationArrayDeque;
     }
 
 }

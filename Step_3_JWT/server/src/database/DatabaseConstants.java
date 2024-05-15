@@ -11,6 +11,7 @@ public class DatabaseConstants {
     public static final String USER_TABLE_ID_COLUMN = "id";
     public static final String USER_TABLE_USERNAME_COLUMN = "username";
     public static final String USER_TABLE_PASSWORD_COLUMN = "password";
+    public static final String USER_TABLE_ROLE_ID_COLUMN = "role_id";
     //ADDRESS_TABLE column names
     public static final String ADDRESS_TABLE_ID_COLUMN = "id";
     public static final String ADDRESS_TABLE_STREET_COLUMN = "street";
@@ -31,7 +32,7 @@ public class DatabaseConstants {
     public static final String ORGANIZATION_TABLE_USER_ID_COLUMN = "user_id";
     // ORGANIZATION_TABLE
     public static final String SELECT_ALL_ORGANIZATIONS = "SELECT * FROM " + ORGANIZATION_TABLE;
-    public static final String SELECT_ORGANIZATION_BY_ID = SELECT_ALL_ORGANIZATIONS + "WHERE " + ORGANIZATION_TABLE_ID_COLUMN + " = ?";// for commands "remove_by_id", "update"
+    public static final String SELECT_ORGANIZATION_BY_ID = SELECT_ALL_ORGANIZATIONS + "WHERE " + ORGANIZATION_TABLE_ID_COLUMN + " = ?";
     public static final String INSERT_ORGANIZATION = "INSERT INTO " +
             ORGANIZATION_TABLE + " (" +
             ORGANIZATION_TABLE_NAME_COLUMN + ", " +
@@ -61,6 +62,9 @@ public class DatabaseConstants {
     public static final String UPDATE_ORGANIZATION_ADDRESS_BY_ID = "UPDATE " + ORGANIZATION_TABLE + " SET " +
             ORGANIZATION_TABLE_ADDRESS_ID_COLUMN + " = ?" + " WHERE " +
             ORGANIZATION_TABLE_ID_COLUMN + " = ?";
+    public static final String UPDATE_ORGANIZATION_COORDINATES = "UPDATE " + ORGANIZATION_TABLE + " SET " +
+            ORGANIZATION_TABLE_COORDINATES_ID + " = ?" + " WHERE " +
+            ORGANIZATION_TABLE_ID_COLUMN + " = ?";
     public static final String DELETE_ORGANIZATION_BY_ID_AND_USER_ID = "DELETE FROM " + ORGANIZATION_TABLE +
             " WHERE " + ORGANIZATION_TABLE_ID_COLUMN + " = ? AND " + ORGANIZATION_TABLE_USER_ID_COLUMN + " = ?";
     public static final String DELETE_ORGANIZATION_BY_USER_ID = "DELETE FROM " + ORGANIZATION_TABLE +
@@ -71,6 +75,8 @@ public class DatabaseConstants {
             USER_TABLE_ID_COLUMN + " = ?";
     public static final String SELECT_USER_BY_USERNAME = "SELECT * FROM " + USER_TABLE + " WHERE " +
             USER_TABLE_USERNAME_COLUMN + " = ?";
+    public static final String SELECT_ROLE_ID_BY_USERNAME = "SELECT " + USER_TABLE_ROLE_ID_COLUMN + " WHERE " +
+            USER_TABLE_USERNAME_COLUMN + " = ?";
     public static final String SELECT_USER_ID_BY_USERNAME = "SELECT id FROM " + USER_TABLE + " WHERE " +
             USER_TABLE_USERNAME_COLUMN + " = ?";
     public static final String SELECT_USER_BY_USERNAME_AND_PASSWORD = SELECT_USER_BY_USERNAME + " AND " +
@@ -78,8 +84,8 @@ public class DatabaseConstants {
     public static final String INSERT_USER = "INSERT INTO " +
             USER_TABLE + " (" +
             USER_TABLE_USERNAME_COLUMN + ", " +
-            USER_TABLE_PASSWORD_COLUMN + ") VALUES (?, ?)";
-
+            USER_TABLE_PASSWORD_COLUMN + ", " +
+            USER_TABLE_ROLE_ID_COLUMN + ") VALUES (?, ?, ?)";
     // COORDINATES_TABLE
     public static final String SELECT_ALL_COORDINATES = "SELECT * FROM " + COORDINATES_TABLE;
     public static final String SELECT_COORDINATES_BY_ORGANIZATION_ID = SELECT_ALL_COORDINATES +
@@ -103,5 +109,11 @@ public class DatabaseConstants {
     public static final String UPDATE_ADDRESS_BY_ID = "UPDATE " + ADDRESS_TABLE + " SET " +
             ADDRESS_TABLE_STREET_COLUMN + " = ? " + " WHERE " +
             ADDRESS_TABLE_ID_COLUMN + " = ?";
-
+    // ROLES_TABLE
+    public static final String SELECT_ROLE_BY_ROLE_ID = "SELECT role FROM ROLES WHERE id = ?";
+    public static final String SELECT_FUNCTION_BY_ROLE = "SELECT f.function " +
+            "FROM ROLES r " +
+            "JOIN ROLE_FUNCTIONS rf ON r.id = rf.role_id " +
+            "JOIN FUNCTIONS f ON rf.function_id = f.id " +
+            "WHERE r.role = ?";
 }

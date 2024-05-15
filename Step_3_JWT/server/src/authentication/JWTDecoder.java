@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 
 import java.util.Date;
+import java.util.List;
 
 
 public class JWTDecoder {
@@ -17,16 +18,21 @@ public class JWTDecoder {
         return claimsJws.getBody();
     }
 
-    public static String checkJWT(String jwtToken) {
+    public static boolean checkJWT(String jwtToken) {
         Claims claims = decodeJWT(jwtToken);
         if (claims != null) {
-            String username = claims.get("username", String.class);
             Date expirationDate = claims.getExpiration();
-            if (expirationDate.before(new Date())) {
-                return "Token has expired!";
-            }
-            return username;
-        }
-        return "Invalid JWT token";
+            if (expirationDate.before(new Date())) return false;
+            return true;
+        } else return false;
+    }
+
+    public static String getUsername(String jwtToken) {
+        Claims claims = decodeJWT(jwtToken);
+        return claims.get("username", String.class);
+    }
+    public static List<String> getFunctionList(String jwtToken) {
+        Claims claims = decodeJWT(jwtToken);
+        return claims.get("function", List.class);
     }
 }

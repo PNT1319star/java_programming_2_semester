@@ -2,22 +2,25 @@ package processing;
 
 import authentication.JWTEncoder;
 import data.Organization;
+import database.DatabaseCollectionManager;
 import database.DatabaseUserManager;
 import exceptions.HandlingDatabaseException;
 import interaction.OrganizationRaw;
 import interaction.User;
 import utilities.CollectionManager;
 import utilities.Invoker;
+import utilities.Roles;
 
 import java.io.IOException;
+import java.util.List;
 
 public class ServerCommandProcessor {
     private final DatabaseUserManager databaseUserManager;
     private final CollectionManager collectionManager;
 
-    public ServerCommandProcessor(DatabaseUserManager databaseUserManager, CollectionManager collectionManager) {
+    public ServerCommandProcessor(DatabaseUserManager databaseUserManager, DatabaseCollectionManager databaseCollectionManager) {
         this.databaseUserManager = databaseUserManager;
-        this.collectionManager = collectionManager;
+        this.collectionManager = new CollectionManager(databaseCollectionManager);
     }
 
     public String help() throws IOException {
@@ -30,16 +33,16 @@ public class ServerCommandProcessor {
         return collectionManager.add((OrganizationRaw) object);
     }
 
-    public String addIfMax(Object object) throws IOException {
-        return collectionManager.addIfMax((Organization) object);
+    public String addIfMax(Object object, String userName) throws IOException {
+        return collectionManager.addIfMax((OrganizationRaw) object, userName);
     }
 
     public String info() throws IOException {
         return collectionManager.info();
     }
 
-    public String clear() throws IOException {
-        return collectionManager.clear();
+    public String clear(String userName) throws IOException {
+        return collectionManager.clear(userName);
     }
 
     public String filterStartsWithFullName(String fullName) throws IOException {
@@ -62,12 +65,12 @@ public class ServerCommandProcessor {
         return collectionManager.printUniquePostalAddress();
     }
 
-    public String removeById(String sID) throws IOException {
-        return collectionManager.removeByID(sID);
+    public String removeById(String sID, String userName) throws IOException {
+        return collectionManager.removeByID(sID, userName);
     }
 
-    public String removeLower(Object object) throws IOException {
-        return collectionManager.removeLower((Organization) object);
+    public String removeLower(Object object, String userName) throws IOException {
+        return collectionManager.removeLower((OrganizationRaw) object, userName);
     }
 
     public String update(String sID, Object object) throws IOException {
@@ -83,9 +86,11 @@ public class ServerCommandProcessor {
     public String login(Object object) {
         try {
             User user = (User) object;
-            if (databaseUserManager.checkUserByUsernameAndPassword(user))
-                return JWTEncoder.encodeJWT(user.getUsername());
-            else return "Incorrect username or password!";
+            if (databaseUserManager.checkUserByUsernameAndPassword(user)) {
+                Roles role = databaseUserManager.getUserRole(user);
+                List<String> functionList =databaseUserManager.getFunctionList(role);
+                return JWTEncoder.encodeJWT(user.getUsername(), role, functionList);
+            } else return "Incorrect username or password!";
         } catch (HandlingDatabaseException exception) {
             return "An error occurred while accessing to the database!";
         }
@@ -98,6 +103,12 @@ public class ServerCommandProcessor {
             else return "User " + user.getUsername() + " has been existed!";
         } catch (HandlingDatabaseException exception) {
             return "An error occurred while accessing to the database!";
+        }
+    }
+
+    public String changeRole(String role) {
+        try {
+
         }
     }
 }

@@ -4,6 +4,7 @@ import connector.Communicator;
 import connector.Receiver;
 import connector.Sender;
 import exceptions.ConnectionErrorException;
+import exceptions.LoginException;
 import interaction.Request;
 import interaction.Response;
 import interaction.User;
@@ -18,6 +19,7 @@ import java.util.Scanner;
 public class UserAuthHandler {
     private final Scanner scanner;
     private final Communicator communicator;
+    private String token;
 
     public UserAuthHandler(Scanner scanner, Communicator communicator) {
         this.scanner = scanner;
@@ -33,9 +35,9 @@ public class UserAuthHandler {
         return new Request(command, user, "","");
     }
 
-    public String processAuthentication() {
+    public void processAuthentication() throws LoginException, ConnectionErrorException {
         Request request;
-        Response response = null ;
+        Response response ;
         try {
             request = handleAuthentication();
             communicator.connect();
@@ -43,7 +45,10 @@ public class UserAuthHandler {
             sender.sendObject(request);
             Receiver receiver = new Receiver(communicator.getSocketChannel().socket());
             response = receiver.receive();
-            ConsolePrinter.printResult(response.getAnswer());
+            if (response != null) {
+                ConsolePrinter.printResult(response.getAnswer());
+                token = response.getAnswer();
+            } else throw new LoginException();
         } catch (InvalidClassException | NotSerializableException exception) {
             ConsolePrinter.printError("An error occurred while sending data to the server!");
         } catch (ClassNotFoundException exception) {
@@ -51,9 +56,11 @@ public class UserAuthHandler {
         } catch (IOException exception) {
             ConsolePrinter.printError("The connection to the server has been lost!");
         } catch (ConnectionErrorException exception) {
-            ConsolePrinter.printError("The number of connection attempts has been exceeded!");
-            ConsolePrinter.printError("Can not connect to server!");
+            throw new ConnectionErrorException();
         }
-        return response.getAnswer();
+    }
+
+    public String getToken() {
+        return token;
     }
 }

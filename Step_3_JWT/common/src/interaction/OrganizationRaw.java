@@ -2,6 +2,7 @@ package interaction;
 
 import data.Address;
 import data.Coordinates;
+import data.Organization;
 import data.OrganizationType;
 
 import java.io.Serial;
@@ -51,5 +52,6 @@ public class OrganizationRaw implements Serializable {
     public Address getAddress() {
         return address;
     }
+
 
 }

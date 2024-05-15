@@ -1,11 +1,13 @@
 package processing.specificcommands;
 
-import interaction.User;
+
+import utilities.Roles;
 
 public abstract class AbstractCommand {
     private final String name;
 
     private final String description;
+
 
     public AbstractCommand(String name, String description) {
         this.name = name;
