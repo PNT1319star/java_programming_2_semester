@@ -2,7 +2,6 @@ package processing;
 
 import authentication.JWTEncoder;
 import data.Organization;
-import database.DatabaseCollectionManager;
 import database.DatabaseUserManager;
 import exceptions.HandlingDatabaseException;
 import interaction.OrganizationRaw;
@@ -16,67 +15,65 @@ import java.util.List;
 
 public class ServerCommandProcessor {
     private final DatabaseUserManager databaseUserManager;
-    private final CollectionManager collectionManager;
 
-    public ServerCommandProcessor(DatabaseUserManager databaseUserManager, DatabaseCollectionManager databaseCollectionManager) {
+    public ServerCommandProcessor(DatabaseUserManager databaseUserManager) {
         this.databaseUserManager = databaseUserManager;
-        this.collectionManager = new CollectionManager(databaseCollectionManager);
     }
 
     public String help() throws IOException {
         StringBuilder sb = new StringBuilder();
-        Invoker.getCommands().forEach((name, command) -> sb.append(command.getCommandInformation()).append("\n"));
+        Invoker.getCommandsList().forEach((name, command) -> sb.append(command.getCommandInformation()).append("\n"));
         return sb.toString();
     }
 
     public String add(Object object) throws IOException {
-        return collectionManager.add((OrganizationRaw) object);
+        return CollectionManager.add((OrganizationRaw) object);
     }
 
-    public String addIfMax(Object object, String userName) throws IOException {
-        return collectionManager.addIfMax((OrganizationRaw) object, userName);
+    public String addIfMax(Object object) throws IOException {
+        return CollectionManager.addIfMax((OrganizationRaw) object);
     }
 
     public String info() throws IOException {
-        return collectionManager.info();
+        return CollectionManager.info();
     }
 
-    public String clear(String userName) throws IOException {
-        return collectionManager.clear(userName);
+    public String clear() throws IOException {
+        return CollectionManager.clear();
     }
 
     public String filterStartsWithFullName(String fullName) throws IOException {
-        return collectionManager.filterStartsWithFullName(fullName);
+        return CollectionManager.filterStartsWithFullName(fullName);
     }
 
     public String head() throws IOException {
-        return collectionManager.head();
+        return CollectionManager.head();
     }
 
     public String minByCreationDate() throws IOException {
-        return collectionManager.minByCreationDate();
+        return CollectionManager.minByCreationDate();
     }
 
     public String show() throws IOException {
-        return collectionManager.show();
+        return CollectionManager.show();
     }
 
     public String printUniquePostalAddress() throws IOException {
-        return collectionManager.printUniquePostalAddress();
+        return CollectionManager.printUniquePostalAddress();
     }
 
-    public String removeById(String sID, String userName) throws IOException {
-        return collectionManager.removeByID(sID, userName);
+    public String removeById(String sID) throws IOException {
+        return CollectionManager.removeByID(sID);
     }
 
-    public String removeLower(Object object, String userName) throws IOException {
-        return collectionManager.removeLower((OrganizationRaw) object, userName);
+    public String removeLower(Object object) throws IOException {
+        return CollectionManager.removeLower((OrganizationRaw) object);
     }
 
     public String update(String sID, Object object) throws IOException {
         int ID = Integer.parseInt(sID);
-        if (collectionManager.idExistence(ID)) {
-            collectionManager.updateElement((Organization) object, ID);
+        if (CollectionManager.idExistence(ID)) {
+            CollectionManager.updateElement((Organization) object, ID);
             return "The organization has been updated";
         } else {
             return "This ID does not exist in this collection!";
@@ -106,9 +103,12 @@ public class ServerCommandProcessor {
         }
     }
 
-    public String changeRole(String role) {
+    public String changeRole(String username,String role) {
         try {
-
+            if (databaseUserManager.updateUserRole(username, role)) return "Role of " + username + " has been changed!";
+            else return "Nothing has been changed!";
+        } catch (HandlingDatabaseException exception) {
+            return "An error occurred while accessing to the database!";
         }
     }
 }

@@ -6,6 +6,7 @@ import utilities.PasswordEncryptor;
 import utilities.Roles;
 import utility.ConsolePrinter;
 
+import javax.xml.crypto.Data;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -95,8 +96,8 @@ public class DatabaseUserManager {
                 preparedInsertedUserStatement.setString(2, hashedPassword);
                 preparedInsertedUserStatement.setInt(3, 3);
             }
-            ResultSet resultSet = preparedInsertedUserStatement.executeQuery();
-            return resultSet.next();
+            int rowsUpdate = preparedInsertedUserStatement.executeUpdate();
+            return rowsUpdate > 0;
         } catch (SQLException exception) {
             ConsolePrinter.printError("An error occurred while executing the INSERT_USER query!");
             throw new HandlingDatabaseException();
@@ -149,11 +150,25 @@ public class DatabaseUserManager {
         }
         return functionList;
     }
-    public boolean updateUserRole(Roles role) throws HandlingDatabaseException {
-        String sRole = role.toString().toLowerCase();
+    public boolean updateUserRole(String username, String role) throws HandlingDatabaseException {
         PreparedStatement updateUserRoleStatement = null;
         try {
-
+            PreparedStatement getRoleIdStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.SELECT_ROLE_ID_BY_ROLE, false);
+            getRoleIdStatement.setString(1, role);
+            ResultSet resultSet = getRoleIdStatement.executeQuery();
+            if (!resultSet.next()) throw new HandlingDatabaseException();
+            int roleId = resultSet.getInt("id");
+            StatementBuilder.closedPreparedStatement(getRoleIdStatement);
+            updateUserRoleStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.UPDATE_ROLE_ID_BY_USERNAME, false);
+            updateUserRoleStatement.setInt(1, roleId);
+            updateUserRoleStatement.setString(2, username);
+            int rowsUpdate = updateUserRoleStatement.executeUpdate();
+            return rowsUpdate > 0;
+        } catch (SQLException exception) {
+            throw new HandlingDatabaseException();
+        } finally {
+            StatementBuilder.closedPreparedStatement(updateUserRoleStatement);
         }
     }
+
 }

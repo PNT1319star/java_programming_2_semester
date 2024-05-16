@@ -8,6 +8,7 @@ import database.DatabaseConnector;
 import database.DatabaseHandler;
 import database.DatabaseUserManager;
 import exceptions.ConnectionErrorException;
+import exceptions.ConnectionTimeOutException;
 import exceptions.OpeningServerSocketException;
 import processing.CommandManager;
 import processing.ServerCommandProcessor;
@@ -44,8 +45,10 @@ public class Server {
                 ServerProcessor serverProcessor = new ServerProcessor(receiver, sender);
                 DatabaseUserManager databaseUserManager = new DatabaseUserManager(databaseConnector);
                 DatabaseHandler databaseHandler = new DatabaseHandler(databaseConnector);
-                DatabaseCollectionManager databaseCollectionManager = new DatabaseCollectionManager(databaseConnector,databaseUserManager,databaseHandler);
-                ServerCommandProcessor serverCommandProcessor = new ServerCommandProcessor(databaseUserManager,databaseCollectionManager);
+                DatabaseCollectionManager databaseCollectionManager = new DatabaseCollectionManager(databaseConnector, databaseUserManager, databaseHandler);
+                CollectionManager.setDatabaseCollectionManager(databaseCollectionManager);
+                CollectionManager.loadCollectionFromDatabase();
+                ServerCommandProcessor serverCommandProcessor = new ServerCommandProcessor(databaseUserManager);
                 CommandManager.invokeCommand(serverCommandProcessor);
                 serverProcessor.decodeAndProcessCommand();
             }
@@ -53,6 +56,8 @@ public class Server {
             exception.printStackTrace();
         } catch (OpeningServerSocketException | ConnectionErrorException e) {
             throw new RuntimeException(e);
+        } catch (ConnectionTimeOutException e) {
+            System.exit(0);
         }
     }
 

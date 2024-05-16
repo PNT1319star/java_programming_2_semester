@@ -37,9 +37,9 @@ public class DatabaseConstants {
             ORGANIZATION_TABLE + " (" +
             ORGANIZATION_TABLE_NAME_COLUMN + ", " +
             ORGANIZATION_TABLE_TIME_COLUMN + ", " +
-            ORGANIZATION_TABLE_COORDINATES_ID + ", " +
             ORGANIZATION_TABLE_TURNOVER_COLUMN + ", " +
             ORGANIZATION_TABLE_FULL_NAME_COLUMN + ", " +
+            ORGANIZATION_TABLE_COORDINATES_ID + ", " +
             ORGANIZATION_TABLE_EMPLOYEE_COLUMN + ", " +
             ORGANIZATION_TABLE_TYPE_COLUMN + ", " +
             ORGANIZATION_TABLE_ADDRESS_ID_COLUMN + ", " +
@@ -86,6 +86,8 @@ public class DatabaseConstants {
             USER_TABLE_USERNAME_COLUMN + ", " +
             USER_TABLE_PASSWORD_COLUMN + ", " +
             USER_TABLE_ROLE_ID_COLUMN + ") VALUES (?, ?, ?)";
+    public static final String UPDATE_ROLE_ID_BY_USERNAME = "UPDATE " + USER_TABLE + " SET " + USER_TABLE_ROLE_ID_COLUMN
+            + " = ? WHERE " + USER_TABLE_USERNAME_COLUMN + " = ?";
     // COORDINATES_TABLE
     public static final String SELECT_ALL_COORDINATES = "SELECT * FROM " + COORDINATES_TABLE;
     public static final String SELECT_COORDINATES_BY_ORGANIZATION_ID = SELECT_ALL_COORDINATES +
@@ -116,4 +118,5 @@ public class DatabaseConstants {
             "JOIN ROLE_FUNCTIONS rf ON r.id = rf.role_id " +
             "JOIN FUNCTIONS f ON rf.function_id = f.id " +
             "WHERE r.role = ?";
+    public static final String SELECT_ROLE_ID_BY_ROLE = "SELECT id FROM ROLES WHERE role = ?";
 }

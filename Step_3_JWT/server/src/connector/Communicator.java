@@ -1,6 +1,7 @@
 package connector;
 
 import exceptions.ConnectionErrorException;
+import exceptions.ConnectionTimeOutException;
 import exceptions.OpeningServerSocketException;
 import utility.ConsolePrinter;
 
@@ -33,14 +34,14 @@ public class Communicator {
         }
     }
 
-    public void handleClientConnection() throws ConnectionErrorException, IOException {
+    public void handleClientConnection() throws ConnectionErrorException, IOException, ConnectionTimeOutException {
         try {
             ConsolePrinter.printInformation("Listening to port '" + port + "'...");
             clientSocket = serverSocket.accept();
             ConsolePrinter.printResult("The connection from the client was successfully established!");
         } catch (SocketTimeoutException exception) {
             ConsolePrinter.printError("Connection timed out!");
-            System.exit(0);
+            throw new ConnectionTimeOutException();
         } catch (IOException exception) {
             ConsolePrinter.printError("An error occurred while connecting to the client!");
             throw new ConnectionErrorException();

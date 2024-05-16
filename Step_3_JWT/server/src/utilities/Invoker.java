@@ -10,6 +10,7 @@ public class Invoker {
     private final static HashMap<String, AbstractCommand> editCommands = new HashMap<>();
     private final static HashMap<String, AbstractCommand> adminCommands = new HashMap<>();
     private final static HashMap<String, AbstractCommand> innerServerCommands = new HashMap<>();
+    private final static HashMap<String, AbstractCommand> commandsList = new HashMap<>();
 
     private final static HashMap<String, HashMap<String, AbstractCommand>> roleCommandsList = new HashMap<>();
 
@@ -33,12 +34,16 @@ public class Invoker {
         roleCommandsList.put("edit", editCommands);
         roleCommandsList.put("function", adminCommands);
         roleCommandsList.put("server", innerServerCommands);
+        commandsList.putAll(viewCommands);
+        commandsList.putAll(editCommands);
+        commandsList.putAll(adminCommands);
     }
 
 
     public static HashMap<String, HashMap<String, AbstractCommand>> getRoleCommandsList() {
         return roleCommandsList;
     }
+    public static HashMap<String, AbstractCommand> getCommandsList() {return commandsList;}
 
     public static String executeCommand(Request commandRequest, HashMap<String, AbstractCommand> commands) {
         String name = commandRequest.getCommand();

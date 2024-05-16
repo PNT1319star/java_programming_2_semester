@@ -80,16 +80,16 @@ public class DatabaseCollectionManager {
             }
             preparedInsertOrganizationStatement.setString(1, rawOrganization.getName());
             preparedInsertOrganizationStatement.setTimestamp(2, Timestamp.valueOf(creationDate.toLocalDateTime()));
-            preparedInsertOrganizationStatement.setInt(3, coordinatesId);
-            preparedInsertOrganizationStatement.setFloat(4, rawOrganization.getAnnualTurnover());
-            preparedInsertOrganizationStatement.setString(5, rawOrganization.getFullName());
+            preparedInsertOrganizationStatement.setFloat(3, rawOrganization.getAnnualTurnover());
+            preparedInsertOrganizationStatement.setString(4, rawOrganization.getFullName());
+            preparedInsertOrganizationStatement.setInt(5, coordinatesId);
             preparedInsertOrganizationStatement.setInt(6, rawOrganization.getEmployeesCount());
             preparedInsertOrganizationStatement.setString(7, rawOrganization.getType().toString());
             preparedInsertOrganizationStatement.setInt(8, addressId);
             preparedInsertOrganizationStatement.setInt(9, databaseUserManager.selectUserIdByUsername(userName));
-
+            int rowsUpdate = preparedInsertOrganizationStatement.executeUpdate();
             databaseHandler.commitTransaction();
-            return true;
+            return rowsUpdate > 0;
         } catch (SQLException exception) {
             ConsolePrinter.printError("An error occurred while executing the INSERT_ORGANIZATION query!");
             databaseHandler.rollbackTransaction();
