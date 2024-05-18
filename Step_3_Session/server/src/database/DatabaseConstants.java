@@ -1,5 +1,6 @@
 package database;
 
+//All syntax in PostgreSQL
 public class DatabaseConstants {
     // Table names
     public static final String USER_TABLE = "USERS";
@@ -106,6 +107,7 @@ public class DatabaseConstants {
     public static final String INSERT_ADDRESS = "INSERT INTO " +
             ADDRESS_TABLE + " (" +
             ADDRESS_TABLE_STREET_COLUMN + ") VALUES (?) ON CONFLICT (street) DO NOTHING RETURNING id";
+    public static final String SELECT_ROLE_ID_BY_ROLE = "SELECT id FROM ROLES WHERE role = ?";
     // SESSIONS_TABLE
     public static final String SELECT_SESSION_ID_BY_USER_ID = "SELECT id FROM SESSIONS WHERE user_id = ?";
     public static final String SELECT_USER_ID_BY_SESSION_ID = "SELECT user_id FROM SESSIONS WHERE id = ?";
