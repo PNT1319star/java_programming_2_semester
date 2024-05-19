@@ -28,17 +28,6 @@ public class DatabaseConnector {
             ConsolePrinter.printError("Database management driver not found!");
         } catch (SQLException e) {
             ConsolePrinter.printError("An error occurred while connecting to the database!");
-            e.printStackTrace();
-        }
-    }
-
-    public void closeConnection() {
-        if (connection == null) return;
-        try {
-            connection.close();
-            ConsolePrinter.printResult("The connection to the database was lost.");
-        } catch (SQLException exception) {
-            ConsolePrinter.printError("An error occurred while disconnecting the database connection!");
         }
     }
 

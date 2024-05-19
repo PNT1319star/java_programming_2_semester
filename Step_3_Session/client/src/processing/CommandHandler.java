@@ -55,6 +55,7 @@ public class CommandHandler {
                     if (commandSet[1].isEmpty()) throw new WrongAmountOfElementsException();
                     FileScriptMode fileScriptMode = new FileScriptMode(commandSet[1]);
                     fileScriptMode.executeMode(this);
+                    return 1;
                 case "update":
                     if (commandSet[1].isEmpty()) throw new WrongAmountOfElementsException();
                     request = new Request(commandSet[0], OrganizationCreator.organizationCreator(scanner), commandSet[1], session_id);

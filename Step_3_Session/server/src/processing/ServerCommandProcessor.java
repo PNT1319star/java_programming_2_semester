@@ -1,6 +1,5 @@
 package processing;
 
-import data.Organization;
 import database.DatabaseUserManager;
 import exceptions.HandlingDatabaseException;
 import exceptions.NotUpdateException;

@@ -2,8 +2,6 @@ package processing.specificcommands;
 
 import processing.ServerCommandProcessor;
 
-import java.io.IOException;
-
 public class RoleChangeCommand extends AbstractCommand {
     private final ServerCommandProcessor serverCommandProcessor;
 

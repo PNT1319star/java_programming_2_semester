@@ -3,14 +3,11 @@ package utilities;
 import connector.Communicator;
 import exceptions.ConnectionErrorException;
 import exceptions.LoginException;
-import interaction.User;
 import mode.UserInputMode;
 import processing.CommandHandler;
 import processing.UserAuthHandler;
 import utility.ConsolePrinter;
 
-import java.util.Locale;
-import java.util.Objects;
 import java.util.Scanner;
 
 public class ConsoleManager {

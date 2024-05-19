@@ -1,6 +1,5 @@
 package database;
 
-//All syntax in PostgreSQL
 public class DatabaseConstants {
     // Table names
     public static final String USER_TABLE = "USERS";
@@ -32,7 +31,6 @@ public class DatabaseConstants {
     public static final String ORGANIZATION_TABLE_USER_ID_COLUMN = "user_id";
     // ORGANIZATION_TABLE
     public static final String SELECT_ALL_ORGANIZATIONS = "SELECT * FROM " + ORGANIZATION_TABLE;
-    public static final String SELECT_ORGANIZATION_BY_ID = SELECT_ALL_ORGANIZATIONS + "WHERE " + ORGANIZATION_TABLE_ID_COLUMN + " = ?";
     public static final String INSERT_ORGANIZATION = "INSERT INTO " +
             ORGANIZATION_TABLE + " (" +
             ORGANIZATION_TABLE_NAME_COLUMN + ", " +

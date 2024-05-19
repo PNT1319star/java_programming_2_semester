@@ -1,8 +1,5 @@
 package processing.specificcommands;
 
-
-import utilities.Roles;
-
 public abstract class AbstractCommand {
     private final String name;
 

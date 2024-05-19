@@ -28,7 +28,6 @@ public class ServerProcessor {
     private final ExecutorService requestReader = Executors.newCachedThreadPool();
     private final ExecutorService requestProcessor = Executors.newFixedThreadPool(5);
     private final ExecutorService responseSender = Executors.newCachedThreadPool();
-    private volatile boolean isRunning = true;
 
     public ServerProcessor(Receiver receiver, Sender sender, DatabaseSessionManager databaseSessionManager) {
         this.receiver = receiver;
@@ -40,7 +39,7 @@ public class ServerProcessor {
     public void decodeAndProcessCommand() {
         //Request reader task
         requestReader.execute(() -> {
-            while (isRunning) {
+            while (true) {
                 try {
                     Request request = receiver.receive();
                     if (request != null) requestQueue.put(request);
@@ -55,7 +54,7 @@ public class ServerProcessor {
         //Request processor task
         for (int i = 0; i < 5; i++) {
             requestProcessor.execute(() -> {
-                while (isRunning) {
+                while (true) {
                     try {
                         Request request = requestQueue.take();
                         Response response;
@@ -91,7 +90,7 @@ public class ServerProcessor {
 
         //Response sender task
         responseSender.execute(() -> {
-            while (isRunning) {
+            while (true) {
                 try {
                     Response response = responseQueue.take();
                     sender.send(response);
@@ -106,10 +105,4 @@ public class ServerProcessor {
         });
     }
 
-    public void stop() {
-        isRunning = false;
-        requestReader.shutdown();
-        requestProcessor.shutdown();
-        responseSender.shutdown();
-    }
 }

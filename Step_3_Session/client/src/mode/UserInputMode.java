@@ -1,6 +1,5 @@
 package mode;
 
-import interaction.User;
 import processing.CommandHandler;
 import utility.ConsolePrinter;
 

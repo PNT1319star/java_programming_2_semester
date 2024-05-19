@@ -8,7 +8,6 @@ import exceptions.HandlingDatabaseException;
 import interaction.OrganizationRaw;
 import utility.ConsolePrinter;
 
-import javax.swing.plaf.nimbus.State;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -49,39 +48,10 @@ public class DatabaseCollectionManager {
 
             // if this address has been existed in the table ADDRESS
             int addressId = 0;
-            if (preparedInsertAddressStatement.executeUpdate() == 0) {
-                PreparedStatement selectAddressStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.SELECT_ADDRESS_ID_BY_ADDRESS, false);
-                selectAddressStatement.setString(1, rawOrganization.getAddress().getStreet());
-                ResultSet resultSet = selectAddressStatement.executeQuery();
-                if (resultSet.next()) {
-                    addressId = resultSet.getInt("id");
-                }
-                selectAddressStatement.close();
-            } else {
-                ResultSet generatedAddressKeys = preparedInsertAddressStatement.getGeneratedKeys();
-                if (generatedAddressKeys.next()) {
-                    addressId = generatedAddressKeys.getInt(1);
-                } else throw new SQLException();
-            }
+            addressId = getAddressId(rawOrganization, preparedInsertAddressStatement, addressId);
             // if these coordinates have been existed in the table COORDINATES
             int coordinatesId = 0;
-            preparedInsertCoordinatesStatement.setLong(1, rawOrganization.getCoordinates().getX());
-            preparedInsertCoordinatesStatement.setLong(2, rawOrganization.getCoordinates().getY());
-            if (preparedInsertCoordinatesStatement.executeUpdate() == 0) {
-                PreparedStatement selectCoordinateStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.SELECT_COORDINATE_ID_BY_X_AND_Y, false);
-                selectCoordinateStatement.setLong(1, rawOrganization.getCoordinates().getX());
-                selectCoordinateStatement.setLong(2, rawOrganization.getCoordinates().getY());
-                ResultSet resultSet = selectCoordinateStatement.executeQuery();
-                if (resultSet.next()) {
-                    coordinatesId = resultSet.getInt(DatabaseConstants.COORDINATES_TABLE_ID_COLUMN);
-                }
-                selectCoordinateStatement.close();
-            } else {
-                ResultSet generatedCoordinatesKeys = preparedInsertCoordinatesStatement.getGeneratedKeys();
-                if (generatedCoordinatesKeys.next()) {
-                    coordinatesId = generatedCoordinatesKeys.getInt(1);
-                } else throw new SQLException();
-            }
+            coordinatesId = getCoordinatesId(rawOrganization, preparedInsertCoordinatesStatement, coordinatesId);
             preparedInsertOrganizationStatement.setString(1, rawOrganization.getName());
             preparedInsertOrganizationStatement.setTimestamp(2, Timestamp.valueOf(creationDate.toLocalDateTime()));
             preparedInsertOrganizationStatement.setFloat(3, rawOrganization.getAnnualTurnover());
@@ -105,6 +75,45 @@ public class DatabaseCollectionManager {
             StatementBuilder.closedPreparedStatement(preparedInsertAddressStatement);
             databaseHandler.stopTransaction();
         }
+    }
+
+    private int getAddressId(OrganizationRaw rawOrganization, PreparedStatement preparedInsertAddressStatement, int addressId) throws SQLException {
+        if (preparedInsertAddressStatement.executeUpdate() == 0) {
+            PreparedStatement selectAddressStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.SELECT_ADDRESS_ID_BY_ADDRESS, false);
+            selectAddressStatement.setString(1, rawOrganization.getAddress().getStreet());
+            ResultSet resultSet = selectAddressStatement.executeQuery();
+            if (resultSet.next()) {
+                addressId = resultSet.getInt("id");
+            }
+            selectAddressStatement.close();
+        } else {
+            ResultSet generatedAddressKeys = preparedInsertAddressStatement.getGeneratedKeys();
+            if (generatedAddressKeys.next()) {
+                addressId = generatedAddressKeys.getInt(1);
+            } else throw new SQLException();
+        }
+        return addressId;
+    }
+
+    private int getCoordinatesId(OrganizationRaw rawOrganization, PreparedStatement preparedInsertCoordinatesStatement, int coordinatesId) throws SQLException {
+        preparedInsertCoordinatesStatement.setLong(1, rawOrganization.getCoordinates().getX());
+        preparedInsertCoordinatesStatement.setLong(2, rawOrganization.getCoordinates().getY());
+        if (preparedInsertCoordinatesStatement.executeUpdate() == 0) {
+            PreparedStatement selectCoordinateStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.SELECT_COORDINATE_ID_BY_X_AND_Y, false);
+            selectCoordinateStatement.setLong(1, rawOrganization.getCoordinates().getX());
+            selectCoordinateStatement.setLong(2, rawOrganization.getCoordinates().getY());
+            ResultSet resultSet = selectCoordinateStatement.executeQuery();
+            if (resultSet.next()) {
+                coordinatesId = resultSet.getInt(DatabaseConstants.COORDINATES_TABLE_ID_COLUMN);
+            }
+            selectCoordinateStatement.close();
+        } else {
+            ResultSet generatedCoordinatesKeys = preparedInsertCoordinatesStatement.getGeneratedKeys();
+            if (generatedCoordinatesKeys.next()) {
+                coordinatesId = generatedCoordinatesKeys.getInt(1);
+            } else throw new SQLException();
+        }
+        return coordinatesId;
     }
 
 
@@ -188,23 +197,7 @@ public class DatabaseCollectionManager {
             if (organizationRaw.getCoordinates() != null) {
                 int coordinatesId = 0;
                 PreparedStatement insertCoordinatesStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.INSERT_COORDINATES, true);
-                insertCoordinatesStatement.setLong(1, organizationRaw.getCoordinates().getX());
-                insertCoordinatesStatement.setLong(2, organizationRaw.getCoordinates().getY());
-                if (insertCoordinatesStatement.executeUpdate() == 0) {
-                    PreparedStatement selectCoordinateIdStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.SELECT_COORDINATE_ID_BY_X_AND_Y, false);
-                    selectCoordinateIdStatement.setLong(1, organizationRaw.getCoordinates().getX());
-                    selectCoordinateIdStatement.setLong(2, organizationRaw.getCoordinates().getY());
-                    ResultSet resultSet = selectCoordinateIdStatement.executeQuery();
-                    if (resultSet.next()) {
-                        coordinatesId = resultSet.getInt(DatabaseConstants.COORDINATES_TABLE_ID_COLUMN);
-                    }
-                    selectCoordinateIdStatement.close();
-                } else {
-                    ResultSet generatedCoordinatesKeys = insertCoordinatesStatement.getGeneratedKeys();
-                    if (generatedCoordinatesKeys.next()) {
-                        coordinatesId = generatedCoordinatesKeys.getInt(1);
-                    } else throw new SQLException();
-                }
+                coordinatesId = getCoordinatesId(organizationRaw, insertCoordinatesStatement, coordinatesId);
                 preparedUpdateCoordinatesByOrganizationIdStatement.setInt(1, coordinatesId);
                 preparedUpdateCoordinatesByOrganizationIdStatement.setInt(2, organizationId);
                 count += preparedUpdateCoordinatesByOrganizationIdStatement.executeUpdate();
@@ -223,20 +216,7 @@ public class DatabaseCollectionManager {
                 int addressId = 0;
                 PreparedStatement insertAddressStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.INSERT_ADDRESS, true);
                 insertAddressStatement.setString(1, organizationRaw.getAddress().getStreet());
-                if (insertAddressStatement.executeUpdate() == 0) {
-                    PreparedStatement selectAddressStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.SELECT_ADDRESS_ID_BY_ADDRESS, false);
-                    selectAddressStatement.setString(1, organizationRaw.getAddress().getStreet());
-                    ResultSet resultSet = selectAddressStatement.executeQuery();
-                    if (resultSet.next()) {
-                        addressId = resultSet.getInt("id");
-                    }
-                    selectAddressStatement.close();
-                } else {
-                    ResultSet generatedAddressKeys = insertAddressStatement.getGeneratedKeys();
-                    if (generatedAddressKeys.next()) {
-                        addressId = generatedAddressKeys.getInt(1);
-                    } else throw new SQLException();
-                }
+                addressId = getAddressId(organizationRaw, insertAddressStatement, addressId);
                 preparedUpdateAddressByIdStatement.setInt(1, addressId);
                 preparedUpdateAddressByIdStatement.setInt(2, organizationId);
                 count += preparedUpdateAddressByIdStatement.executeUpdate();
@@ -299,25 +279,6 @@ public class DatabaseCollectionManager {
             StatementBuilder.closedPreparedStatement(preparedSelectedCoordinatesByOrganizationIdStatement);
         }
         return coordinates;
-    }
-
-    private int getAddressIdById(int organizationId) throws SQLException {
-        int addressId;
-        PreparedStatement preparedSelectedAddressIdStatement = null;
-        try {
-            preparedSelectedAddressIdStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.SELECT_ORGANIZATION_BY_ID, false);
-            preparedSelectedAddressIdStatement.setInt(1, organizationId);
-            ResultSet resultSet = preparedSelectedAddressIdStatement.executeQuery();
-            if (resultSet.next()) {
-                addressId = resultSet.getInt(DatabaseConstants.ADDRESS_TABLE_ID_COLUMN);
-            } else throw new SQLException();
-        } catch (SQLException exception) {
-            ConsolePrinter.printError("An error occurred while executing the SELECT_ADDRESS_ID_BY_ORGANIZATION_ID query!");
-            throw new SQLException();
-        } finally {
-            StatementBuilder.closedPreparedStatement(preparedSelectedAddressIdStatement);
-        }
-        return addressId;
     }
 
     private Address getAddressById(int addressId) throws SQLException {

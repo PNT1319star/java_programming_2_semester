@@ -5,7 +5,6 @@ import exceptions.HandlingDatabaseException;
 import exceptions.NotUpdateException;
 import interaction.User;
 import utilities.PasswordEncryptor;
-import utilities.Roles;
 import utility.ConsolePrinter;
 
 import java.sql.PreparedStatement;
@@ -13,8 +12,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 public class DatabaseUserManager {
     private final DatabaseConnector databaseConnector;

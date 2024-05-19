@@ -16,7 +16,7 @@ public class Sender {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream);
         outputStream.writeObject(response);
-        outputStream.flush();;
+        outputStream.flush();
         byte[] data = byteArrayOutputStream.toByteArray();
         socket.getOutputStream().write(data);
         outputStream.close();

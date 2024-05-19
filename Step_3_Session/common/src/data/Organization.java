@@ -1,7 +1,5 @@
 package data;
 
-import interaction.User;
-
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.Objects;
@@ -12,15 +10,15 @@ import java.util.Objects;
  * full name, employees count, type, and postal address.
  */
 public class Organization implements Cloneable, Serializable {
-    private Integer id;
+    private final Integer id;
     private String name;
-    private Coordinates coordinates;
+    private final Coordinates coordinates;
     private final ZonedDateTime creationDate;
-    private Float annualTurnover;
-    private String fullName;
-    private Integer employeesCount;
-    private OrganizationType type;
-    private Address postalAddress;
+    private final Float annualTurnover;
+    private final String fullName;
+    private final Integer employeesCount;
+    private final OrganizationType type;
+    private final Address postalAddress;
     private final String userName;
 
     /**
@@ -35,7 +33,7 @@ public class Organization implements Cloneable, Serializable {
      * @param employeesCount the organization employees count
      * @param type           the organization type
      * @param postalAddress  the organization postal address
-     * @param userName           the user having created this organization
+     * @param userName       the user having created this organization
      */
     public Organization(Integer id, String name, Coordinates coordinates, ZonedDateTime creationDate, Float annualTurnover,
                         String fullName, Integer employeesCount, OrganizationType type, Address postalAddress, String userName) {
@@ -55,24 +53,12 @@ public class Organization implements Cloneable, Serializable {
         return id;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Coordinates getCoordinates() {
-        return coordinates;
-    }
-
-    public void setCoordinates(Coordinates coordinates) {
-        this.coordinates = coordinates;
     }
 
     public ZonedDateTime getCreationDate() {
@@ -83,46 +69,17 @@ public class Organization implements Cloneable, Serializable {
         return annualTurnover;
     }
 
-    public void setAnnualTurnover(Float annualTurnover) {
-        this.annualTurnover = annualTurnover;
-    }
-
     public String getFullName() {
         return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public Integer getEmployeesCount() {
-        return employeesCount;
-    }
-
-    public void setEmployeesCount(Integer employeesCount) {
-        this.employeesCount = employeesCount;
-    }
-
-    public OrganizationType getType() {
-        return type;
-    }
-
-    public void setType(OrganizationType type) {
-        this.type = type;
     }
 
     public Address getPostalAddress() {
         return postalAddress;
     }
 
-    public void setPostalAddress(Address postalAddress) {
-        this.postalAddress = postalAddress;
-    }
-
     public String getUsername() {
         return userName;
     }
-
 
     public int compareTo(Float annualTurnover) {
         if (this.annualTurnover - annualTurnover > 0) return 1;

@@ -197,7 +197,6 @@ public class CollectionManager {
                 return false;
             }
         } catch (HandlingDatabaseException e) {
-            e.printStackTrace();
             throw new IOException();
         } finally {
             reentrantLock.unlock();
