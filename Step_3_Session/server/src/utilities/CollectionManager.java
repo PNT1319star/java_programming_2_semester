@@ -204,6 +204,34 @@ public class CollectionManager {
         return false;
     }
 
+    public static String addFunction(Roles role, String function) throws IOException {
+        try {
+            if (role.equals(Roles.ADMIN)) return "You have all functions";
+            else {
+                if (databaseCollectionManager.updateFunction(role.toString().toLowerCase(), function)) {
+                    return "You have added the " + function + " function " + "to the " + role;
+                } else {
+                    return "Role already has this function!";
+                }
+            }
+        } catch (HandlingDatabaseException exception) {
+            throw new IOException();
+        }
+    }
+
+    public static String removeFunction(Roles role, String function) throws IOException {
+        try {
+            if (databaseCollectionManager.removeFunction(role.toString().toLowerCase(), function)) {
+                return "You have removed the " + function + " function " + "to the " + role;
+            } else {
+                return "Role doesn't have this function!";
+            }
+
+        } catch (HandlingDatabaseException exception) {
+            throw new IOException();
+        }
+    }
+
     public static void loadCollectionFromDatabase() {
         try {
             arrayDeque = databaseCollectionManager.loadCollection();
@@ -215,6 +243,7 @@ public class CollectionManager {
             ConsolePrinter.printError("Collection has not been loaded!");
         }
     }
+
 
     public static void setUsername(int userId) {
         CollectionManager.userId = userId;

@@ -83,6 +83,9 @@ public class DatabaseConstants {
             USER_TABLE_USERNAME_COLUMN + ", " +
             USER_TABLE_PASSWORD_COLUMN + ", " +
             USER_TABLE_ROLE_ID_COLUMN + ") VALUES (?, ?, ?)";
+    public static final String SELECT_USER_ROLE = "SELECT u.username, r.role " +
+            "FROM USERS u " +
+            "JOIN ROLES r ON u.role_id = r.id";
     public static final String UPDATE_ROLE_ID_BY_USERNAME = "UPDATE " + USER_TABLE + " SET " + USER_TABLE_ROLE_ID_COLUMN
             + " = ? WHERE " + USER_TABLE_USERNAME_COLUMN + " = ?";
     // COORDINATES_TABLE
@@ -118,4 +121,7 @@ public class DatabaseConstants {
             "JOIN role_functions AS rf ON r.id = rf.role_id " +
             "JOIN functions AS f ON rf.function_id = f.id " +
             "WHERE s.id = ?";
+    public static final String SELECT_FUNCTION_ID_BY_ID = "SELECT id FROM FUNCTIONS WHERE function = ?";
+    public static final String UPDATE_ROLE_FUNCTION = "INSERT INTO ROLE_FUNCTIONS (role_id, function_id) VALUES (?, ?)";
+    public static final String DELETE_ROLE_FUNCTION = "DELETE FROM ROLE_FUNCTIONS WHERE role_id = ? AND function_id = ?";
 }

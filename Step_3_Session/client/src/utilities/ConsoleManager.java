@@ -26,7 +26,7 @@ public class ConsoleManager {
             do {
                 userAuthHandler.processAuthentication();
                 session_id = userAuthHandler.getSessionId();
-            } while (session_id.contains("Incorrect username or password!"));
+            } while (session_id.contains("Incorrect username or password!") || session_id.contains("User has been existed!"));
             CommandHandler commandHandler = new CommandHandler(communicator, session_id);
             userInputMode.executeMode(commandHandler);
         } catch (ConnectionErrorException exception) {

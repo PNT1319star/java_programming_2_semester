@@ -77,6 +77,78 @@ public class DatabaseCollectionManager {
         }
     }
 
+    private int getRoleId(String role) throws SQLException {
+        int roleId;
+        PreparedStatement selectRoleIdByRoleStatement = null;
+        try {
+            selectRoleIdByRoleStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.SELECT_ROLE_ID_BY_ROLE, false);
+            selectRoleIdByRoleStatement.setString(1, role);
+            ResultSet resultSet = selectRoleIdByRoleStatement.executeQuery();
+            if (resultSet.next()) {
+                roleId = resultSet.getInt("id");
+            } else throw new SQLException();
+        } catch (SQLException exception) {
+            ConsolePrinter.printError("An error occurred while executing the SELECT_ROLE_ID_BY_ROLE query!");
+            exception.printStackTrace();
+            throw new SQLException();
+        } finally {
+            StatementBuilder.closedPreparedStatement(selectRoleIdByRoleStatement);
+        }
+        return roleId;
+    }
+
+    private int getFunctionId(String function) throws SQLException {
+        int functionId;
+        PreparedStatement selectFunctionIdByFunctionStatement = null;
+        try {
+            selectFunctionIdByFunctionStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.SELECT_FUNCTION_ID_BY_ID, false);
+            selectFunctionIdByFunctionStatement.setString(1, function);
+            ResultSet resultSet = selectFunctionIdByFunctionStatement.executeQuery();
+            if (resultSet.next()) {
+                functionId = resultSet.getInt("id");
+            } else throw new SQLException();
+        } catch (SQLException exception) {
+            ConsolePrinter.printError("An error occurred while executing the SELECT_FUNCTION_ID_BY_FUNCTION query!");
+            exception.printStackTrace();
+            throw new SQLException();
+        } finally {
+            StatementBuilder.closedPreparedStatement(selectFunctionIdByFunctionStatement);
+        }
+        return functionId;
+    }
+
+    public boolean updateFunction(String role, String function) throws HandlingDatabaseException {
+        PreparedStatement updateFunctionStatement = null;
+        try {
+            updateFunctionStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.UPDATE_ROLE_FUNCTION, false);
+            updateFunctionStatement.setInt(1, getRoleId(role));
+            updateFunctionStatement.setInt(2, getFunctionId(function));
+            int affectedRows = updateFunctionStatement.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            ConsolePrinter.printError("An error occurred while executing the INSERT_ROLE_FUNCTION query!");
+            throw new HandlingDatabaseException();
+        } finally {
+            StatementBuilder.closedPreparedStatement(updateFunctionStatement);
+        }
+    }
+
+    public boolean removeFunction(String role, String function) throws HandlingDatabaseException {
+        PreparedStatement removeFunctionStatement = null;
+        try {
+            removeFunctionStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.DELETE_ROLE_FUNCTION, false);
+            removeFunctionStatement.setInt(1, getRoleId(role));
+            removeFunctionStatement.setInt(2, getFunctionId(function));
+            int affectedRows = removeFunctionStatement.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            ConsolePrinter.printError("An error occurred while executing the INSERT_ROLE_FUNCTION query!");
+            throw new HandlingDatabaseException();
+        } finally {
+            StatementBuilder.closedPreparedStatement(removeFunctionStatement);
+        }
+    }
+
     private int getAddressId(OrganizationRaw rawOrganization, PreparedStatement preparedInsertAddressStatement, int addressId) throws SQLException {
         if (preparedInsertAddressStatement.executeUpdate() == 0) {
             PreparedStatement selectAddressStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.SELECT_ADDRESS_ID_BY_ADDRESS, false);

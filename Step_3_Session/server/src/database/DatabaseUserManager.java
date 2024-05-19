@@ -5,6 +5,7 @@ import exceptions.HandlingDatabaseException;
 import exceptions.NotUpdateException;
 import interaction.User;
 import utilities.PasswordEncryptor;
+import utilities.Roles;
 import utility.ConsolePrinter;
 
 import java.sql.PreparedStatement;
@@ -12,6 +13,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 
 public class DatabaseUserManager {
     private final DatabaseConnector databaseConnector;
@@ -166,6 +168,25 @@ public class DatabaseUserManager {
             throw new HandlingDatabaseException();
         } finally {
             StatementBuilder.closedPreparedStatement(updateUserRoleStatement);
+        }
+    }
+
+    public HashMap<String, Roles> getUsersList() throws HandlingDatabaseException {
+        PreparedStatement getUserStatement = null;
+        HashMap<String, Roles> userRoleMap = new HashMap<>();
+        try {
+            getUserStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.SELECT_USER_ROLE, false);
+            ResultSet resultSet = getUserStatement.executeQuery();
+            while (resultSet.next()) {
+                String username = resultSet.getString("username");
+                String role = resultSet.getString("role");
+                userRoleMap.put(username, Roles.valueOf(role.toUpperCase()));
+            }
+            return userRoleMap;
+        } catch (SQLException e) {
+            throw new HandlingDatabaseException();
+        } finally {
+            StatementBuilder.closedPreparedStatement(getUserStatement);
         }
     }
 

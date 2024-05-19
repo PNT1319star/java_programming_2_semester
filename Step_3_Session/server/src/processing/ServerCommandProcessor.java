@@ -7,8 +7,11 @@ import interaction.OrganizationRaw;
 import interaction.User;
 import utilities.CollectionManager;
 import utilities.Invoker;
+import utilities.Roles;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ServerCommandProcessor {
     private final DatabaseUserManager databaseUserManager;
@@ -96,10 +99,8 @@ public class ServerCommandProcessor {
             User user = (User) object;
             int user_id = databaseUserManager.insertUserIntoUserTable(user);
             return databaseUserManager.insertUserIdIntoSessionsTable(user_id);
-        } catch (HandlingDatabaseException exception) {
-            return "An error occurred while accessing to the database!";
-        } catch (NotUpdateException exception) {
-            return "User  has been existed!";
+        } catch (HandlingDatabaseException | NotUpdateException exception) {
+            return "User has been existed!";
         }
     }
 
@@ -110,5 +111,25 @@ public class ServerCommandProcessor {
         } catch (HandlingDatabaseException exception) {
             return "An error occurred while accessing to the database!";
         }
+    }
+
+    public String viewRole() {
+        try {
+            HashMap<String, Roles> userRoleMap = databaseUserManager.getUsersList();
+            StringBuilder sb = new StringBuilder();
+            for (Map.Entry<String, Roles> entry : userRoleMap.entrySet()) {
+                sb.append("Username: ").append(entry.getKey()).append(", Role: ").append(entry.getValue().toString()).append("\n");
+            }
+            return sb.toString();
+        } catch (HandlingDatabaseException exception) {
+            return "An error occurred while accessing to the database!";
+        }
+    }
+
+    public String addFunction(Object role, String function) throws IOException {
+        return CollectionManager.addFunction(Roles.valueOf(((String) role).toUpperCase()), function);
+    }
+    public String removeFunction(Object role, String function) throws IOException {
+        return CollectionManager.removeFunction(Roles.valueOf(((String) role).toUpperCase()), function);
     }
 }

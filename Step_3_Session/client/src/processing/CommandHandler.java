@@ -39,7 +39,7 @@ public class CommandHandler {
             Request request = null;
             switch (commandSet[0].toLowerCase()) {
                 case "help", "clear", "head", "info", "min_by_creation_date",
-                        "print_unique_postal_address", "show":
+                        "print_unique_postal_address", "show", "view_role" :
                     if (!commandSet[1].isEmpty()) throw new WrongAmountOfElementsException();
                     request = new Request(commandSet[0], null, "", session_id);
                     break;
@@ -60,7 +60,7 @@ public class CommandHandler {
                     if (commandSet[1].isEmpty()) throw new WrongAmountOfElementsException();
                     request = new Request(commandSet[0], OrganizationCreator.organizationCreator(scanner), commandSet[1], session_id);
                     break;
-                case "change_role":
+                case "change_role", "add_function", "remove_function":
                     if (commandSet[1].isEmpty() || commandSet[2].isEmpty())
                         throw new WrongAmountOfElementsException();
                     request = new Request(commandSet[0], commandSet[2], commandSet[1], session_id);
