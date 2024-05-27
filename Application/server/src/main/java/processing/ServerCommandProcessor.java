@@ -1,0 +1,135 @@
+package processing;
+
+import database.DatabaseUserManager;
+import org.csjchoisoojong.exceptions.HandlingDatabaseException;
+import org.csjchoisoojong.exceptions.NotUpdateException;
+import org.csjchoisoojong.interaction.OrganizationRaw;
+import org.csjchoisoojong.interaction.User;
+import utilities.CollectionManager;
+import utilities.Invoker;
+import utilities.Roles;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+public class ServerCommandProcessor {
+    private final DatabaseUserManager databaseUserManager;
+
+    public ServerCommandProcessor(DatabaseUserManager databaseUserManager) {
+        this.databaseUserManager = databaseUserManager;
+    }
+
+    public String help() throws IOException {
+        StringBuilder sb = new StringBuilder();
+        Invoker.getCommandsList().forEach((name, command) -> sb.append(command.getCommandInformation()).append("\n"));
+        return sb.toString();
+    }
+
+    public String add(Object object) throws IOException {
+        return CollectionManager.add((OrganizationRaw) object);
+    }
+
+    public String addIfMax(Object object) throws IOException {
+        return CollectionManager.addIfMax((OrganizationRaw) object);
+    }
+
+    public String info() throws IOException {
+        return CollectionManager.info();
+    }
+
+    public String clear() throws IOException {
+        return CollectionManager.clear();
+    }
+
+    public String filterStartsWithFullName(String fullName) throws IOException {
+        return CollectionManager.filterStartsWithFullName(fullName);
+    }
+
+    public String head() throws IOException {
+        return CollectionManager.head();
+    }
+
+    public String minByCreationDate() throws IOException {
+        return CollectionManager.minByCreationDate();
+    }
+
+    public String show() throws IOException {
+        return CollectionManager.show();
+    }
+
+    public String printUniquePostalAddress() throws IOException {
+        return CollectionManager.printUniquePostalAddress();
+    }
+
+    public String removeById(String sID) throws IOException {
+        int Id = Integer.parseInt(sID);
+        if (!CollectionManager.idExistence(Id)) return "The organization with this id has not existed!";
+        return CollectionManager.removeByID(sID);
+    }
+
+    public String removeLower(Object object) throws IOException {
+        return CollectionManager.removeLower((OrganizationRaw) object);
+    }
+
+    public String update(String sID, Object object) throws IOException {
+        int ID = Integer.parseInt(sID);
+        if (CollectionManager.idExistence(ID)) {
+            if (CollectionManager.updateElement((OrganizationRaw) object, ID)) return "The organization has been updated";
+            else return "You can not update this organization";
+        } else {
+            return "This ID does not exist in this collection!";
+        }
+    }
+
+    public String login(Object object) {
+        try {
+            User user = (User) object;
+            if (databaseUserManager.checkUserByUsernameAndPassword(user)) {
+                int user_id = databaseUserManager.selectUserIdByUsername(user.getUsername());
+                return databaseUserManager.getSessionIdByUserId(user_id);
+            } else return "Incorrect username or password!";
+        } catch (HandlingDatabaseException exception) {
+            return "An error occurred while accessing to the database!";
+        }
+    }
+
+    public String register(Object object) {
+        try {
+            User user = (User) object;
+            int user_id = databaseUserManager.insertUserIntoUserTable(user);
+            return databaseUserManager.insertUserIdIntoSessionsTable(user_id);
+        } catch (HandlingDatabaseException | NotUpdateException exception) {
+            return "User has been existed!";
+        }
+    }
+
+    public String changeRole(String username,String role) {
+        try {
+            if (databaseUserManager.updateUserRole(username, role)) return "Role of " + username + " has been changed!";
+            else return "Nothing has been changed!";
+        } catch (HandlingDatabaseException exception) {
+            return "An error occurred while accessing to the database!";
+        }
+    }
+
+    public String viewRole() {
+        try {
+            HashMap<String, Roles> userRoleMap = databaseUserManager.getUsersList();
+            StringBuilder sb = new StringBuilder();
+            for (Map.Entry<String, Roles> entry : userRoleMap.entrySet()) {
+                sb.append("Username: ").append(entry.getKey()).append(", Role: ").append(entry.getValue().toString()).append("\n");
+            }
+            return sb.toString();
+        } catch (HandlingDatabaseException exception) {
+            return "An error occurred while accessing to the database!";
+        }
+    }
+
+    public String addFunction(Object role, String function) throws IOException {
+        return CollectionManager.addFunction(Roles.valueOf(((String) role).toUpperCase()), function);
+    }
+    public String removeFunction(Object role, String function) throws IOException {
+        return CollectionManager.removeFunction(Roles.valueOf(((String) role).toUpperCase()), function);
+    }
+}
