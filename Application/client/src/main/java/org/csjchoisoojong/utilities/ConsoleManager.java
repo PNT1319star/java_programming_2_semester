@@ -18,9 +18,6 @@ public class ConsoleManager {
             int port = Integer.parseInt(sPort);
             Communicator communicator = new Communicator(host, port, RECONNECTION_TIMEOUT, MAX_RECONNECTION_ATTEMPTS);
             UserAuthHandler userAuthHandler = new UserAuthHandler(new Scanner(System.in), communicator);
-            UserInputMode userInputMode = new UserInputMode();
-            ConsolePrinter.printInformation("Welcome to my application!");
-            ConsolePrinter.printInformation("You have to log in or register!");
             String session_id;
             do {
                 userAuthHandler.processAuthentication();
