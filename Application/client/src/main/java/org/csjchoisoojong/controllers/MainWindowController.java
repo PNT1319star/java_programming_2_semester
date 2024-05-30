@@ -21,6 +21,7 @@ import org.csjchoisoojong.data.Organization;
 import org.csjchoisoojong.data.OrganizationType;
 import org.csjchoisoojong.interaction.OrganizationRaw;
 import org.csjchoisoojong.processing.CommandHandler;
+import org.csjchoisoojong.script.FileScriptHandler;
 import org.csjchoisoojong.utilities.UIOutputer;
 
 import java.io.File;
@@ -127,6 +128,7 @@ public class MainWindowController {
     private Color prevColor;
     private Random randomGenerator;
     private ObservableResourceFactory resourceFactory;
+    private FileScriptHandler fileScriptHandler;
 
     public void initialize() {
         initializeTable();
@@ -142,7 +144,6 @@ public class MainWindowController {
         localeMap.put("Slovenčina", new Locale("sk", "SK"));
         localeMap.put("Latviešu", new Locale("lv", "LV"));
         languageComboBox.setItems(FXCollections.observableArrayList(localeMap.keySet()));
-
     }
 
     public void setCommandHandler(CommandHandler commandHandler) {
@@ -165,16 +166,25 @@ public class MainWindowController {
         this.askWindowController = askWindowController;
     }
 
+    public void setFileScriptHandler(FileScriptHandler fileScriptHandler) {
+        this.fileScriptHandler = fileScriptHandler;
+    }
+
     public void initializeLanguages(ObservableResourceFactory resourceFactory) {
         this.resourceFactory = resourceFactory;
         for (String localeName : localeMap.keySet()) {
             if (localeMap.get(localeName).equals(resourceFactory.getResources().getLocale()))
                 languageComboBox.getSelectionModel().select(localeName);
         }
-        if (languageComboBox.getSelectionModel().getSelectedItem().isEmpty())
+        String selectedItem = languageComboBox.getSelectionModel().getSelectedItem();
+        if (selectedItem == null || selectedItem.isEmpty())
             languageComboBox.getSelectionModel().selectFirst();
-        languageComboBox.setOnAction((event) -> resourceFactory.setResources(ResourceBundle.getBundle("bundle.ui", localeMap.get(languageComboBox.getValue()))));
-
+        languageComboBox.setOnAction((event) -> resourceFactory.setResources(ResourceBundle.getBundle("bundles.ui", localeMap.get(languageComboBox.getValue()))));
+        bindLanguage();
+    }
+    @FXML
+    public void refreshButtonOnAction() {
+        commandHandler.executeCommand(REFRESH_COMMAND_NAME, "", null);
     }
 
     private void initializeTable() {
@@ -192,7 +202,7 @@ public class MainWindowController {
     }
 
     private void bindLanguage() {
-        resourceFactory.setResources(ResourceBundle.getBundle("bundle.ui", localeMap.get(languageComboBox.getSelectionModel().getSelectedItem())));
+        resourceFactory.setResources(ResourceBundle.getBundle("bundles.gui", localeMap.get(languageComboBox.getSelectionModel().getSelectedItem())));
 
         idColumn.textProperty().bind(resourceFactory.getStringBinding("IdColumn"));
         nameColumn.textProperty().bind(resourceFactory.getStringBinding("NameColumn"));
@@ -292,15 +302,10 @@ public class MainWindowController {
     }
 
     @FXML
-    private void refreshButtonOnAction() {
-        commandHandler.executeCommand(REFRESH_COMMAND_NAME, "", null);
-    }
-
-    @FXML
     private void executeScriptButtonOnAction() {
         File file = fileChooser.showOpenDialog(primaryStage);
         if (file == null) return;
-        if () Platform.exit();
+        if (fileScriptHandler.execute(file)) Platform.exit();
         else refreshButtonOnAction();
     }
 
@@ -363,6 +368,4 @@ public class MainWindowController {
         prevColor = (Color) shape.getFill();
         shape.setFill(prevColor.brighter());
     }
-
-
 }

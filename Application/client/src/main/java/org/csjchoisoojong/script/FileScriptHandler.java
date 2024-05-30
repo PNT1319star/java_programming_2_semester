@@ -19,27 +19,25 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class FileScriptHandler {
-    private final String argument;
     private int commandStatus = 0;
-    private final List<String> scriptStack = new ArrayList<>();
+    private final List<File> scriptStack = new ArrayList<>();
     private Scanner userScanner;
     private final String session_id;
     private final CommandHandler commandHandler;
 
-    public FileScriptHandler(String argument, CommandHandler commandHandler) {
-        this.argument = argument;
+    public FileScriptHandler(CommandHandler commandHandler) {
         this.commandHandler = commandHandler;
         this.session_id = commandHandler.getSessionId();
     }
 
-    public void execute() {
+    public boolean execute(File file) {
         try {
-            initializeScript(this.argument);
+            initializeScript(file);
             do {
                 String userCommand = getNextUserCommand();
                 commandStatus = handleUserCommand(userCommand);
             } while (commandStatus == 1 && userScanner.hasNextLine());
-
+            return true;
         } catch (FileNotFoundException exception) {
             ConsolePrinter.printError("Find not found!");
         } catch (NoSuchElementException exception) {
@@ -51,12 +49,13 @@ public class FileScriptHandler {
         } catch (ScriptRecursionException e) {
             ConsolePrinter.printError("The script cannot be executed recursively");
         }
+        return false;
     }
 
-    public void initializeScript(String argument) throws FileNotFoundException, NoSuchElementException {
-        this.userScanner = new Scanner(new File(argument));
+    public void initializeScript(File file) throws FileNotFoundException, NoSuchElementException {
+        this.userScanner = new Scanner(file);
         if (!userScanner.hasNext()) throw new NoSuchElementException();
-        scriptStack.add(argument);
+        scriptStack.add(file);
     }
 
     public String getNextUserCommand() {
@@ -76,8 +75,8 @@ public class FileScriptHandler {
                 commandArgument = commandPart.length > 1 ? commandPart[1].trim() : "";
             }
             if (commandName.equals("execute_script")) {
-                for (String script : scriptStack) {
-                    if (script.equals(commandArgument)) throw new ScriptRecursionException();
+                for (File file : scriptStack) {
+                    if (file.equals(new File(commandArgument))) throw new ScriptRecursionException();
                 }
                 Request request = executeCommand(commandPart);
                 commandHandler.processCommand(request);

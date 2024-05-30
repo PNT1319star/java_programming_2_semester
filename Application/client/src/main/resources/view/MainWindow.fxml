@@ -102,6 +102,7 @@
                 <Tooltip fx:id="refreshButtonToolTip" text="RefreshButtonToolTip"/>
             </tooltip>
         </Button>
+        <ComboBox fx:id="languageComboBox" prefWidth="150.0"/>
     </HBox>
 
 </AnchorPane>

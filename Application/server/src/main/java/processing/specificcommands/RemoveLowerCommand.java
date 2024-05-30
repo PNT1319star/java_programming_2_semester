@@ -1,5 +1,7 @@
 package processing.specificcommands;
 
+import org.csjchoisoojong.interaction.Response;
+import org.csjchoisoojong.interaction.ResponseCode;
 import processing.ServerCommandProcessor;
 
 import java.io.IOException;
@@ -13,11 +15,11 @@ public class RemoveLowerCommand extends AbstractCommand {
     }
 
     @Override
-    public String execute(String argument, Object object) {
+    public Response execute(String argument, Object object) {
         try {
-            return serverCommandProcessor.removeLower(object);
+            return new Response(ResponseCode.OK,serverCommandProcessor.removeLower(object), serverCommandProcessor.getCollection());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            return new Response(ResponseCode.ERROR, "Something went wrong with this command", serverCommandProcessor.getCollection());
         }
     }
 

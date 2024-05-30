@@ -83,11 +83,6 @@ public class DatabaseConstants {
             USER_TABLE_USERNAME_COLUMN + ", " +
             USER_TABLE_PASSWORD_COLUMN + ", " +
             USER_TABLE_ROLE_ID_COLUMN + ") VALUES (?, ?, ?)";
-    public static final String SELECT_USER_ROLE = "SELECT u.username, r.role " +
-            "FROM USERS u " +
-            "JOIN ROLES r ON u.role_id = r.id";
-    public static final String UPDATE_ROLE_ID_BY_USERNAME = "UPDATE " + USER_TABLE + " SET " + USER_TABLE_ROLE_ID_COLUMN
-            + " = ? WHERE " + USER_TABLE_USERNAME_COLUMN + " = ?";
     // COORDINATES_TABLE
     public static final String SELECT_ALL_COORDINATES = "SELECT * FROM " + COORDINATES_TABLE;
     public static final String SELECT_COORDINATES_BY_COORDINATE_ID = SELECT_ALL_COORDINATES +
@@ -108,7 +103,6 @@ public class DatabaseConstants {
     public static final String INSERT_ADDRESS = "INSERT INTO " +
             ADDRESS_TABLE + " (" +
             ADDRESS_TABLE_STREET_COLUMN + ") VALUES (?) ON CONFLICT (street) DO NOTHING RETURNING id";
-    public static final String SELECT_ROLE_ID_BY_ROLE = "SELECT id FROM ROLES WHERE role = ?";
     // SESSIONS_TABLE
     public static final String SELECT_SESSION_ID_BY_USER_ID = "SELECT id FROM SESSIONS WHERE user_id = ?";
     public static final String SELECT_USER_ID_BY_SESSION_ID = "SELECT user_id FROM SESSIONS WHERE id = ?";
@@ -121,7 +115,4 @@ public class DatabaseConstants {
             "JOIN role_functions AS rf ON r.id = rf.role_id " +
             "JOIN functions AS f ON rf.function_id = f.id " +
             "WHERE s.id = ?";
-    public static final String SELECT_FUNCTION_ID_BY_ID = "SELECT id FROM FUNCTIONS WHERE function = ?";
-    public static final String UPDATE_ROLE_FUNCTION = "INSERT INTO ROLE_FUNCTIONS (role_id, function_id) VALUES (?, ?)";
-    public static final String DELETE_ROLE_FUNCTION = "DELETE FROM ROLE_FUNCTIONS WHERE role_id = ? AND function_id = ?";
 }

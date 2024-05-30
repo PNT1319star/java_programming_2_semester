@@ -1,5 +1,7 @@
 package processing.specificcommands;
 
+import org.csjchoisoojong.interaction.Response;
+import org.csjchoisoojong.interaction.ResponseCode;
 import processing.ServerCommandProcessor;
 
 import java.io.IOException;
@@ -13,9 +15,9 @@ public class PrintUniqPostalAddCommand extends AbstractCommand {
     }
 
     @Override
-    public String execute(String argument, Object object) {
+    public Response execute(String argument, Object object) {
         try {
-            return serverCommandProcessor.printUniquePostalAddress();
+            return new Response(ResponseCode.OK, "Command has been successfully executed", serverCommandProcessor.printUniquePostalAddress());
         } catch (IOException exception) {
             throw new RuntimeException(exception);
         }

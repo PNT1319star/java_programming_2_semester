@@ -8,10 +8,7 @@ import org.csjchoisoojong.utility.ConsolePrinter;
 
 import java.io.IOException;
 import java.time.ZonedDateTime;
-import java.util.ArrayDeque;
-import java.util.Comparator;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
@@ -87,45 +84,41 @@ public class CollectionManager {
                 + ".\nNumber of elements: " + arrayDeque.size() + ".";
     }
 
-    public static String filterStartsWithFullName(String fullName) {
+    public static ArrayDeque<Organization> filterStartsWithFullName(String fullName) {
         try {
             reentrantLock.lock();
-            StringBuilder string = new StringBuilder();
-            arrayDeque.stream()
+            return arrayDeque.stream()
                     .filter(organization -> organization.getFullName().startsWith(fullName))
-                    .forEach(string::append);
-            if (string.toString().isEmpty()) return "There is no organizations with this full name!";
-            return string.toString();
+                    .collect(Collectors.toCollection(ArrayDeque::new));
         } finally {
             reentrantLock.unlock();
         }
     }
 
-    public static String head() {
+    public static ArrayDeque<Organization> head() {
         try {
             reentrantLock.lock();
-            if (arrayDeque.isEmpty()) {
-                return "The collection is empty!";
+            ArrayDeque<Organization> results = new ArrayDeque<>();
+            if (!arrayDeque.isEmpty()) {
+                results.add(arrayDeque.peekFirst());
             }
-            return arrayDeque.peekFirst().toString();
+            return results;
         } finally {
             reentrantLock.unlock();
         }
     }
 
-    public static String minByCreationDate() {
+    public static ArrayDeque<Organization> minByCreationDate() {
         return arrayDeque.stream()
                 .min(Comparator.comparing(Organization::getCreationDate))
-                .map(Organization::toString)
-                .orElse("The collection is empty");
+                .stream().collect(Collectors.toCollection(ArrayDeque::new));
     }
 
-    public static String printUniquePostalAddress() {
-        if (arrayDeque.isEmpty()) return "The collection is empty!";
+    public static ArrayDeque<Organization> printUniquePostalAddress() {
+        Set<String> uniqueAddress = new HashSet<>();
         return arrayDeque.stream()
-                .map(organization -> organization.getPostalAddress().getStreet())
-                .distinct()
-                .collect(Collectors.joining());
+                .filter(organization -> uniqueAddress.add(organization.getPostalAddress().getStreet()))
+                .collect(Collectors.toCollection(ArrayDeque::new));
     }
 
     public static String removeByID(String sID) throws IOException {
@@ -168,18 +161,6 @@ public class CollectionManager {
         return "All organizations that meet the conditions have been deleted!";
     }
 
-    public static String show() {
-        if (arrayDeque.isEmpty()) return "The collection is empty!";
-        try {
-            reentrantLock.lock();
-            return arrayDeque.stream()
-                    .map(Organization::toString)
-                    .collect(Collectors.joining());
-        } finally {
-            reentrantLock.unlock();
-        }
-    }
-
     public static boolean updateElement(OrganizationRaw newOrganization, Integer ID) throws IOException {
         try {
             reentrantLock.lock();
@@ -204,34 +185,6 @@ public class CollectionManager {
         return false;
     }
 
-    public static String addFunction(Roles role, String function) throws IOException {
-        try {
-            if (role.equals(Roles.ADMIN)) return "You have all functions";
-            else {
-                if (databaseCollectionManager.updateFunction(role.toString().toLowerCase(), function)) {
-                    return "You have added the " + function + " function " + "to the " + role;
-                } else {
-                    return "Role already has this function!";
-                }
-            }
-        } catch (HandlingDatabaseException exception) {
-            throw new IOException();
-        }
-    }
-
-    public static String removeFunction(Roles role, String function) throws IOException {
-        try {
-            if (databaseCollectionManager.removeFunction(role.toString().toLowerCase(), function)) {
-                return "You have removed the " + function + " function " + "to the " + role;
-            } else {
-                return "Role doesn't have this function!";
-            }
-
-        } catch (HandlingDatabaseException exception) {
-            throw new IOException();
-        }
-    }
-
     public static void loadCollectionFromDatabase() {
         try {
             arrayDeque = databaseCollectionManager.loadCollection();
@@ -242,11 +195,6 @@ public class CollectionManager {
             initializationDate = ZonedDateTime.now();
             ConsolePrinter.printError("Collection has not been loaded!");
         }
-    }
-
-
-    public static void setUsername(int userId) {
-        CollectionManager.userId = userId;
     }
 
     public static void setDatabaseCollectionManager(DatabaseCollectionManager databaseCollectionManager) {

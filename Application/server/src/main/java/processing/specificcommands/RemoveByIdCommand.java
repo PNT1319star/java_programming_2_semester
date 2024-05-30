@@ -1,5 +1,7 @@
 package processing.specificcommands;
 
+import org.csjchoisoojong.interaction.Response;
+import org.csjchoisoojong.interaction.ResponseCode;
 import processing.ServerCommandProcessor;
 
 import java.io.IOException;
@@ -13,11 +15,11 @@ public class RemoveByIdCommand extends AbstractCommand {
     }
 
     @Override
-    public String execute(String argument, Object object) {
+    public Response execute(String argument, Object object) {
         try {
-            return serverCommandProcessor.removeById(argument);
+            return new Response(ResponseCode.OK, serverCommandProcessor.removeById(argument), serverCommandProcessor.getCollection());
         } catch (IOException exception) {
-            throw new RuntimeException(exception);
+            return new Response(ResponseCode.ERROR, "Something went wrong with this command", serverCommandProcessor.getCollection());
         }
     }
 

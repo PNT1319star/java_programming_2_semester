@@ -6,6 +6,7 @@ import database.DatabaseSessionManager;
 import org.csjchoisoojong.exceptions.HandlingDatabaseException;
 import org.csjchoisoojong.interaction.Request;
 import org.csjchoisoojong.interaction.Response;
+import org.csjchoisoojong.interaction.ResponseCode;
 import processing.specificcommands.AbstractCommand;
 import utilities.CollectionManager;
 import utilities.Invoker;
@@ -54,32 +55,13 @@ public class ServerProcessor {
         requestProcessor.execute(() -> {
             try {
                 Request request = requestQueue.take();
-                Response response;
-                if (request.getSessionId().isEmpty()) {
-                    HashMap<String, AbstractCommand> commandHashMap = Invoker.getRoleCommandsList().get("server");
-                    response = new Response(Invoker.executeCommand(request, commandHashMap));
-                } else {
-                    String sessionId = request.getSessionId();
-                    int userId = databaseSessionManager.getUserIdBySessionId(sessionId);
-                    CollectionManager.setUsername(userId);
-                    List<String> functionList = databaseSessionManager.getFunctionsList(sessionId);
-                    HashMap<String, AbstractCommand> commandHashMap = new HashMap<>();
-                    for (String function : functionList) {
-                        HashMap<String, AbstractCommand> smallCommandsList = Invoker.getRoleCommandsList().get(function);
-                        commandHashMap.putAll(smallCommandsList);
-                    }
-                    try {
-                        response = new Response(Invoker.executeCommand(request, commandHashMap));
-                    } catch (NullPointerException exception) {
-                        response = new Response("You can not use this command!");
-                    }
-                }
-                responseQueue.put(response);
+                Response response = Invoker.executeCommand(request);
+                if (response != null) responseQueue.put(response);
             } catch (InterruptedException exception) {
                 ConsolePrinter.printError("Interrupted while processing request: " + exception.getMessage());
                 throw new RuntimeException(exception);
-            } catch (HandlingDatabaseException exception) {
-                ConsolePrinter.printError("Something when wrong in the database");
+            } catch (NullPointerException exception) {
+                throw new RuntimeException(exception);
             }
         });
 

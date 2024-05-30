@@ -34,6 +34,11 @@
                         <Font size="21.0" />
                     </font>
                 </Label>
+                <Label fx:id="passwordLabel" text="Password" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.vgrow="SOMETIMES">
+                    <font>
+                        <Font size="21.0" />
+                    </font>
+                </Label>
                 <TextField fx:id="usernameField" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.vgrow="SOMETIMES" />
                 <PasswordField fx:id="passwordField" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.vgrow="SOMETIMES" />
                 <ImageView fitHeight="80.0" fitWidth="286.0" pickOnBounds="true" preserveRatio="true" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.vgrow="ALWAYS">
@@ -47,7 +52,7 @@
                         <Button fx:id="signInButton" mnemonicParsing="false" onAction="#signInButtonOnAction" text="Sign in" />
                     </children>
                 </HBox>
-                <Label fx:id="isConnectedLabel" text="Failed" textFill="RED" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.vgrow="NEVER"/>
+                <Label fx:id="isConnectedLabel" text="IsConnected" textFill="RED" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.vgrow="NEVER"/>
             </children>
         </GridPane>
     </children>

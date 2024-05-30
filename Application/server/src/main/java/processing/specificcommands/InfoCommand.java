@@ -1,5 +1,7 @@
 package processing.specificcommands;
 
+import org.csjchoisoojong.interaction.Response;
+import org.csjchoisoojong.interaction.ResponseCode;
 import processing.ServerCommandProcessor;
 
 import java.io.IOException;
@@ -14,11 +16,11 @@ public class InfoCommand extends AbstractCommand {
     }
 
     @Override
-    public String execute(String argument, Object object) {
+    public Response execute(String argument, Object object) {
         try {
-            return serverCommandProcessor.info();
+            return new Response(ResponseCode.OK,serverCommandProcessor.info(),null);
         } catch (IOException exception) {
-            throw new RuntimeException(exception);
+            return new Response(ResponseCode.ERROR, "Something went wrong with this command", null);
         }
     }
 

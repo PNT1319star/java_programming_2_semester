@@ -15,6 +15,7 @@ public class Communicator {
     private int reconnectionAttempts;
     private final int maxReconnectionAttempts;
     private SocketChannel socketChannel;
+    private boolean isConnected;
 
     public Communicator(String host, int port, int reconnectionTimeout, int maxReconnectionAttempts) {
         this.host = host;
@@ -27,11 +28,14 @@ public class Communicator {
         try {
             if (reconnectionAttempts >= 1) ConsolePrinter.printResult("Reconnecting to the server...");
             socketChannel = SocketChannel.open(new InetSocketAddress(host, port));
+            isConnected = true;
         } catch (IllegalArgumentException exception) {
             ConsolePrinter.printError("The server address was entered incorrectly!");
+            isConnected = false;
             throw new NotInDeclaredLimitsException();
         } catch (IOException exception) {
             ConsolePrinter.printError("An error occurred while connecting to the server!");
+            isConnected = false;
             throw new ConnectionErrorException();
         }
     }
@@ -77,6 +81,9 @@ public class Communicator {
 
     public SocketChannel getSocketChannel() {
         return socketChannel;
+    }
+    public boolean isConnected(){
+        return isConnected;
     }
 
 }

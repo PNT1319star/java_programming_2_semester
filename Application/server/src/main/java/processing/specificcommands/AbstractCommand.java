@@ -1,5 +1,7 @@
 package processing.specificcommands;
 
+import org.csjchoisoojong.interaction.Response;
+
 public abstract class AbstractCommand {
     private final String name;
 
@@ -11,7 +13,7 @@ public abstract class AbstractCommand {
         this.description = description;
     }
 
-    public abstract String execute(String string, Object object);
+    public abstract Response execute(String string, Object object);
 
     public String getName() {
         return name;

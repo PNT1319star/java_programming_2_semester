@@ -1,5 +1,7 @@
 package processing.specificcommands;
 
+import org.csjchoisoojong.interaction.Response;
+import org.csjchoisoojong.interaction.ResponseCode;
 import processing.ServerCommandProcessor;
 
 import java.io.IOException;
@@ -13,11 +15,11 @@ public class FilterStartsWFullNameCommand extends AbstractCommand {
     }
 
     @Override
-    public String execute(String argument, Object object) {
+    public Response execute(String argument, Object object) {
         try {
-            return serverCommandProcessor.filterStartsWithFullName(argument);
+            return new Response(ResponseCode.OK,"Command has been successfully executed!",serverCommandProcessor.filterStartsWithFullName(argument));
         } catch (IOException exception) {
-            throw new RuntimeException(exception);
+            return new Response(ResponseCode.ERROR, "Something went wrong with this command", serverCommandProcessor.getCollection());
         }
     }
 

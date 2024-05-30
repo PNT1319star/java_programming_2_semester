@@ -14,12 +14,12 @@ import java.util.Scanner;
 
 public class CommandHandler {
     private final Communicator communicator;
-    private final String session_id;
-    private Scanner scanner = new Scanner(System.in);
+    private String session_id;
+    private final Scanner scanner;
 
-    public CommandHandler(Communicator communicator, String session_id) {
+    public CommandHandler(Communicator communicator, Scanner scanner) {
         this.communicator = communicator;
-        this.session_id = session_id;
+        this.scanner = scanner;
     }
 
     public void processCommand(Request request) throws IOException, ClassNotFoundException, ConnectionErrorException {
@@ -45,12 +45,11 @@ public class CommandHandler {
         }
         return 1;
     }
-
-    public void setScanner(Scanner scanner) {
-        this.scanner = scanner;
-    }
     public String getSessionId() {
         return session_id;
+    }
+    public void setSessionId(String session_id) {
+        this.session_id = session_id;
     }
 
 }

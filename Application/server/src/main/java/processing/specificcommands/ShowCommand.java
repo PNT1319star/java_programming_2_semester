@@ -1,8 +1,8 @@
 package processing.specificcommands;
 
+import org.csjchoisoojong.interaction.Response;
+import org.csjchoisoojong.interaction.ResponseCode;
 import processing.ServerCommandProcessor;
-
-import java.io.IOException;
 
 public class ShowCommand extends AbstractCommand {
     private final ServerCommandProcessor serverCommandProcessor;
@@ -13,12 +13,8 @@ public class ShowCommand extends AbstractCommand {
     }
 
     @Override
-    public String execute(String argument, Object object) {
-        try {
-            return serverCommandProcessor.show();
-        } catch (IOException exception) {
-            throw new RuntimeException(exception);
-        }
+    public Response execute(String argument, Object object) {
+        return new Response(ResponseCode.OK, "Command has been successfully executed!", serverCommandProcessor.getCollection());
     }
 
     @Override

@@ -14,6 +14,7 @@ import org.csjchoisoojong.data.Organization;
 import org.csjchoisoojong.data.OrganizationType;
 import org.csjchoisoojong.exceptions.EmptyException;
 import org.csjchoisoojong.interaction.OrganizationRaw;
+import org.csjchoisoojong.utilities.UIOutputer;
 
 public class AskWindowController {
     @FXML
@@ -122,6 +123,7 @@ public class AskWindowController {
         employeesCountLabel.textProperty().bind(resourceFactory.getStringBinding("EmployeesCountColumn"));
         typeLabel.textProperty().bind(resourceFactory.getStringBinding("TypeColumn"));
         addressLabel.textProperty().bind(resourceFactory.getStringBinding("AddressColumn"));
+        enterButton.textProperty().bind(resourceFactory.getStringBinding("EnterButton"));
     }
 
     private String convertName() throws IllegalArgumentException {
@@ -130,6 +132,7 @@ public class AskWindowController {
             name = nameField.getText();
             if (name.isEmpty()) throw new EmptyException();
         } catch (EmptyException exception) {
+            UIOutputer.printError("NameEmptyException");
             throw new IllegalArgumentException();
         }
         return name;
@@ -142,6 +145,7 @@ public class AskWindowController {
             strX = xField.getText();
             x = Long.parseLong(strX);
         } catch (NumberFormatException exception) {
+            UIOutputer.printError("XFormatException");
             throw new IllegalArgumentException();
         }
         return x;
@@ -154,6 +158,7 @@ public class AskWindowController {
             strY = yField.getText();
             y = Long.parseLong(strY);
         } catch (NumberFormatException exception) {
+            UIOutputer.printError("YFormatException");
             throw new IllegalArgumentException();
         }
         return y;
@@ -166,6 +171,7 @@ public class AskWindowController {
             strAnnualTurnover = annualTurnoverField.getText();
             annualTurnover = Float.parseFloat(strAnnualTurnover);
         } catch (NumberFormatException exception) {
+            UIOutputer.printError("AnnualTurnoverException");
             throw new IllegalArgumentException();
         }
         return annualTurnover;
@@ -177,6 +183,7 @@ public class AskWindowController {
             fullName = fullNameField.getText();
             if (fullName.isEmpty()) throw new EmptyException();
         } catch (EmptyException exception) {
+            UIOutputer.printError("FullNameException");
             throw new IllegalArgumentException();
         }
         return fullName;
@@ -189,6 +196,7 @@ public class AskWindowController {
             strEmployeesCount = employeesCountField.getText();
             employeesCount = Integer.parseInt(strEmployeesCount);
         } catch (NumberFormatException exception) {
+            UIOutputer.printError("EmployeesCountException");
             throw new IllegalArgumentException();
         }
         return employeesCount;
@@ -200,8 +208,10 @@ public class AskWindowController {
             address = addressField.getText();
             if (address.isEmpty()) throw new EmptyException();
         } catch (EmptyException exception) {
+            UIOutputer.printError("AddressException");
             throw new IllegalArgumentException();
         }
         return address;
     }
+
 }

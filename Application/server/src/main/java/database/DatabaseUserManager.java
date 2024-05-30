@@ -5,7 +5,6 @@ import org.csjchoisoojong.exceptions.HandlingDatabaseException;
 import org.csjchoisoojong.exceptions.NotUpdateException;
 import org.csjchoisoojong.interaction.User;
 import utilities.PasswordEncryptor;
-import utilities.Roles;
 import org.csjchoisoojong.utility.ConsolePrinter;
 
 import java.sql.PreparedStatement;
@@ -13,7 +12,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 
 public class DatabaseUserManager {
     private final DatabaseConnector databaseConnector;
@@ -150,44 +148,6 @@ public class DatabaseUserManager {
         }
     }
 
-    public boolean updateUserRole(String username, String role) throws HandlingDatabaseException {
-        PreparedStatement updateUserRoleStatement = null;
-        try {
-            PreparedStatement getRoleIdStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.SELECT_ROLE_ID_BY_ROLE, false);
-            getRoleIdStatement.setString(1, role);
-            ResultSet resultSet = getRoleIdStatement.executeQuery();
-            if (!resultSet.next()) throw new HandlingDatabaseException();
-            int roleId = resultSet.getInt("id");
-            StatementBuilder.closedPreparedStatement(getRoleIdStatement);
-            updateUserRoleStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.UPDATE_ROLE_ID_BY_USERNAME, false);
-            updateUserRoleStatement.setInt(1, roleId);
-            updateUserRoleStatement.setString(2, username);
-            int rowsUpdate = updateUserRoleStatement.executeUpdate();
-            return rowsUpdate > 0;
-        } catch (SQLException exception) {
-            throw new HandlingDatabaseException();
-        } finally {
-            StatementBuilder.closedPreparedStatement(updateUserRoleStatement);
-        }
-    }
 
-    public HashMap<String, Roles> getUsersList() throws HandlingDatabaseException {
-        PreparedStatement getUserStatement = null;
-        HashMap<String, Roles> userRoleMap = new HashMap<>();
-        try {
-            getUserStatement = StatementBuilder.buildPreparedStatement(databaseConnector.getConnection(), DatabaseConstants.SELECT_USER_ROLE, false);
-            ResultSet resultSet = getUserStatement.executeQuery();
-            while (resultSet.next()) {
-                String username = resultSet.getString("username");
-                String role = resultSet.getString("role");
-                userRoleMap.put(username, Roles.valueOf(role.toUpperCase()));
-            }
-            return userRoleMap;
-        } catch (SQLException e) {
-            throw new HandlingDatabaseException();
-        } finally {
-            StatementBuilder.closedPreparedStatement(getUserStatement);
-        }
-    }
 
 }
