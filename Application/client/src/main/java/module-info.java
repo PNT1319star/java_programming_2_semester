@@ -2,6 +2,8 @@ module org.csjchoisoojong.client {
     requires javafx.controls;
     requires javafx.fxml;
     requires common;
+    requires org.controlsfx.controls;
+    requires com.jfoenix;
 
 
     opens org.csjchoisoojong.run to javafx.fxml;
@@ -9,4 +11,5 @@ module org.csjchoisoojong.client {
     exports org.csjchoisoojong.controllers;
 
     opens org.csjchoisoojong.controllers to javafx.fxml;
+
 }

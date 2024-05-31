@@ -4,6 +4,7 @@ import javafx.animation.ScaleTransition;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
@@ -16,6 +17,7 @@ import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import org.controlsfx.control.table.TableFilter;
 import org.csjchoisoojong.controllers.tools.ObservableResourceFactory;
 import org.csjchoisoojong.data.Organization;
 import org.csjchoisoojong.data.OrganizationType;
@@ -25,6 +27,7 @@ import org.csjchoisoojong.script.FileScriptHandler;
 import org.csjchoisoojong.utilities.UIOutputer;
 
 import java.io.File;
+import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.*;
 
@@ -182,9 +185,10 @@ public class MainWindowController {
         languageComboBox.setOnAction((event) -> resourceFactory.setResources(ResourceBundle.getBundle("bundles.ui", localeMap.get(languageComboBox.getValue()))));
         bindLanguage();
     }
+
     @FXML
     public void refreshButtonOnAction() {
-        commandHandler.executeCommand(REFRESH_COMMAND_NAME, "", null);
+        requestAction(REFRESH_COMMAND_NAME);
     }
 
     private void initializeTable() {
@@ -242,7 +246,7 @@ public class MainWindowController {
 
     @FXML
     private void infoButtonOnAction() {
-        commandHandler.executeCommand(INFO_COMMAND_NAME, "", null);
+        requestAction(INFO_COMMAND_NAME);
     }
 
     @FXML
@@ -250,7 +254,8 @@ public class MainWindowController {
         askWindowController.clearOrganization();
         askStage.showAndWait();
         OrganizationRaw organizationRaw = askWindowController.getAndClear();
-        if (organizationRaw != null) commandHandler.executeCommand(ADD_COMMAND_NAME, "", organizationRaw);
+        if (organizationRaw != null) requestAction(ADD_COMMAND_NAME, "", organizationRaw);
+        refreshButtonOnAction();
     }
 
     @FXML
@@ -258,7 +263,8 @@ public class MainWindowController {
         askWindowController.clearOrganization();
         askStage.showAndWait();
         OrganizationRaw organizationRaw = askWindowController.getAndClear();
-        if (organizationRaw != null) commandHandler.executeCommand(ADD_IF_MAX_COMMAND_NAME, "", organizationRaw);
+        if (organizationRaw != null) requestAction(ADD_IF_MAX_COMMAND_NAME, "", organizationRaw);
+        refreshButtonOnAction();
     }
 
     @FXML
@@ -268,15 +274,17 @@ public class MainWindowController {
             askWindowController.setOrganization(organizationTableView.getSelectionModel().getSelectedItem());
             askStage.showAndWait();
             OrganizationRaw organizationRaw = askWindowController.getAndClear();
-            if (organizationRaw != null) commandHandler.executeCommand(UPDATE_COMMAND_NAME, id + "", organizationRaw);
+            if (organizationRaw != null) requestAction(UPDATE_COMMAND_NAME, id + "", organizationRaw);
         } else UIOutputer.printError("UpdateButtonSelectionException");
+        refreshButtonOnAction();
     }
 
     @FXML
     private void removeButtonOnAction() {
         if (!organizationTableView.getSelectionModel().isEmpty()) {
-            commandHandler.executeCommand(REMOVE_BY_ID_COMMAND_NAME, organizationTableView.getSelectionModel().getSelectedItem().getId().toString(), null);
+            requestAction(REMOVE_BY_ID_COMMAND_NAME, organizationTableView.getSelectionModel().getSelectedItem().getId().toString(), null);
         } else UIOutputer.printError("RemoveByIdButtonException");
+        refreshButtonOnAction();
     }
 
     @FXML
@@ -292,13 +300,15 @@ public class MainWindowController {
                     organizationFromTable.getType(),
                     organizationFromTable.getPostalAddress()
             );
-            commandHandler.executeCommand(REMOVE_LOWER_COMMAND_NAME, "", newOrganization);
+            requestAction(REMOVE_LOWER_COMMAND_NAME, "", newOrganization);
         } else UIOutputer.printError("RemoveLowerException");
+        refreshButtonOnAction();
     }
 
     @FXML
     private void clearButtonOnAction() {
-        commandHandler.executeCommand(CLEAR_COMMAND_NAME, "", null);
+        requestAction(CLEAR_COMMAND_NAME);
+        refreshButtonOnAction();
     }
 
     @FXML
@@ -367,5 +377,20 @@ public class MainWindowController {
         prevClicked = shape;
         prevColor = (Color) shape.getFill();
         shape.setFill(prevColor.brighter());
+    }
+
+    private void requestAction(String commandName, String commandStringArgument, Serializable commandObjectArgument) {
+        ArrayDeque<Organization> organizations = commandHandler.executeCommand(commandName, commandStringArgument, commandObjectArgument);
+        if (organizations != null) {
+            ObservableList<Organization> organizationObservableList = FXCollections.observableArrayList(organizations);
+            organizationTableView.setItems(organizationObservableList);
+            TableFilter.forTableView(organizationTableView).apply();
+            organizationTableView.getSelectionModel().clearSelection();
+            refreshCanvas();
+        }
+    }
+
+    private void requestAction(String commandName) {
+        requestAction(commandName, "", null);
     }
 }

@@ -197,6 +197,9 @@ public class CollectionManager {
         }
     }
 
+    public static void setUserId(int userId){
+        CollectionManager.userId = userId;
+    }
     public static void setDatabaseCollectionManager(DatabaseCollectionManager databaseCollectionManager) {
         CollectionManager.databaseCollectionManager = databaseCollectionManager;
     }

@@ -1,6 +1,7 @@
 package processing.specificcommands;
 
 import org.csjchoisoojong.interaction.Response;
+import org.csjchoisoojong.interaction.ResponseCode;
 import processing.ServerCommandProcessor;
 
 public class RefreshCommand extends AbstractCommand {
@@ -13,7 +14,7 @@ public class RefreshCommand extends AbstractCommand {
 
     @Override
     public Response execute(String string, Object object) {
-        return null;
+        return new Response(ResponseCode.OK, "The table has been refreshed!", serverCommandProcessor.getCollection());
     }
 
     @Override

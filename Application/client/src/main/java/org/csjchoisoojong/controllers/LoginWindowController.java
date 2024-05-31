@@ -38,6 +38,7 @@ public class LoginWindowController {
     public void setCommunicator(Communicator communicator) {
         this.communicator = communicator;
     }
+
     public void setUserAuthHandler(UserAuthHandler userAuthHandler) {
         this.userAuthHandler = userAuthHandler;
     }
@@ -46,15 +47,17 @@ public class LoginWindowController {
         this.resourceFactory = resourceFactory;
         bindLanguage();
     }
+
     public String getUsername() {
         return usernameField.getText().trim();
     }
 
     @FXML
     private void signInButtonOnAction() {
-        if (userAuthHandler.processAuthentication(usernameField.getText(), passwordField.getText(), registerCheckBox.isSelected())|| userAuthHandler.processAuthentication(usernameField.getText(), passwordField.getText(), !registerCheckBox.isSelected()))
+        if (userAuthHandler.processAuthentication(usernameField.getText(), passwordField.getText(), registerCheckBox.isSelected()) || userAuthHandler.processAuthentication(usernameField.getText(), passwordField.getText(), !registerCheckBox.isSelected())) {
+            System.out.println("Login successful, setting main window.");
             app.setMainWindow();
-        else if (!communicator.isConnected()) {
+        } else if (!communicator.isConnected()) {
             isConnectedLabel.textProperty().bind(resourceFactory.getStringBinding("NotConnected"));
             isConnectedLabel.setTextFill(NOT_CONNECTED_COLOR);
         } else {

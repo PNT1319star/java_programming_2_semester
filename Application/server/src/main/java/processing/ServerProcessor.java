@@ -53,15 +53,24 @@ public class ServerProcessor {
 
         //Request processor task
         requestProcessor.execute(() -> {
+            Response response;
             try {
                 Request request = requestQueue.take();
-                Response response = Invoker.executeCommand(request);
+                if (request.getSessionId().isEmpty()) response = Invoker.executeCommand(request);
+                else {
+                    String sessionId = request.getSessionId();
+                    int userId = databaseSessionManager.getUserIdBySessionId(sessionId);
+                    CollectionManager.setUserId(userId);
+                    response = Invoker.executeCommand(request);
+                }
                 if (response != null) responseQueue.put(response);
             } catch (InterruptedException exception) {
                 ConsolePrinter.printError("Interrupted while processing request: " + exception.getMessage());
                 throw new RuntimeException(exception);
             } catch (NullPointerException exception) {
                 throw new RuntimeException(exception);
+            } catch (HandlingDatabaseException e) {
+                ConsolePrinter.printError("Something when wrong in the database");
             }
         });
 

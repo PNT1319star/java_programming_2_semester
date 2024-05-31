@@ -85,6 +85,8 @@ public class App extends Application {
 
     public void setMainWindow() {
         try {
+            commandHandler.setSessionId(userAuthHandler.getSessionId());
+            System.out.println("Loading MainWindow.fxml");
             FXMLLoader mainWindowLoader = new FXMLLoader();
             mainWindowLoader.setLocation(getClass().getResource("/view/MainWindow.fxml"));
             Parent mainWindowRootNode = mainWindowLoader.load();
@@ -120,8 +122,8 @@ public class App extends Application {
             primaryStage.setMinHeight(mainWindowScene.getHeight());
             primaryStage.setResizable(true);
         } catch (Exception exception) {
-            System.err.println(exception);
-            exception.printStackTrace();
+//            System.err.println(exception);
+//            exception.printStackTrace();
         }
 
     }
