@@ -7,7 +7,6 @@ import org.csjchoisoojong.exceptions.NotUpdateException;
 import org.csjchoisoojong.interaction.OrganizationRaw;
 import org.csjchoisoojong.interaction.User;
 import utilities.CollectionManager;
-import utilities.Invoker;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
@@ -65,8 +64,8 @@ public class ServerCommandProcessor {
         int ID = Integer.parseInt(sID);
         if (CollectionManager.idExistence(ID)) {
             if (CollectionManager.updateElement((OrganizationRaw) object, ID))
-                return "The organization has been updated";
-            else return "You can not update this organization";
+                return "UpdateSuccess";
+            else return "UpdateFailure";
         } else {
             return "This ID does not exist in this collection!";
         }

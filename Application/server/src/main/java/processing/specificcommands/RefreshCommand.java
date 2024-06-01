@@ -14,7 +14,7 @@ public class RefreshCommand extends AbstractCommand {
 
     @Override
     public Response execute(String string, Object object) {
-        return new Response(ResponseCode.OK, "The table has been refreshed!", serverCommandProcessor.getCollection());
+        return new Response(ResponseCode.OK, "RefreshSuccess", serverCommandProcessor.getCollection());
     }
 
     @Override

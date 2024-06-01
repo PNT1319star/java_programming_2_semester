@@ -53,6 +53,21 @@
             <artifactId>jfoenix</artifactId>
             <version>9.0.10</version>
         </dependency>
+        <dependency>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>3.0.0-M5</version>
+        </dependency>
+        <dependency>
+            <groupId>com.jidesoft</groupId>
+            <artifactId>jidefx-common</artifactId>
+            <version>0.9.1</version>
+        </dependency>
 
     </dependencies>
 
@@ -77,9 +92,6 @@
                         <id>default-cli</id>
                         <configuration>
                             <mainClass>org.csjchoisoojong.client/run.App</mainClass>
-                            <options>
-                                <option>--add-opens=javafx.controls/javafx.scene.control.skin=org.controlsfx.controls</option>
-                            </options>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>
                             <jlinkImageName>app</jlinkImageName>
@@ -90,6 +102,27 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0-M5</version>
+                <configuration>
+                    <argLine>--add-opens javafx.controls/javafx.scene.control.skin=org.controlsfx.controls</argLine>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.0.0</version>
+                <configuration>
+                    <mainClass>org.csjchoisoojong.client/run.App</mainClass>
+                    <arguments>
+                        <argument>--add-opens</argument>
+                        <argument>javafx.controls/javafx.scene.control.skin=org.controlsfx.controls</argument>
+                    </arguments>
+                </configuration>
+            </plugin>
         </plugins>
+
     </build>
 </project>

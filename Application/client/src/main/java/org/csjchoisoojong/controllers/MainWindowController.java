@@ -5,6 +5,7 @@ import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
@@ -46,7 +47,7 @@ public class MainWindowController {
 
     private final long RANDOM_SEED = 1821L;
     private final Duration ANIMATION_DURATION = Duration.millis(800);
-    private final double MAX_SIZE = 250;
+    private final double MAX_SIZE = 2500;
     @FXML
     private TableView<Organization> organizationTableView;
     @FXML
@@ -126,6 +127,7 @@ public class MainWindowController {
     private Map<String, Color> userColorMap;
     private Map<Shape, Integer> shapeMap;
     private Map<Integer, Text> textMap;
+    private Map<Shape, Tooltip> tooltipMap;
     private Map<String, Locale> localeMap;
     private Shape prevClicked;
     private Color prevColor;
@@ -182,7 +184,7 @@ public class MainWindowController {
         String selectedItem = languageComboBox.getSelectionModel().getSelectedItem();
         if (selectedItem == null || selectedItem.isEmpty())
             languageComboBox.getSelectionModel().selectFirst();
-        languageComboBox.setOnAction((event) -> resourceFactory.setResources(ResourceBundle.getBundle("bundles.ui", localeMap.get(languageComboBox.getValue()))));
+        languageComboBox.setOnAction((event) -> resourceFactory.setResources(ResourceBundle.getBundle("bundles.gui", localeMap.get(languageComboBox.getValue()))));
         bindLanguage();
     }
 
@@ -324,6 +326,7 @@ public class MainWindowController {
         shapeMap.clear();
         textMap.values().forEach(s -> canvasPane.getChildren().remove(s));
         textMap.clear();
+        tooltipMap = new HashMap<>();
         for (Organization organization : organizationTableView.getItems()) {
             if (!userColorMap.containsKey(organization.getUsername()))
                 userColorMap.put(organization.getUsername(), Color.color(randomGenerator.nextDouble(), randomGenerator.nextDouble(), randomGenerator.nextDouble()));
@@ -332,6 +335,10 @@ public class MainWindowController {
             object.setOnMouseClicked(this::shapeOnMouseClicked);
             object.translateXProperty().bind(canvasPane.widthProperty().divide(2).add(organization.getCoordinates().getX()));
             object.translateYProperty().bind(canvasPane.heightProperty().divide(2).subtract(organization.getCoordinates().getY()));
+
+            Tooltip tooltip = new Tooltip(organization.toString());
+            Tooltip.install(object,tooltip);
+            tooltipMap.put(object, tooltip);
 
             Text textObject = new Text(organization.getId().toString());
             textObject.setOnMouseClicked(object::fireEvent);
@@ -362,7 +369,7 @@ public class MainWindowController {
         }
     }
 
-    private void shapeOnMouseClicked(MouseEvent event) {
+    private void  shapeOnMouseClicked(MouseEvent event) {
         Shape shape = (Shape) event.getSource();
         int id = shapeMap.get(shape);
         for (Organization organization : organizationTableView.getItems()) {

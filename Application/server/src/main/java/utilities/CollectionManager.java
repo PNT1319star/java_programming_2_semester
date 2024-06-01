@@ -32,9 +32,9 @@ public class CollectionManager {
             reentrantLock.lock();
             if (databaseCollectionManager.insertOrganization(organization, userId)) {
                 databaseCollectionManager.loadCollection();
-                return "Organization has been added to the collection!";
+                return "AddSuccess";
             } else {
-                return "Organization existed in the collection!";
+                return "AddFailure";
             }
         } catch (HandlingDatabaseException exception) {
             throw new IOException();
@@ -48,10 +48,10 @@ public class CollectionManager {
             reentrantLock.lock();
             if (databaseCollectionManager.deleteOrganizationByUsername(userId)) {
                 databaseCollectionManager.loadCollection();
-                return "All your organizations have been deleted!";
+                return "ClearSuccess";
             } else {
                 databaseCollectionManager.loadCollection();
-                return "You didn't add any organizations!";
+                return "ClearFailure";
             }
         } catch (HandlingDatabaseException exception) {
             throw new IOException();
@@ -66,7 +66,7 @@ public class CollectionManager {
                 reentrantLock.lock();
                 if (databaseCollectionManager.insertOrganization(organization, userId)) {
                     databaseCollectionManager.loadCollection();
-                    return "Organization has been added to the collection!";
+                    return "AddIfMaxSuccess";
                 } else {
                     throw new HandlingDatabaseException();
                 }
@@ -76,7 +76,7 @@ public class CollectionManager {
                 reentrantLock.unlock();
             }
         }
-        return "The organization can not be added to the collection!";
+        return "AddIfMaxFailure";
     }
 
     public static String info() {
@@ -128,10 +128,10 @@ public class CollectionManager {
             int Id = Integer.parseInt(sID);
             if (databaseCollectionManager.deleteOrganizationById(Id, userId)) {
                 databaseCollectionManager.loadCollection();
-                return "The organization with this ID has been removed!";
+                return "RemoveSuccess";
             } else {
                 databaseCollectionManager.loadCollection();
-                return "You can not remove this organization!";
+                return "RemoveFailure";
             }
         } catch (HandlingDatabaseException exception) {
             throw new IOException();
@@ -149,7 +149,7 @@ public class CollectionManager {
                     if (databaseCollectionManager.deleteOrganizationById(organization1.getId(), userId)) {
                         databaseCollectionManager.loadCollection();
                     } else {
-                        return "There is no organizations that meet the conditions have been deleted!";
+                        return "RemoveLowerFailure";
                     }
                 }
             }
@@ -158,7 +158,7 @@ public class CollectionManager {
         } finally {
             reentrantLock.unlock();
         }
-        return "All organizations that meet the conditions have been deleted!";
+        return "RemoveLowerSuccess";
     }
 
     public static boolean updateElement(OrganizationRaw newOrganization, Integer ID) throws IOException {

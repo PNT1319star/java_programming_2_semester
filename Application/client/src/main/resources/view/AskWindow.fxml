@@ -29,42 +29,42 @@
         </padding>
         <Label fx:id="nameLabel" text="Name" GridPane.halignment="CENTER">
             <font>
-                <Font size="21.0"/>
+                <Font size="14.0"/>
             </font>
         </Label>
         <Label fx:id="xLabel" layoutX="64.0" layoutY="32.0" text="X" GridPane.halignment="CENTER" GridPane.rowIndex="1">
             <font>
-                <Font size="21.0"/>
+                <Font size="14.0"/>
             </font>
         </Label>
         <Label fx:id="yLabel" layoutX="64.0" layoutY="32.0" text="Y" GridPane.halignment="CENTER" GridPane.rowIndex="2">
             <font>
-                <Font size="21.0"/>
+                <Font size="14.0"/>
             </font>
         </Label>
         <Label fx:id="annualTurnoverLabel" layoutX="90.0" layoutY="160.0" text="Annual Turnover" GridPane.halignment="CENTER" GridPane.rowIndex="3">
             <font>
-                <Font size="21.0"/>
+                <Font size="14.0"/>
             </font>
         </Label>
         <Label fx:id="fullNameLabel" layoutX="90.0" layoutY="160.0" text="Full Name" GridPane.halignment="CENTER" GridPane.rowIndex="4">
             <font>
-                <Font size="21.0"/>
+                <Font size="14.0"/>
             </font>
         </Label>
         <Label fx:id="employeesCountLabel" layoutX="90.0" layoutY="160.0" text="Employees Count" GridPane.halignment="CENTER" GridPane.rowIndex="5">
             <font>
-                <Font size="21.0"/>
+                <Font size="14.0"/>
             </font>
         </Label>
         <Label fx:id="typeLabel" layoutX="64.0" layoutY="32.0" text="Type" GridPane.halignment="CENTER" GridPane.rowIndex="6">
             <font>
-                <Font size="21.0"/>
+                <Font size="14.0"/>
             </font>
         </Label>
         <Label fx:id="addressLabel" layoutX="90.0" layoutY="160.0" text="Address" GridPane.halignment="CENTER" GridPane.rowIndex="7">
             <font>
-                <Font size="21.0"/>
+                <Font size="14.0"/>
             </font>
         </Label>
         <TextField fx:id="nameField" GridPane.columnIndex="1"/>
