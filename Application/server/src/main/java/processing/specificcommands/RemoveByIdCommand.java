@@ -19,7 +19,7 @@ public class RemoveByIdCommand extends AbstractCommand {
         try {
             return new Response(ResponseCode.OK, serverCommandProcessor.removeById(argument), serverCommandProcessor.getCollection());
         } catch (IOException exception) {
-            return new Response(ResponseCode.ERROR, "Something went wrong with this command", serverCommandProcessor.getCollection());
+            return new Response(ResponseCode.ERROR, "CommandWrongException", serverCommandProcessor.getCollection());
         }
     }
 

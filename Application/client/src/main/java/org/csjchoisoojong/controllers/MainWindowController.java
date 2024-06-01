@@ -317,7 +317,9 @@ public class MainWindowController {
     private void executeScriptButtonOnAction() {
         File file = fileChooser.showOpenDialog(primaryStage);
         if (file == null) return;
-        if (fileScriptHandler.execute(file)) Platform.exit();
+        if (!fileScriptHandler.execute(file)) {
+            Platform.exit();
+        }
         else refreshButtonOnAction();
     }
 
@@ -391,7 +393,7 @@ public class MainWindowController {
         if (organizations != null) {
             ObservableList<Organization> organizationObservableList = FXCollections.observableArrayList(organizations);
             organizationTableView.setItems(organizationObservableList);
-            TableFilter.forTableView(organizationTableView).apply();
+//            TableFilter.forTableView(organizationTableView).apply();
             organizationTableView.getSelectionModel().clearSelection();
             refreshCanvas();
         }

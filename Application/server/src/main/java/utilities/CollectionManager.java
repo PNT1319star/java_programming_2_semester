@@ -84,45 +84,8 @@ public class CollectionManager {
                 + ".\nNumber of elements: " + arrayDeque.size() + ".";
     }
 
-    public static ArrayDeque<Organization> filterStartsWithFullName(String fullName) {
-        try {
-            reentrantLock.lock();
-            return arrayDeque.stream()
-                    .filter(organization -> organization.getFullName().startsWith(fullName))
-                    .collect(Collectors.toCollection(ArrayDeque::new));
-        } finally {
-            reentrantLock.unlock();
-        }
-    }
-
-    public static ArrayDeque<Organization> head() {
-        try {
-            reentrantLock.lock();
-            ArrayDeque<Organization> results = new ArrayDeque<>();
-            if (!arrayDeque.isEmpty()) {
-                results.add(arrayDeque.peekFirst());
-            }
-            return results;
-        } finally {
-            reentrantLock.unlock();
-        }
-    }
-
-    public static ArrayDeque<Organization> minByCreationDate() {
-        return arrayDeque.stream()
-                .min(Comparator.comparing(Organization::getCreationDate))
-                .stream().collect(Collectors.toCollection(ArrayDeque::new));
-    }
-
-    public static ArrayDeque<Organization> printUniquePostalAddress() {
-        Set<String> uniqueAddress = new HashSet<>();
-        return arrayDeque.stream()
-                .filter(organization -> uniqueAddress.add(organization.getPostalAddress().getStreet()))
-                .collect(Collectors.toCollection(ArrayDeque::new));
-    }
-
     public static String removeByID(String sID) throws IOException {
-        if (arrayDeque.isEmpty()) return "The collection is empty!";
+        if (arrayDeque.isEmpty()) return "EmptyCollection";
         try {
             reentrantLock.lock();
             int Id = Integer.parseInt(sID);
@@ -141,7 +104,7 @@ public class CollectionManager {
     }
 
     public static String removeLower(OrganizationRaw organization) throws IOException {
-        if (arrayDeque.isEmpty()) return "The collection is empty!";
+        if (arrayDeque.isEmpty()) return "EmptyCollection";
         try {
             reentrantLock.lock();
             for (Organization organization1 : arrayDeque) {

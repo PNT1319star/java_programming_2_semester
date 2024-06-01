@@ -33,26 +33,9 @@ public class ServerCommandProcessor {
         return CollectionManager.clear();
     }
 
-    public ArrayDeque<Organization> filterStartsWithFullName(String fullName) throws IOException {
-        return CollectionManager.filterStartsWithFullName(fullName);
-    }
-
-    public ArrayDeque<Organization> head() throws IOException {
-        return CollectionManager.head();
-    }
-
-    public ArrayDeque<Organization> minByCreationDate() throws IOException {
-        return CollectionManager.minByCreationDate();
-    }
-
-
-    public ArrayDeque<Organization> printUniquePostalAddress() throws IOException {
-        return CollectionManager.printUniquePostalAddress();
-    }
-
     public String removeById(String sID) throws IOException {
         int Id = Integer.parseInt(sID);
-        if (!CollectionManager.idExistence(Id)) return "The organization with this id has not existed!";
+        if (!CollectionManager.idExistence(Id)) return "OrganizationNotExistException";
         return CollectionManager.removeByID(sID);
     }
 
@@ -67,7 +50,7 @@ public class ServerCommandProcessor {
                 return "UpdateSuccess";
             else return "UpdateFailure";
         } else {
-            return "This ID does not exist in this collection!";
+            return "OrganizationNotExistException";
         }
     }
 
@@ -77,7 +60,7 @@ public class ServerCommandProcessor {
             if (databaseUserManager.checkUserByUsernameAndPassword(user)) {
                 int user_id = databaseUserManager.selectUserIdByUsername(user.getUsername());
                 return databaseUserManager.getSessionIdByUserId(user_id);
-            } else return "Incorrect username or password!";
+            } else return "IncorrectUserException";
         } catch (HandlingDatabaseException exception) {
             return "An error occurred while accessing to the database!";
         }
@@ -89,7 +72,7 @@ public class ServerCommandProcessor {
             int user_id = databaseUserManager.insertUserIntoUserTable(user);
             return databaseUserManager.insertUserIdIntoSessionsTable(user_id);
         } catch (HandlingDatabaseException | NotUpdateException exception) {
-            return "User has been existed!";
+            return "UserExistException";
         }
     }
     public ArrayDeque<Organization> getCollection() {

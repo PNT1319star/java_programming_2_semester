@@ -2,10 +2,12 @@
 package org.csjchoisoojong.script;
 
 
+import org.csjchoisoojong.connector.Communicator;
 import org.csjchoisoojong.exceptions.ConnectionErrorException;
 import org.csjchoisoojong.exceptions.ScriptRecursionException;
 import org.csjchoisoojong.exceptions.WrongAmountOfElementsException;
 import org.csjchoisoojong.interaction.Request;
+import org.csjchoisoojong.interaction.Response;
 import org.csjchoisoojong.processing.CommandHandler;
 import org.csjchoisoojong.utility.ConsolePrinter;
 import org.csjchoisoojong.utility.OrganizationCreator;
@@ -22,12 +24,13 @@ public class FileScriptHandler {
     private int commandStatus = 0;
     private final List<File> scriptStack = new ArrayList<>();
     private Scanner userScanner;
-    private final String session_id;
+    private  String session_id;
     private final CommandHandler commandHandler;
+    private final Communicator communicator;
 
-    public FileScriptHandler(CommandHandler commandHandler) {
+    public FileScriptHandler(CommandHandler commandHandler, Communicator communicator) {
+        this.communicator = communicator;
         this.commandHandler = commandHandler;
-        this.session_id = commandHandler.getSessionId();
     }
 
     public boolean execute(File file) {
@@ -49,7 +52,7 @@ public class FileScriptHandler {
         } catch (ScriptRecursionException e) {
             ConsolePrinter.printError("The script cannot be executed recursively");
         }
-        return false;
+        return true;
     }
 
     public void initializeScript(File file) throws FileNotFoundException, NoSuchElementException {
@@ -79,11 +82,15 @@ public class FileScriptHandler {
                     if (file.equals(new File(commandArgument))) throw new ScriptRecursionException();
                 }
                 Request request = executeCommand(commandPart);
+                communicator.connect();
                 commandHandler.processCommand(request);
+                communicator.closeConnection();
                 return 1;
             }
             Request request = executeCommand(commandPart);
+            communicator.connect();
             commandHandler.processCommand(request);
+            communicator.closeConnection();
             return 1;
         } catch (ConnectionErrorException | ClassNotFoundException e) {
             throw new RuntimeException(e);
@@ -121,6 +128,10 @@ public class FileScriptHandler {
             ConsolePrinter.printError("Invalid command format");
             return null;
         }
+    }
+
+    public void setSession_id(String session_id) {
+        this.session_id = session_id;
     }
 
 }

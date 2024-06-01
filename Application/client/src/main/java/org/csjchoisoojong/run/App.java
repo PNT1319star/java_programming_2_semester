@@ -67,7 +67,7 @@ public class App extends Application {
         communicator = new Communicator(host, port, RECONNECTION_TIMEOUT, MAX_RECONNECTION_ATTEMPTS);
         userAuthHandler = new UserAuthHandler(scanner, communicator);
         commandHandler = new CommandHandler(communicator,scanner);
-        fileScriptHandler = new FileScriptHandler(commandHandler);
+        fileScriptHandler = new FileScriptHandler(commandHandler, communicator);
     }
 
     @Override
@@ -86,7 +86,7 @@ public class App extends Application {
     public void setMainWindow() {
         try {
             commandHandler.setSessionId(userAuthHandler.getSessionId());
-            System.out.println("Loading MainWindow.fxml");
+            fileScriptHandler.setSession_id(userAuthHandler.getSessionId());
             FXMLLoader mainWindowLoader = new FXMLLoader();
             mainWindowLoader.setLocation(getClass().getResource("/view/MainWindow.fxml"));
             Parent mainWindowRootNode = mainWindowLoader.load();
@@ -122,8 +122,8 @@ public class App extends Application {
             primaryStage.setMinHeight(mainWindowScene.getHeight());
             primaryStage.setResizable(true);
         } catch (Exception exception) {
-//            System.err.println(exception);
-//            exception.printStackTrace();
+            System.err.println(exception);
+            exception.printStackTrace();
         }
 
     }

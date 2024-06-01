@@ -19,7 +19,7 @@ public class UpdateCommand extends AbstractCommand {
         try {
             return new Response(ResponseCode.OK, serverCommandProcessor.update(argument, object), serverCommandProcessor.getCollection());
         } catch (IOException e) {
-            return new Response(ResponseCode.ERROR, "Something went wrong with this command!", serverCommandProcessor.getCollection());
+            return new Response(ResponseCode.ERROR, "CommandWrongException", serverCommandProcessor.getCollection());
         }
     }
 
