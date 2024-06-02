@@ -332,7 +332,7 @@ public class MainWindowController {
         for (Organization organization : organizationTableView.getItems()) {
             if (!userColorMap.containsKey(organization.getUsername()))
                 userColorMap.put(organization.getUsername(), Color.color(randomGenerator.nextDouble(), randomGenerator.nextDouble(), randomGenerator.nextDouble()));
-            double size = Math.min(organization.getAnnualTurnover(), MAX_SIZE);
+            double size = Math.min(organization.getAnnualTurnover()/2, MAX_SIZE);
             Shape object = new Circle(size, userColorMap.get(organization.getUsername()));
             object.setOnMouseClicked(this::shapeOnMouseClicked);
             object.translateXProperty().bind(canvasPane.widthProperty().divide(2).add(organization.getCoordinates().getX()));
