@@ -4,6 +4,8 @@ import org.csjchoisoojong.interaction.Response;
 import org.csjchoisoojong.interaction.ResponseCode;
 import processing.ServerCommandProcessor;
 
+import java.io.IOException;
+
 public class LoginCommand extends AbstractCommand {
     private final ServerCommandProcessor serverCommandProcessor;
 
@@ -14,7 +16,11 @@ public class LoginCommand extends AbstractCommand {
 
     @Override
     public Response execute(String argument, Object object) {
-        return new Response(ResponseCode.OK, serverCommandProcessor.login(object), null);
+        try {
+            return new Response(ResponseCode.OK, serverCommandProcessor.login(object), null);
+        } catch (IOException e) {
+            return new Response(ResponseCode.ERROR, "IncorrectUserException", null);
+        }
     }
 
     @Override

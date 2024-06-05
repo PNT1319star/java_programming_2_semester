@@ -53,7 +53,7 @@ public class UserAuthHandler {
             session_id = response.getAnswer();
             return true;
         }
-        return true;
+        return false;
     }
 
     public String getSessionId() {

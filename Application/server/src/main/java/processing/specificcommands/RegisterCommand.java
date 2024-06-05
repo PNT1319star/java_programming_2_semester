@@ -4,6 +4,8 @@ import org.csjchoisoojong.interaction.Response;
 import org.csjchoisoojong.interaction.ResponseCode;
 import processing.ServerCommandProcessor;
 
+import java.io.IOException;
+
 public class RegisterCommand extends AbstractCommand {
     private final ServerCommandProcessor serverCommandProcessor;
 
@@ -14,7 +16,11 @@ public class RegisterCommand extends AbstractCommand {
 
     @Override
     public Response execute(String string, Object object) {
-        return new Response(ResponseCode.OK,serverCommandProcessor.register(object),null);
+        try {
+            return new Response(ResponseCode.OK, serverCommandProcessor.register(object), null);
+        } catch (IOException exception) {
+            return new Response(ResponseCode.ERROR, "UserExistException", null);
+        }
     }
 
     @Override

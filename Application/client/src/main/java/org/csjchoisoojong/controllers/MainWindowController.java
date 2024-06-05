@@ -5,14 +5,12 @@ import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Shape;
+import javafx.scene.shape.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
@@ -134,6 +132,7 @@ public class MainWindowController {
     private Random randomGenerator;
     private ObservableResourceFactory resourceFactory;
     private FileScriptHandler fileScriptHandler;
+    int cnt = -1;
 
     public void initialize() {
         initializeTable();
@@ -324,6 +323,11 @@ public class MainWindowController {
     }
 
     private void refreshCanvas() {
+//        drawAxes();
+        cnt = cnt +1;
+        if (cnt <= 1) {
+            drawAxes();
+        }
         shapeMap.keySet().forEach(s -> canvasPane.getChildren().remove(s));
         shapeMap.clear();
         textMap.values().forEach(s -> canvasPane.getChildren().remove(s));
@@ -333,7 +337,25 @@ public class MainWindowController {
             if (!userColorMap.containsKey(organization.getUsername()))
                 userColorMap.put(organization.getUsername(), Color.color(randomGenerator.nextDouble(), randomGenerator.nextDouble(), randomGenerator.nextDouble()));
             double size = Math.min(organization.getAnnualTurnover()/2, MAX_SIZE);
-            Shape object = new Circle(size, userColorMap.get(organization.getUsername()));
+            Shape object = null;
+            switch (organization.getType()) {
+                case PUBLIC :
+                    object = new Circle(size, userColorMap.get(organization.getUsername()));
+                    break;
+                case GOVERNMENT:
+                    object = new Rectangle(size, size, userColorMap.get(organization.getUsername()));
+                    break;
+                case TRUST:
+                    object = new Rectangle(size, size/2, userColorMap.get(organization.getUsername()));
+                    break;
+                case OPEN_JOINT_STOCK_COMPANY:
+                    object = new Rectangle(size/2, size, userColorMap.get(organization.getUsername()));
+                    break;
+                case PRIVATE_LIMITED_COMPANY:
+                    object = new Ellipse(size, size/2);
+                    object.setFill(userColorMap.get(organization.getUsername()));
+                    break;
+            }
             object.setOnMouseClicked(this::shapeOnMouseClicked);
             object.translateXProperty().bind(canvasPane.widthProperty().divide(2).add(organization.getCoordinates().getX()));
             object.translateYProperty().bind(canvasPane.heightProperty().divide(2).subtract(organization.getCoordinates().getY()));
@@ -346,8 +368,8 @@ public class MainWindowController {
             textObject.setOnMouseClicked(object::fireEvent);
             textObject.setFont(Font.font(size / 3));
             textObject.setFill(userColorMap.get(organization.getUsername()).darker());
-            textObject.translateXProperty().bind(object.translateXProperty().subtract(textObject.getLayoutBounds().getWidth() / 2));
-            textObject.translateYProperty().bind(object.translateYProperty().add(textObject.getLayoutBounds().getHeight() / 4));
+            textObject.translateXProperty().bind(object.translateXProperty().subtract(textObject.getLayoutBounds().getWidth()/4));
+            textObject.translateYProperty().bind(object.translateYProperty().add(textObject.getLayoutBounds().getHeight()));
 
             canvasPane.getChildren().add(object);
             canvasPane.getChildren().add(textObject);
@@ -402,4 +424,60 @@ public class MainWindowController {
     private void requestAction(String commandName) {
         requestAction(commandName, "", null);
     }
+    private void drawAxes() {
+        double canvasWidth = canvasPane.getWidth();
+        double canvasHeight = canvasPane.getHeight();
+        double maxAxisValue = 100; // Giới hạn lớn nhất cho trục tọa độ
+
+        // Vẽ trục X
+        Line xAxis = new Line();
+        xAxis.setStartX(0);
+        xAxis.setEndX(canvasWidth);
+        xAxis.setStartY(canvasHeight / 2);
+        xAxis.setEndY(canvasHeight / 2);
+        xAxis.setStroke(Color.RED);
+        xAxis.setStrokeWidth(2);
+
+        // Vẽ các đường vạch trên trục X
+        for (double x = -maxAxisValue; x <= maxAxisValue; x += 5) {
+            Line tick = new Line();
+            double tickX = (x / (2 * maxAxisValue)) * canvasWidth + (canvasWidth / 2);
+            tick.setStartX(tickX);
+            tick.setEndX(tickX);
+            tick.setStartY(canvasHeight / 2 - 5); // Độ dài vạch là 5 pixel
+            tick.setEndY(canvasHeight / 2 + 5);
+            tick.setStroke(Color.RED);
+            tick.setStrokeWidth(1);
+            canvasPane.getChildren().add(tick);
+        }
+
+        // Vẽ trục Y
+        Line yAxis = new Line();
+        yAxis.setStartX(canvasWidth / 2);
+        yAxis.setEndX(canvasWidth / 2);
+        yAxis.setStartY(0);
+        yAxis.setEndY(canvasHeight);
+        yAxis.setStroke(Color.RED);
+        yAxis.setStrokeWidth(2);
+
+        // Vẽ các đường vạch trên trục Y
+        for (double y = -maxAxisValue; y <= maxAxisValue; y += 5) {
+            Line tick = new Line();
+            double tickY = canvasHeight - ((y / (2 * maxAxisValue)) * canvasHeight + (canvasHeight / 2));
+            tick.setStartX(canvasWidth / 2 - 5); // Độ dài vạch là 5 pixel
+            tick.setEndX(canvasWidth / 2 + 5);
+            tick.setStartY(tickY);
+            tick.setEndY(tickY);
+            tick.setStroke(Color.RED);
+            tick.setStrokeWidth(1);
+            canvasPane.getChildren().add(tick);
+        }
+
+        // Thêm trục tọa độ vào canvas
+        canvasPane.getChildren().addAll(xAxis, yAxis);
+    }
+
+
+
+
 }

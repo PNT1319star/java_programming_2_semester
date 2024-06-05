@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
 
 public class CollectionManager {
     private static ArrayDeque<Organization> arrayDeque;

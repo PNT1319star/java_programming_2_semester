@@ -55,6 +55,8 @@ public class LoginWindowController {
     @FXML
     private void signInButtonOnAction() {
         if (userAuthHandler.processAuthentication(usernameField.getText(), passwordField.getText(), registerCheckBox.isSelected()) || userAuthHandler.processAuthentication(usernameField.getText(), passwordField.getText(), !registerCheckBox.isSelected())) {
+            isConnectedLabel.textProperty().bind(resourceFactory.getStringBinding("Connected"));
+            isConnectedLabel.setTextFill(CONNECTED_COLOR);
             app.setMainWindow();
         } else if (!communicator.isConnected()) {
             isConnectedLabel.textProperty().bind(resourceFactory.getStringBinding("NotConnected"));

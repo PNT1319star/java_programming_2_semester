@@ -5,6 +5,8 @@
 <?import javafx.scene.layout.*?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Text?>
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="org.csjchoisoojong.controllers.MainWindowController"
@@ -39,13 +41,17 @@
             <Tab fx:id="canvasTab" text="CanvasTab">
                 <AnchorPane fx:id="canvasPane" prefHeight="1800.0" prefWidth="2000.0"
                             style="-fx-background-color: white,
-                            linear-gradient(from 0.5px 0.0px to 10.5px 0.0px, repeat, blue 5%, transparent 5%),
-                            linear-gradient(from 0.0px 0.5px to 0.0px 10.5px, repeat, blue 5%, transparent 5%);">
+                linear-gradient(from 0.5px 0.0px to 10.5px 0.0px, repeat, blue 5%, transparent 5%),
+                linear-gradient(from 0.0px 0.5px to 0.0px 10.5px, repeat, blue 5%, transparent 5%);">
+<!--                    <Line fx:id="xAxis" startX="0.0" startY="900.0" endX="2000.0" endY="900.0" stroke="red" strokeWidth="2"/>-->
+<!--                    <Line fx:id="yAxis" startX="1000.0" startY="0.0" endX="1000.0" endY="1800.0" stroke="red" strokeWidth="2"/>-->
                     <cursor>
                         <Cursor fx:constant="CROSSHAIR"/>
                     </cursor>
                 </AnchorPane>
             </Tab>
+
+
         </TabPane>
         <Separator prefWidth="200.0"/>
         <FlowPane alignment="CENTER" columnHalignment="CENTER" hgap="10.0" prefHeight="86.0" prefWidth="900.0"

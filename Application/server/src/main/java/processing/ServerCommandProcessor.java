@@ -54,25 +54,25 @@ public class ServerCommandProcessor {
         }
     }
 
-    public String login(Object object) {
+    public String login(Object object) throws IOException {
         try {
             User user = (User) object;
             if (databaseUserManager.checkUserByUsernameAndPassword(user)) {
                 int user_id = databaseUserManager.selectUserIdByUsername(user.getUsername());
                 return databaseUserManager.getSessionIdByUserId(user_id);
-            } else return "IncorrectUserException";
+            } else throw new IOException();
         } catch (HandlingDatabaseException exception) {
             return "An error occurred while accessing to the database!";
         }
     }
 
-    public String register(Object object) {
+    public String register(Object object) throws IOException{
         try {
             User user = (User) object;
             int user_id = databaseUserManager.insertUserIntoUserTable(user);
             return databaseUserManager.insertUserIdIntoSessionsTable(user_id);
         } catch (HandlingDatabaseException | NotUpdateException exception) {
-            return "UserExistException";
+            throw new IOException();
         }
     }
     public ArrayDeque<Organization> getCollection() {
