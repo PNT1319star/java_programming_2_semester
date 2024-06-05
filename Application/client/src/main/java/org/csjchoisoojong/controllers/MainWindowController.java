@@ -181,6 +181,7 @@ public class MainWindowController {
                 languageComboBox.getSelectionModel().select(localeName);
         }
         String selectedItem = languageComboBox.getSelectionModel().getSelectedItem();
+        System.out.println(selectedItem);
         if (selectedItem == null || selectedItem.isEmpty())
             languageComboBox.getSelectionModel().selectFirst();
         languageComboBox.setOnAction((event) -> resourceFactory.setResources(ResourceBundle.getBundle("bundles.gui", localeMap.get(languageComboBox.getValue()))));
@@ -323,7 +324,6 @@ public class MainWindowController {
     }
 
     private void refreshCanvas() {
-//        drawAxes();
         cnt = cnt +1;
         if (cnt <= 1) {
             drawAxes();

@@ -43,8 +43,6 @@
                             style="-fx-background-color: white,
                 linear-gradient(from 0.5px 0.0px to 10.5px 0.0px, repeat, blue 5%, transparent 5%),
                 linear-gradient(from 0.0px 0.5px to 0.0px 10.5px, repeat, blue 5%, transparent 5%);">
-<!--                    <Line fx:id="xAxis" startX="0.0" startY="900.0" endX="2000.0" endY="900.0" stroke="red" strokeWidth="2"/>-->
-<!--                    <Line fx:id="yAxis" startX="1000.0" startY="0.0" endX="1000.0" endY="1800.0" stroke="red" strokeWidth="2"/>-->
                     <cursor>
                         <Cursor fx:constant="CROSSHAIR"/>
                     </cursor>

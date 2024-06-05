@@ -48,6 +48,7 @@ public class App extends Application {
             loginWindowController.setApp(this);
             loginWindowController.setCommunicator(communicator);
             loginWindowController.setUserAuthHandler(userAuthHandler);
+            loginWindowController.initialize();
             loginWindowController.initializeLanguage(resourceFactory);
 
             primaryStage.setTitle(APP_TITLE);
