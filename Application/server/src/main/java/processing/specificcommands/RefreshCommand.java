@@ -14,7 +14,7 @@ public class RefreshCommand extends AbstractCommand {
 
     @Override
     public Response execute(String string, Object object) {
-        return new Response(ResponseCode.OK, "RefreshSuccess", serverCommandProcessor.getCollection());
+        return new Response(ResponseCode.OK, "refresh", serverCommandProcessor.getCollection());
     }
 
     @Override

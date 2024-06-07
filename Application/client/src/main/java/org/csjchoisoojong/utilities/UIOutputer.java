@@ -14,6 +14,7 @@ public class UIOutputer {
 
 
     public static void tryError(String toOut) {
+        if (toOut.contains("refresh")) return;
         if (toOut.startsWith("Error: ")) message("Organization Management Application", toOut.substring(7), Alert.AlertType.ERROR);
         else message("", toOut, Alert.AlertType.INFORMATION);
     }

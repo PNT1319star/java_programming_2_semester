@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayDeque;
 import java.util.Scanner;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 public class CommandHandler {
     private final Communicator communicator;
@@ -50,9 +52,6 @@ public class CommandHandler {
             ConsolePrinter.printError("Can not connect to server!");
         }
         return organizations;
-    }
-    public String getSessionId() {
-        return session_id;
     }
     public void setSessionId(String session_id) {
         this.session_id = session_id;

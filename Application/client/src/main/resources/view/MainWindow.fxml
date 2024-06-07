@@ -101,9 +101,9 @@
     </VBox>
     <HBox alignment="CENTER_RIGHT" spacing="10.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="2.0">
         <Label fx:id="userNameLabel" text="UsernameLabel"/>
-        <Button fx:id="refreshButton" mnemonicParsing="false" onAction="#refreshButtonOnAction" text="RefreshButton">
+        <Button fx:id="exitButton" mnemonicParsing="false" onAction="#exitButtonOnAction" text="ExitButton">
             <tooltip>
-                <Tooltip fx:id="refreshButtonToolTip" text="RefreshButtonToolTip"/>
+                <Tooltip fx:id="exitButtonToolTip" text="RefreshButtonToolTip"/>
             </tooltip>
         </Button>
         <ComboBox fx:id="languageComboBox" prefWidth="150.0"/>

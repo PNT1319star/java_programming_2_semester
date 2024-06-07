@@ -116,7 +116,7 @@ public class App extends Application {
             mainWindowController.setAskStage(askStage);
             mainWindowController.setPrimaryStage(primaryStage);
             mainWindowController.setAskWindowController(askWindowController);
-            mainWindowController.refreshButtonOnAction();
+            mainWindowController.startPeriodicRefresh();
 
             primaryStage.setScene(mainWindowScene);
             primaryStage.setMinWidth(mainWindowScene.getWidth());

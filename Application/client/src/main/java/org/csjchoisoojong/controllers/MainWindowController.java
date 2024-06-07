@@ -16,7 +16,6 @@ import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import org.controlsfx.control.table.TableFilter;
 import org.csjchoisoojong.controllers.tools.ObservableResourceFactory;
 import org.csjchoisoojong.data.Organization;
 import org.csjchoisoojong.data.OrganizationType;
@@ -29,6 +28,9 @@ import java.io.File;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class MainWindowController {
     public static final String LOGIN_COMMAND_NAME = "login";
@@ -93,7 +95,7 @@ public class MainWindowController {
     @FXML
     private Button executeScriptButton;
     @FXML
-    private Button refreshButton;
+    private Button exitButton;
     @FXML
     private Tooltip infoButtonToolTip;
     @FXML
@@ -111,7 +113,7 @@ public class MainWindowController {
     @FXML
     private Tooltip executeScriptButtonToolTip;
     @FXML
-    private Tooltip refreshButtonToolTip;
+    private Tooltip exitButtonToolTip;
     @FXML
     private ComboBox<String> languageComboBox;
     @FXML
@@ -132,7 +134,9 @@ public class MainWindowController {
     private Random randomGenerator;
     private ObservableResourceFactory resourceFactory;
     private FileScriptHandler fileScriptHandler;
-    int cnt = -1;
+    private int cnt = -1;
+    private final ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
+
 
     public void initialize() {
         initializeTable();
@@ -187,6 +191,19 @@ public class MainWindowController {
         languageComboBox.setOnAction((event) -> resourceFactory.setResources(ResourceBundle.getBundle("bundles.gui", localeMap.get(languageComboBox.getValue()))));
         bindLanguage();
     }
+    public void startPeriodicRefresh() {
+        Runnable task = () -> {
+            try {
+                Platform.runLater(() -> requestAction(REFRESH_COMMAND_NAME));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        };
+        scheduler.scheduleAtFixedRate(task,0, 5, TimeUnit.SECONDS);
+    }
+    private void stopPeriodicRefresh() {
+        scheduler.shutdown();
+    }
 
     @FXML
     public void refreshButtonOnAction() {
@@ -233,7 +250,7 @@ public class MainWindowController {
         removeLowerButton.textProperty().bind(resourceFactory.getStringBinding("RemoveLowerButton"));
         clearButton.textProperty().bind(resourceFactory.getStringBinding("ClearButton"));
         executeScriptButton.textProperty().bind(resourceFactory.getStringBinding("ExecuteScriptButton"));
-        refreshButton.textProperty().bind(resourceFactory.getStringBinding("RefreshButton"));
+        exitButton.textProperty().bind(resourceFactory.getStringBinding("ExitButton"));
 
         infoButtonToolTip.textProperty().bind(resourceFactory.getStringBinding("InfoButtonToolTip"));
         addButtonToolTip.textProperty().bind(resourceFactory.getStringBinding("AddButtonToolTip"));
@@ -243,7 +260,7 @@ public class MainWindowController {
         removeLowerButtonToolTip.textProperty().bind(resourceFactory.getStringBinding("RemoveLowerButtonToolTip"));
         clearButtonToolTip.textProperty().bind(resourceFactory.getStringBinding("ClearButtonToolTip"));
         executeScriptButtonToolTip.textProperty().bind(resourceFactory.getStringBinding("ExecuteScriptButtonToolTip"));
-        refreshButtonToolTip.textProperty().bind(resourceFactory.getStringBinding("RefreshButtonToolTip"));
+        exitButtonToolTip.textProperty().bind(resourceFactory.getStringBinding("ExitButtonToolTip"));
     }
 
     @FXML
@@ -271,7 +288,9 @@ public class MainWindowController {
 
     @FXML
     private void updateButtonOnAction() {
+        stopPeriodicRefresh();
         if (!organizationTableView.getSelectionModel().isEmpty()) {
+
             int id = organizationTableView.getSelectionModel().getSelectedItem().getId();
             askWindowController.setOrganization(organizationTableView.getSelectionModel().getSelectedItem());
             askStage.showAndWait();
@@ -279,6 +298,7 @@ public class MainWindowController {
             if (organizationRaw != null) requestAction(UPDATE_COMMAND_NAME, id + "", organizationRaw);
         } else UIOutputer.printError("UpdateButtonSelectionException");
         refreshButtonOnAction();
+        startPeriodicRefresh();
     }
 
     @FXML
@@ -321,6 +341,12 @@ public class MainWindowController {
             Platform.exit();
         }
         else refreshButtonOnAction();
+    }
+
+    @FXML
+    private void exitButtonOnAction() {
+        stopPeriodicRefresh();
+        System.exit(1);
     }
 
     private void refreshCanvas() {
@@ -414,10 +440,12 @@ public class MainWindowController {
         ArrayDeque<Organization> organizations = commandHandler.executeCommand(commandName, commandStringArgument, commandObjectArgument);
         if (organizations != null) {
             ObservableList<Organization> organizationObservableList = FXCollections.observableArrayList(organizations);
-            organizationTableView.setItems(organizationObservableList);
-//            TableFilter.forTableView(organizationTableView).apply();
-            organizationTableView.getSelectionModel().clearSelection();
-            refreshCanvas();
+            Platform.runLater(() -> {
+                organizationTableView.setItems(organizationObservableList);
+//                TableFilter.forTableView(organizationTableView).apply();
+                organizationTableView.getSelectionModel().clearSelection();
+                refreshCanvas();
+            });
         }
     }
 
