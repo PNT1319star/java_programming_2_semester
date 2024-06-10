@@ -10,6 +10,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.Shape;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -27,6 +28,10 @@ import java.io.File;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 public class MainWindowController {
     public static final String LOGIN_COMMAND_NAME = "login";
@@ -118,19 +123,19 @@ public class MainWindowController {
     private AskWindowController askWindowController;
     private Map<String, Color> userColorMap;
     private Map<Shape, Integer> shapeMap;
-    private Map<Shape, Tooltip> tooltipMap;
     private Map<String, Locale> localeMap;
     private Shape prevClicked;
     private Color prevColor;
     private Random randomGenerator;
     private ObservableResourceFactory resourceFactory;
     private FileScriptHandler fileScriptHandler;
-    private volatile boolean running = true;
-    private Thread periodicThread;
-
+    private ExecutorService executor = Executors.newCachedThreadPool();
+    private boolean paused = false;
+    private Semaphore pauseSemaphore = new Semaphore(1);
 
     public void initialize() {
         initializeTable();
+        initializeCanvas();
         fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(new File("."));
         userColorMap = new HashMap<>();
@@ -176,7 +181,6 @@ public class MainWindowController {
                 languageComboBox.getSelectionModel().select(localeName);
         }
         String selectedItem = languageComboBox.getSelectionModel().getSelectedItem();
-        System.out.println(selectedItem);
         if (selectedItem == null || selectedItem.isEmpty())
             languageComboBox.getSelectionModel().selectFirst();
         languageComboBox.setOnAction((event) -> resourceFactory.setResources(ResourceBundle.getBundle("bundles.gui", localeMap.get(languageComboBox.getValue()))));
@@ -184,33 +188,49 @@ public class MainWindowController {
     }
 
     public void startPeriodicRefresh() {
-        running = true;
-        periodicThread = new Thread(() -> {
-            while (running) {
+        System.out.println("Start");
+        executor.submit(() -> {
+            while (!Thread.currentThread().isInterrupted()) {
                 try {
-                    Platform.runLater(() -> requestAction(REFRESH_COMMAND_NAME));
-                    Thread.sleep(10000);
-                } catch (InterruptedException exception){
-                    exception.printStackTrace();
+                    if (!paused) {
+                        System.out.println("Run");
+                        requestAction(REFRESH_COMMAND_NAME);
+                        Thread.sleep(10000);
+                    } else {
+                        pauseSemaphore.acquire(); // Wait until resumed
+                        pauseSemaphore.release(); // Release semaphore for next pause/resume
+                    }
+                } catch (InterruptedException exception) {
+                    System.out.println("Thread interrupted!");
+                    break;
                 }
             }
         });
-        periodicThread.start();
     }
-
-
     public void stopPeriodicRefresh() {
-        running = false;
-        if (periodicThread != null) {
-            try {
-                periodicThread.join();
-            } catch (InterruptedException exception) {
-                Thread.currentThread().interrupt();
+        System.out.println("Stop");
+        executor.shutdownNow();
+        try {
+            if (!executor.awaitTermination(500, TimeUnit.MILLISECONDS)) {
+                System.out.println("Force shutdown");
+                executor.shutdownNow();
             }
+        } catch (InterruptedException e) {
+            System.out.println("Shutdown interrupted!");
         }
     }
 
-    @FXML
+    public void pausePeriodicRefresh() {
+        paused = true;
+        System.out.println("pause");
+    }
+
+    public void resumePeriodicRefresh() {
+        paused = false;
+        System.out.println("continue");
+        pauseSemaphore.release(); // Release the semaphore to resume the thread
+    }
+
     public void refreshButtonOnAction() {
         requestAction(REFRESH_COMMAND_NAME);
     }
@@ -270,53 +290,61 @@ public class MainWindowController {
 
     @FXML
     private void infoButtonOnAction() {
+        pausePeriodicRefresh();
         requestAction(INFO_COMMAND_NAME);
+        resumePeriodicRefresh();
     }
 
     @FXML
     private void addButtonOnAction() {
+        pausePeriodicRefresh();
         askWindowController.clearOrganization();
         askStage.showAndWait();
         OrganizationRaw organizationRaw = askWindowController.getAndClear();
         if (organizationRaw != null) requestAction(ADD_COMMAND_NAME, "", organizationRaw);
         refreshButtonOnAction();
+        resumePeriodicRefresh();
     }
 
     @FXML
     private void addIfMaxButtonOnAction() {
+        pausePeriodicRefresh();
         askWindowController.clearOrganization();
         askStage.showAndWait();
         OrganizationRaw organizationRaw = askWindowController.getAndClear();
         if (organizationRaw != null) requestAction(ADD_IF_MAX_COMMAND_NAME, "", organizationRaw);
         refreshButtonOnAction();
+        resumePeriodicRefresh();
     }
 
     @FXML
     private void updateButtonOnAction() {
-        stopPeriodicRefresh();
         if (!organizationTableView.getSelectionModel().isEmpty()) {
-
+            pausePeriodicRefresh();
             int id = organizationTableView.getSelectionModel().getSelectedItem().getId();
             askWindowController.setOrganization(organizationTableView.getSelectionModel().getSelectedItem());
             askStage.showAndWait();
             OrganizationRaw organizationRaw = askWindowController.getAndClear();
             if (organizationRaw != null) requestAction(UPDATE_COMMAND_NAME, id + "", organizationRaw);
             refreshButtonOnAction();
+            resumePeriodicRefresh();
         } else UIOutputer.printError("UpdateButtonSelectionException");
-        startPeriodicRefresh();
     }
 
     @FXML
     private void removeButtonOnAction() {
         if (!organizationTableView.getSelectionModel().isEmpty()) {
+            pausePeriodicRefresh();
             requestAction(REMOVE_BY_ID_COMMAND_NAME, organizationTableView.getSelectionModel().getSelectedItem().getId().toString(), null);
+            refreshButtonOnAction();
+            resumePeriodicRefresh();
         } else UIOutputer.printError("RemoveByIdButtonException");
-        refreshButtonOnAction();
     }
 
     @FXML
     private void removeLowerButtonOnAction() {
         if (!organizationTableView.getSelectionModel().isEmpty()) {
+            pausePeriodicRefresh();
             Organization organizationFromTable = organizationTableView.getSelectionModel().getSelectedItem();
             OrganizationRaw newOrganization = new OrganizationRaw(
                     organizationFromTable.getName(),
@@ -328,23 +356,28 @@ public class MainWindowController {
                     organizationFromTable.getPostalAddress()
             );
             requestAction(REMOVE_LOWER_COMMAND_NAME, "", newOrganization);
+            refreshButtonOnAction();
+            resumePeriodicRefresh();
         } else UIOutputer.printError("RemoveLowerException");
-        refreshButtonOnAction();
     }
 
     @FXML
     private void clearButtonOnAction() {
+        pausePeriodicRefresh();
         requestAction(CLEAR_COMMAND_NAME);
         refreshButtonOnAction();
+        resumePeriodicRefresh();
     }
 
     @FXML
     private void executeScriptButtonOnAction() {
+        pausePeriodicRefresh();
         File file = fileChooser.showOpenDialog(primaryStage);
         if (file == null) return;
         if (!fileScriptHandler.execute(file)) {
             Platform.exit();
         } else refreshButtonOnAction();
+        resumePeriodicRefresh();
     }
 
     @FXML
@@ -356,7 +389,7 @@ public class MainWindowController {
     private void refreshCanvas() {
         shapeMap.keySet().forEach(s -> canvasPane.getChildren().remove(s));
         shapeMap.clear();
-        tooltipMap = new HashMap<>();
+        Map<Shape, Tooltip> tooltipMap = new HashMap<>();
         for (Organization organization : organizationTableView.getItems()) {
             if (!userColorMap.containsKey(organization.getUsername()))
                 userColorMap.put(organization.getUsername(), Color.color(randomGenerator.nextDouble(), randomGenerator.nextDouble(), randomGenerator.nextDouble()));
@@ -377,13 +410,11 @@ public class MainWindowController {
             shapeMap.put(object, organization.getId());
 
             ScaleTransition objectAnimation = new ScaleTransition(ANIMATION_DURATION, object);
-
             objectAnimation.setFromX(0);
             objectAnimation.setToX(1);
             objectAnimation.setFromY(0);
             objectAnimation.setToY(1);
             objectAnimation.play();
-
         }
     }
 
@@ -402,6 +433,7 @@ public class MainWindowController {
         prevClicked = shape;
         prevColor = (Color) shape.getFill();
         shape.setFill(prevColor.brighter());
+        pausePeriodicRefresh();
     }
 
     private void requestAction(String commandName, String commandStringArgument, Serializable commandObjectArgument) {
@@ -421,5 +453,48 @@ public class MainWindowController {
         requestAction(commandName, "", null);
     }
 
+    public void initializeCanvas() {
+        drawGridAndAxes();
+        canvasPane.widthProperty().addListener((obs, oldVal, newVal) -> {
+            drawGridAndAxes();
+            refreshCanvas();
+        });
+        canvasPane.heightProperty().addListener((obs, oldVal, newVal) -> {
+            drawGridAndAxes();
+            refreshCanvas();
+        });
+
+    }
+
+    private void drawGridAndAxes() {
+        canvasPane.getChildren().clear();
+        double width = canvasPane.getWidth();
+        double height = canvasPane.getHeight();
+
+        for (int i = 10; i < width; i += 10) {
+            Line verticalLine = new Line(i, 0, i, height);
+            verticalLine.setStroke(Color.LIGHTGRAY);
+            verticalLine.setStrokeWidth(0.5);
+            canvasPane.getChildren().add(verticalLine);
+        }
+
+        for (int i = 10; i < height; i += 10) {
+            Line horizontalLine = new Line(0, i, width, i);
+            horizontalLine.setStroke(Color.LIGHTGRAY);
+            horizontalLine.setStrokeWidth(0.5);
+            canvasPane.getChildren().add(horizontalLine);
+        }
+
+        Line yAxis = new Line(width / 2, 0, width / 2, height);
+        yAxis.setStroke(Color.RED);
+        yAxis.setStrokeWidth(2);
+
+        Line xAxis = new Line(0, height / 2, width, height / 2);
+        xAxis.setStroke(Color.RED);
+        xAxis.setStrokeWidth(2);
+
+        canvasPane.getChildren().addAll(yAxis, xAxis);
+
+    }
 
 }
