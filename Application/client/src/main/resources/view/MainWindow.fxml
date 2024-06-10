@@ -7,6 +7,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Text?>
+<?import javafx.scene.canvas.Canvas?>
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="org.csjchoisoojong.controllers.MainWindowController"
@@ -39,15 +40,16 @@
                 </AnchorPane>
             </Tab>
             <Tab fx:id="canvasTab" text="CanvasTab">
-                <AnchorPane fx:id="canvasPane" prefHeight="1800.0" prefWidth="2000.0"
+                <AnchorPane fx:id="canvasPane" prefHeight="700.0" prefWidth="1600.0"
                             style="-fx-background-color: white,
-                linear-gradient(from 0.5px 0.0px to 10.5px 0.0px, repeat, blue 5%, transparent 5%),
-                linear-gradient(from 0.0px 0.5px to 0.0px 10.5px, repeat, blue 5%, transparent 5%);">
+                linear-gradient(from 0.5px 0.0px to 10.5px 0.0px, repeat, gray 5%, transparent 5%),
+                linear-gradient(from 0.0px 0.5px to 0.0px 10.5px, repeat, gray 5%, transparent 5%);">
                     <cursor>
                         <Cursor fx:constant="CROSSHAIR"/>
                     </cursor>
                 </AnchorPane>
             </Tab>
+
 
 
         </TabPane>

@@ -10,9 +10,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.*;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
+import javafx.scene.shape.Shape;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -22,15 +20,13 @@ import org.csjchoisoojong.data.OrganizationType;
 import org.csjchoisoojong.interaction.OrganizationRaw;
 import org.csjchoisoojong.processing.CommandHandler;
 import org.csjchoisoojong.script.FileScriptHandler;
+import org.csjchoisoojong.utilities.IconGenerator;
 import org.csjchoisoojong.utilities.UIOutputer;
 
 import java.io.File;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 public class MainWindowController {
     public static final String LOGIN_COMMAND_NAME = "login";
@@ -43,11 +39,7 @@ public class MainWindowController {
     public static final String REMOVE_BY_ID_COMMAND_NAME = "remove_by_id";
     public static final String REMOVE_LOWER_COMMAND_NAME = "remove_lower";
     public static final String CLEAR_COMMAND_NAME = "clear";
-    public static final String EXIT_COMMAND_NAME = "exit";
-
-    private final long RANDOM_SEED = 1821L;
     private final Duration ANIMATION_DURATION = Duration.millis(800);
-    private final double MAX_SIZE = 2500;
     @FXML
     private TableView<Organization> organizationTableView;
     @FXML
@@ -126,7 +118,6 @@ public class MainWindowController {
     private AskWindowController askWindowController;
     private Map<String, Color> userColorMap;
     private Map<Shape, Integer> shapeMap;
-    private Map<Integer, Text> textMap;
     private Map<Shape, Tooltip> tooltipMap;
     private Map<String, Locale> localeMap;
     private Shape prevClicked;
@@ -134,8 +125,8 @@ public class MainWindowController {
     private Random randomGenerator;
     private ObservableResourceFactory resourceFactory;
     private FileScriptHandler fileScriptHandler;
-    private int cnt = -1;
-    private final ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
+    private volatile boolean running = true;
+    private Thread periodicThread;
 
 
     public void initialize() {
@@ -144,7 +135,7 @@ public class MainWindowController {
         fileChooser.setInitialDirectory(new File("."));
         userColorMap = new HashMap<>();
         shapeMap = new HashMap<>();
-        textMap = new HashMap<>();
+        long RANDOM_SEED = 1821L;
         randomGenerator = new Random(RANDOM_SEED);
         localeMap = new HashMap<>();
         localeMap.put("English", new Locale("en", "CA"));
@@ -191,18 +182,32 @@ public class MainWindowController {
         languageComboBox.setOnAction((event) -> resourceFactory.setResources(ResourceBundle.getBundle("bundles.gui", localeMap.get(languageComboBox.getValue()))));
         bindLanguage();
     }
+
     public void startPeriodicRefresh() {
-        Runnable task = () -> {
-            try {
-                Platform.runLater(() -> requestAction(REFRESH_COMMAND_NAME));
-            } catch (Exception e) {
-                e.printStackTrace();
+        running = true;
+        periodicThread = new Thread(() -> {
+            while (running) {
+                try {
+                    Platform.runLater(() -> requestAction(REFRESH_COMMAND_NAME));
+                    Thread.sleep(10000);
+                } catch (InterruptedException exception){
+                    exception.printStackTrace();
+                }
             }
-        };
-        scheduler.scheduleAtFixedRate(task,0, 5, TimeUnit.SECONDS);
+        });
+        periodicThread.start();
     }
-    private void stopPeriodicRefresh() {
-        scheduler.shutdown();
+
+
+    public void stopPeriodicRefresh() {
+        running = false;
+        if (periodicThread != null) {
+            try {
+                periodicThread.join();
+            } catch (InterruptedException exception) {
+                Thread.currentThread().interrupt();
+            }
+        }
     }
 
     @FXML
@@ -296,8 +301,8 @@ public class MainWindowController {
             askStage.showAndWait();
             OrganizationRaw organizationRaw = askWindowController.getAndClear();
             if (organizationRaw != null) requestAction(UPDATE_COMMAND_NAME, id + "", organizationRaw);
+            refreshButtonOnAction();
         } else UIOutputer.printError("UpdateButtonSelectionException");
-        refreshButtonOnAction();
         startPeriodicRefresh();
     }
 
@@ -339,8 +344,7 @@ public class MainWindowController {
         if (file == null) return;
         if (!fileScriptHandler.execute(file)) {
             Platform.exit();
-        }
-        else refreshButtonOnAction();
+        } else refreshButtonOnAction();
     }
 
     @FXML
@@ -350,76 +354,40 @@ public class MainWindowController {
     }
 
     private void refreshCanvas() {
-        cnt = cnt +1;
-        if (cnt <= 1) {
-            drawAxes();
-        }
         shapeMap.keySet().forEach(s -> canvasPane.getChildren().remove(s));
         shapeMap.clear();
-        textMap.values().forEach(s -> canvasPane.getChildren().remove(s));
-        textMap.clear();
         tooltipMap = new HashMap<>();
         for (Organization organization : organizationTableView.getItems()) {
             if (!userColorMap.containsKey(organization.getUsername()))
                 userColorMap.put(organization.getUsername(), Color.color(randomGenerator.nextDouble(), randomGenerator.nextDouble(), randomGenerator.nextDouble()));
-            double size = Math.min(organization.getAnnualTurnover()/2, MAX_SIZE);
-            Shape object = null;
-            switch (organization.getType()) {
-                case PUBLIC :
-                    object = new Circle(size, userColorMap.get(organization.getUsername()));
-                    break;
-                case GOVERNMENT:
-                    object = new Rectangle(size, size, userColorMap.get(organization.getUsername()));
-                    break;
-                case TRUST:
-                    object = new Rectangle(size, size/2, userColorMap.get(organization.getUsername()));
-                    break;
-                case OPEN_JOINT_STOCK_COMPANY:
-                    object = new Rectangle(size/2, size, userColorMap.get(organization.getUsername()));
-                    break;
-                case PRIVATE_LIMITED_COMPANY:
-                    object = new Ellipse(size, size/2);
-                    object.setFill(userColorMap.get(organization.getUsername()));
-                    break;
-            }
+            double MAX_SIZE = 2500;
+            double size = Math.min(organization.getAnnualTurnover(), MAX_SIZE);
+            Shape object = IconGenerator.convertImageToShape(organization.getType(), userColorMap.get(organization.getUsername()), size);
+            object.setFill(userColorMap.get(organization.getUsername()));
             object.setOnMouseClicked(this::shapeOnMouseClicked);
             object.translateXProperty().bind(canvasPane.widthProperty().divide(2).add(organization.getCoordinates().getX()));
             object.translateYProperty().bind(canvasPane.heightProperty().divide(2).subtract(organization.getCoordinates().getY()));
 
             Tooltip tooltip = new Tooltip(organization.toString());
-            Tooltip.install(object,tooltip);
+            Tooltip.install(object, tooltip);
             tooltipMap.put(object, tooltip);
 
-            Text textObject = new Text(organization.getId().toString());
-            textObject.setOnMouseClicked(object::fireEvent);
-            textObject.setFont(Font.font(size / 3));
-            textObject.setFill(userColorMap.get(organization.getUsername()).darker());
-            textObject.translateXProperty().bind(object.translateXProperty().subtract(textObject.getLayoutBounds().getWidth()/4));
-            textObject.translateYProperty().bind(object.translateYProperty().add(textObject.getLayoutBounds().getHeight()));
 
             canvasPane.getChildren().add(object);
-            canvasPane.getChildren().add(textObject);
             shapeMap.put(object, organization.getId());
-            textMap.put(organization.getId(), textObject);
 
             ScaleTransition objectAnimation = new ScaleTransition(ANIMATION_DURATION, object);
-            ScaleTransition textAnimation = new ScaleTransition(ANIMATION_DURATION, textObject);
 
             objectAnimation.setFromX(0);
             objectAnimation.setToX(1);
             objectAnimation.setFromY(0);
             objectAnimation.setToY(1);
-            textAnimation.setFromX(0);
-            textAnimation.setToX(1);
-            textAnimation.setFromY(0);
-            textAnimation.setToY(1);
             objectAnimation.play();
-            textAnimation.play();
 
         }
     }
 
-    private void  shapeOnMouseClicked(MouseEvent event) {
+    private void shapeOnMouseClicked(MouseEvent event) {
         Shape shape = (Shape) event.getSource();
         int id = shapeMap.get(shape);
         for (Organization organization : organizationTableView.getItems()) {
@@ -452,60 +420,6 @@ public class MainWindowController {
     private void requestAction(String commandName) {
         requestAction(commandName, "", null);
     }
-    private void drawAxes() {
-        double canvasWidth = canvasPane.getWidth();
-        double canvasHeight = canvasPane.getHeight();
-        double maxAxisValue = 100; // Giới hạn lớn nhất cho trục tọa độ
-
-        // Vẽ trục X
-        Line xAxis = new Line();
-        xAxis.setStartX(0);
-        xAxis.setEndX(canvasWidth);
-        xAxis.setStartY(canvasHeight / 2);
-        xAxis.setEndY(canvasHeight / 2);
-        xAxis.setStroke(Color.RED);
-        xAxis.setStrokeWidth(2);
-
-        // Vẽ các đường vạch trên trục X
-        for (double x = -maxAxisValue; x <= maxAxisValue; x += 5) {
-            Line tick = new Line();
-            double tickX = (x / (2 * maxAxisValue)) * canvasWidth + (canvasWidth / 2);
-            tick.setStartX(tickX);
-            tick.setEndX(tickX);
-            tick.setStartY(canvasHeight / 2 - 5); // Độ dài vạch là 5 pixel
-            tick.setEndY(canvasHeight / 2 + 5);
-            tick.setStroke(Color.RED);
-            tick.setStrokeWidth(1);
-            canvasPane.getChildren().add(tick);
-        }
-
-        // Vẽ trục Y
-        Line yAxis = new Line();
-        yAxis.setStartX(canvasWidth / 2);
-        yAxis.setEndX(canvasWidth / 2);
-        yAxis.setStartY(0);
-        yAxis.setEndY(canvasHeight);
-        yAxis.setStroke(Color.RED);
-        yAxis.setStrokeWidth(2);
-
-        // Vẽ các đường vạch trên trục Y
-        for (double y = -maxAxisValue; y <= maxAxisValue; y += 5) {
-            Line tick = new Line();
-            double tickY = canvasHeight - ((y / (2 * maxAxisValue)) * canvasHeight + (canvasHeight / 2));
-            tick.setStartX(canvasWidth / 2 - 5); // Độ dài vạch là 5 pixel
-            tick.setEndX(canvasWidth / 2 + 5);
-            tick.setStartY(tickY);
-            tick.setEndY(tickY);
-            tick.setStroke(Color.RED);
-            tick.setStrokeWidth(1);
-            canvasPane.getChildren().add(tick);
-        }
-
-        // Thêm trục tọa độ vào canvas
-        canvasPane.getChildren().addAll(xAxis, yAxis);
-    }
-
-
 
 
 }
