@@ -28,10 +28,6 @@ import java.io.File;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
 
 public class MainWindowController {
     public static final String LOGIN_COMMAND_NAME = "login";
@@ -123,15 +119,15 @@ public class MainWindowController {
     private AskWindowController askWindowController;
     private Map<String, Color> userColorMap;
     private Map<Shape, Integer> shapeMap;
+    private Map<OrganizationType, Shape> iconMap;
     private Map<String, Locale> localeMap;
     private Shape prevClicked;
     private Color prevColor;
     private Random randomGenerator;
     private ObservableResourceFactory resourceFactory;
     private FileScriptHandler fileScriptHandler;
-    private ExecutorService executor = Executors.newCachedThreadPool();
-    private boolean paused = false;
-    private Semaphore pauseSemaphore = new Semaphore(1);
+    private Thread periodicThread;
+    private volatile boolean isPaused = false;
 
     public void initialize() {
         initializeTable();
@@ -188,47 +184,38 @@ public class MainWindowController {
     }
 
     public void startPeriodicRefresh() {
-        System.out.println("Start");
-        executor.submit(() -> {
-            while (!Thread.currentThread().isInterrupted()) {
+        periodicThread = new Thread(() -> {
+            while (true) {
                 try {
-                    if (!paused) {
-                        System.out.println("Run");
-                        requestAction(REFRESH_COMMAND_NAME);
-                        Thread.sleep(10000);
-                    } else {
-                        pauseSemaphore.acquire(); // Wait until resumed
-                        pauseSemaphore.release(); // Release semaphore for next pause/resume
+                    if (!isPaused) {
+                        Platform.runLater(() -> requestAction(REFRESH_COMMAND_NAME));
                     }
+                    Thread.sleep(5000);
                 } catch (InterruptedException exception) {
-                    System.out.println("Thread interrupted!");
-                    break;
+                    exception.printStackTrace();
                 }
             }
         });
+        periodicThread.start();
     }
+
+
     public void stopPeriodicRefresh() {
-        System.out.println("Stop");
-        executor.shutdownNow();
-        try {
-            if (!executor.awaitTermination(500, TimeUnit.MILLISECONDS)) {
-                System.out.println("Force shutdown");
-                executor.shutdownNow();
+        if (periodicThread != null) {
+            try {
+                periodicThread.join();
+            } catch (InterruptedException exception) {
+                Thread.currentThread().interrupt();
             }
-        } catch (InterruptedException e) {
-            System.out.println("Shutdown interrupted!");
         }
     }
 
-    public void pausePeriodicRefresh() {
-        paused = true;
-        System.out.println("pause");
+    private void pausePeriodicRefresh() {
+        isPaused = true;
     }
 
-    public void resumePeriodicRefresh() {
-        paused = false;
-        System.out.println("continue");
-        pauseSemaphore.release(); // Release the semaphore to resume the thread
+    private void resumePeriodicRefresh() {
+        isPaused = false;
     }
 
     public void refreshButtonOnAction() {
@@ -494,7 +481,5 @@ public class MainWindowController {
         xAxis.setStrokeWidth(2);
 
         canvasPane.getChildren().addAll(yAxis, xAxis);
-
     }
-
 }
