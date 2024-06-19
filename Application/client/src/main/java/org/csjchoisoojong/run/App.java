@@ -15,6 +15,7 @@ import org.csjchoisoojong.processing.CommandHandler;
 import org.csjchoisoojong.processing.UserAuthHandler;
 import org.csjchoisoojong.script.FileScriptHandler;
 import org.csjchoisoojong.utilities.UIOutputer;
+import org.csjchoisoojong.utility.ConsolePrinter;
 
 import java.util.ResourceBundle;
 import java.util.Scanner;
@@ -39,22 +40,7 @@ public class App extends Application {
     public void start(Stage stage) {
         try {
             this.primaryStage = stage;
-
-            FXMLLoader loginWindowLoader = new FXMLLoader();
-            loginWindowLoader.setLocation(getClass().getResource("/view/LoginWindow.fxml"));
-            Parent loginWindowRootNode = loginWindowLoader.load();
-            Scene loginWindowScene = new Scene(loginWindowRootNode);
-            loginWindowController = loginWindowLoader.getController();
-            loginWindowController.setApp(this);
-            loginWindowController.setCommunicator(communicator);
-            loginWindowController.setUserAuthHandler(userAuthHandler);
-            loginWindowController.initialize();
-            loginWindowController.initializeLanguage(resourceFactory);
-
-            primaryStage.setTitle(APP_TITLE);
-            primaryStage.setScene(loginWindowScene);
-            primaryStage.setResizable(false);
-            primaryStage.show();
+            setLoginWindow();
         } catch (Exception exception) {
             System.err.println(exception);
             exception.printStackTrace();
@@ -110,6 +96,7 @@ public class App extends Application {
             askWindowController.setAskStage(askStage);
             askWindowController.initializeLanguage(resourceFactory);
 
+            mainWindowController.setApp(this);
             mainWindowController.setUsername(loginWindowController.getUsername());
             mainWindowController.setCommandHandler(commandHandler);
             mainWindowController.setFileScriptHandler(fileScriptHandler);
@@ -126,6 +113,26 @@ public class App extends Application {
             System.err.println(exception);
             exception.printStackTrace();
         }
+    }
+    public void setLoginWindow() {
+        try {
+            FXMLLoader loginWindowLoader = new FXMLLoader();
+            loginWindowLoader.setLocation(getClass().getResource("/view/LoginWindow.fxml"));
+            Parent loginWindowRootNode = loginWindowLoader.load();
+            Scene loginWindowScene = new Scene(loginWindowRootNode);
+            loginWindowController = loginWindowLoader.getController();
+            loginWindowController.setApp(this);
+            loginWindowController.setCommunicator(communicator);
+            loginWindowController.setUserAuthHandler(userAuthHandler);
+            loginWindowController.initialize();
+            loginWindowController.initializeLanguage(resourceFactory);
 
+            primaryStage.setTitle(APP_TITLE);
+            primaryStage.setScene(loginWindowScene);
+            primaryStage.setResizable(false);
+            primaryStage.show();
+        } catch (Exception exception) {
+            ConsolePrinter.printError(exception);
+        }
     }
 }

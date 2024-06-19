@@ -7,6 +7,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
@@ -15,11 +16,13 @@ import javafx.scene.shape.Shape;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import org.controlsfx.control.table.TableFilter;
 import org.csjchoisoojong.controllers.tools.ObservableResourceFactory;
 import org.csjchoisoojong.data.Organization;
 import org.csjchoisoojong.data.OrganizationType;
 import org.csjchoisoojong.interaction.OrganizationRaw;
 import org.csjchoisoojong.processing.CommandHandler;
+import org.csjchoisoojong.run.App;
 import org.csjchoisoojong.script.FileScriptHandler;
 import org.csjchoisoojong.utilities.IconGenerator;
 import org.csjchoisoojong.utilities.UIOutputer;
@@ -119,7 +122,6 @@ public class MainWindowController {
     private AskWindowController askWindowController;
     private Map<String, Color> userColorMap;
     private Map<Shape, Integer> shapeMap;
-    private Map<OrganizationType, Shape> iconMap;
     private Map<String, Locale> localeMap;
     private Shape prevClicked;
     private Color prevColor;
@@ -128,6 +130,8 @@ public class MainWindowController {
     private FileScriptHandler fileScriptHandler;
     private Thread periodicThread;
     private volatile boolean isPaused = false;
+    private ArrayDeque<Organization> existedOrganizationCollection = new ArrayDeque<>();
+    private App app;
 
     public void initialize() {
         initializeTable();
@@ -144,10 +148,19 @@ public class MainWindowController {
         localeMap.put("Slovenčina", new Locale("sk", "SK"));
         localeMap.put("Latviešu", new Locale("lv", "LV"));
         languageComboBox.setItems(FXCollections.observableArrayList(localeMap.keySet()));
+        organizationTableView.setOnMouseClicked(mouseEvent -> {
+            if (mouseEvent.getButton() == MouseButton.SECONDARY) {
+                pauseAndResumePeriodicRefresh();
+            }
+        });
     }
 
     public void setCommandHandler(CommandHandler commandHandler) {
         this.commandHandler = commandHandler;
+    }
+
+    public void setApp(App app) {
+        this.app = app;
     }
 
     public void setUsername(String username) {
@@ -190,7 +203,7 @@ public class MainWindowController {
                     if (!isPaused) {
                         Platform.runLater(() -> requestAction(REFRESH_COMMAND_NAME));
                     }
-                    Thread.sleep(5000);
+                    Thread.sleep(10000);
                 } catch (InterruptedException exception) {
                     exception.printStackTrace();
                 }
@@ -201,17 +214,31 @@ public class MainWindowController {
 
 
     public void stopPeriodicRefresh() {
-        if (periodicThread != null) {
+        isPaused = true;
+        if (periodicThread != null && periodicThread.isAlive()) {
             try {
-                periodicThread.join();
+                periodicThread.join(1000); // Đợi một thời gian ngắn để luồng kết thúc
             } catch (InterruptedException exception) {
                 Thread.currentThread().interrupt();
             }
         }
     }
 
+
     private void pausePeriodicRefresh() {
         isPaused = true;
+    }
+    private void pauseAndResumePeriodicRefresh() {
+        pausePeriodicRefresh(); // Dừng periodicThread khi có sự kiện chuột
+
+        // Sử dụng Timer để resume sau 30 giây
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Platform.runLater(() -> resumePeriodicRefresh());
+            }
+        }, 30000); // 30 giây
     }
 
     private void resumePeriodicRefresh() {
@@ -235,6 +262,7 @@ public class MainWindowController {
         addressColumn.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getPostalAddress().getStreet()));
         ownerColumn.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getUsername()));
     }
+
 
     private void bindLanguage() {
         resourceFactory.setResources(ResourceBundle.getBundle("bundles.gui", localeMap.get(languageComboBox.getSelectionModel().getSelectedItem())));
@@ -370,8 +398,15 @@ public class MainWindowController {
     @FXML
     private void exitButtonOnAction() {
         stopPeriodicRefresh();
-        System.exit(1);
+        Platform.runLater(() -> {
+            try {
+                app.setLoginWindow();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
+
 
     private void refreshCanvas() {
         shapeMap.keySet().forEach(s -> canvasPane.getChildren().remove(s));
@@ -391,18 +426,11 @@ public class MainWindowController {
             Tooltip tooltip = new Tooltip(organization.toString());
             Tooltip.install(object, tooltip);
             tooltipMap.put(object, tooltip);
-
-
             canvasPane.getChildren().add(object);
             shapeMap.put(object, organization.getId());
 
-            ScaleTransition objectAnimation = new ScaleTransition(ANIMATION_DURATION, object);
-            objectAnimation.setFromX(0);
-            objectAnimation.setToX(1);
-            objectAnimation.setFromY(0);
-            objectAnimation.setToY(1);
-            objectAnimation.play();
         }
+
     }
 
     private void shapeOnMouseClicked(MouseEvent event) {
@@ -429,7 +457,7 @@ public class MainWindowController {
             ObservableList<Organization> organizationObservableList = FXCollections.observableArrayList(organizations);
             Platform.runLater(() -> {
                 organizationTableView.setItems(organizationObservableList);
-//                TableFilter.forTableView(organizationTableView).apply();
+                TableFilter.forTableView(organizationTableView).apply();
                 organizationTableView.getSelectionModel().clearSelection();
                 refreshCanvas();
             });

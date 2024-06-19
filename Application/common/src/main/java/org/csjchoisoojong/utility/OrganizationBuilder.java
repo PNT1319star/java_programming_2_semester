@@ -20,40 +20,6 @@ public class OrganizationBuilder {
     }
 
     /**
-     * Sets the Scanner object used to read user input.
-     *
-     * @param scanner the Scanner object to set.
-     */
-    public void setUserScanner(Scanner scanner) {
-        this.userScanner = scanner;
-    }
-
-    /**
-     * Gets the Scanner object used to read user input.
-     *
-     * @return the Scanner object.
-     */
-    public Scanner getUserScanner() {
-        return userScanner;
-    }
-
-    /**
-     * Sets the file mode.
-     * This mode is used when reading input from a file.
-     */
-    public void setFileMode() {
-        this.fileMode = true;
-    }
-
-    /**
-     * Sets the user mode.
-     * This mode is used when reading input from the user.
-     */
-    public void setUserMode() {
-        this.fileMode = false;
-    }
-
-    /**
      * Asks the user for the organization's name.
      *
      * @return the organization's name.

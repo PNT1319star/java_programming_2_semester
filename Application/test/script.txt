@@ -1,1 +1,10 @@
-remove_by_id 57
+add
+bauman
+150
+100
+bauman
+russia
+3000
+40
+PUBLIC
+remove_by_id 88
